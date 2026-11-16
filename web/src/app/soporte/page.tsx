@@ -1,74 +1,57 @@
-// Soporte: la URL de contacto que piden App Store Connect y Play Console.
+// Soporte y contacto: la piden App Store y Google Play (URL de soporte en la ficha de cada tienda).
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Soporte · Arreglemos la Calle",
-  description: "Contacto y preguntas frecuentes de Arreglemos la Calle.",
+  description: "Ayuda y contacto de la app Arreglemos la Calle.",
 };
 
-const EMAIL = "hola@arreglemoslacalle.app";
-
-const FAQ: [string, ReactNode][] = [
-  [
-    "¿Cómo hago un reporte?",
-    "Abrí la app, tocá \"Sacar foto\" (o elegí una de la galería), ubicá el pin en el mapa y elegí la categoría. No hace falta crear una cuenta.",
-  ],
-  [
-    "¿La app le manda el reporte a la Municipalidad?",
-    "No sola. Con \"Enviar a la Muni por WhatsApp\" se abre WhatsApp con el mensaje listo y lo mandás vos. Arreglemos la Calle es una iniciativa vecinal independiente: no es un canal oficial del municipio.",
-  ],
-  [
-    "Es una emergencia, ¿qué hago?",
-    "No uses la app: llamá al 911 o al 103 (Defensa Civil).",
-  ],
-  [
-    "¿Quién ve mis reportes?",
-    <>
-      Cualquiera: la foto, la ubicación y la descripción son públicas, pero nunca se muestra quién hizo el reporte. Más
-      detalles en la <a href="/privacidad">política de privacidad</a>.
-    </>,
-  ],
-  [
-    "Ya lo arreglaron, ¿cómo lo marco?",
-    "En el reporte, tocá \"Ya está arreglado\" y, si querés, sumá una foto de cómo quedó. Si otro vecino ve que sigue roto, puede decirlo con \"Sigue roto\".",
-  ],
-  [
-    "Cambié de teléfono, ¿pierdo mis reportes?",
-    "Si vinculaste tu cuenta con Apple o Google desde Mis reportes, no: entrá con la misma cuenta en el teléfono nuevo. Si no la vinculaste, el teléfono nuevo empieza de cero.",
-  ],
-  [
-    "¿Cómo borro mi cuenta o un reporte?",
-    <>
-      Con la cuenta vinculada, en Mis reportes está &ldquo;Borrar mi cuenta&rdquo;, que borra tus reportes y sus fotos.
-      Si no la vinculaste, o para borrar un reporte puntual, escribinos a <a href={`mailto:${EMAIL}`}>{EMAIL}</a> con el
-      link del reporte.
-    </>,
-  ],
-  [
-    "Un reporte tiene algo inapropiado o datos de una persona",
-    "En el reporte, tocá \"Denunciar este reporte\". Si es urgente, escribinos con el link y lo revisamos.",
-  ],
-];
-
-export default function SupportPage() {
+export default function Soporte() {
+  const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
   return (
     <main className="doc">
-      <div>
-        <div className="eyebrow">Soporte</div>
-        <h1>¿Necesitás ayuda?</h1>
-      </div>
-      <p>
-        Escribinos a <a href={`mailto:${EMAIL}`}>{EMAIL}</a> por cualquier consulta, problema con la app o pedido sobre tus
-        datos. Si es sobre un reporte, mandanos el link o el número.
-      </p>
+      <h1>Soporte</h1>
+      <p>¿Algo no anda, tenés una idea o querés que borremos un reporte? Escribinos a {mail}.</p>
+      <p className="muted">Si es sobre un reporte, mandanos su número (aparece como «Reporte 128» debajo de la dirección, o en el link /r/128).</p>
+
       <h2>Preguntas frecuentes</h2>
-      {FAQ.map(([q, a]) => (
-        <section key={q}>
-          <h3>{q}</h3>
-          <p>{a}</p>
-        </section>
-      ))}
+      <dl>
+        <dt>¿La app es del municipio?</dt>
+        <dd>
+          No. Es una app vecinal independiente. Sirve para juntar los reportes y mandárselos a la Muni, pero arreglar
+          la calle le toca al municipio.
+        </dd>
+
+        <dt>¿Cómo borro un reporte que hice?</dt>
+        <dd>
+          Si vinculaste tu cuenta, en Mis reportes está «Borrar mi cuenta», que borra todos tus reportes. Para uno
+          solo, o si no vinculaste, escribinos a {mail} con el número del reporte y lo sacamos.
+        </dd>
+        <dt>Cambié de teléfono, ¿pierdo mis reportes?</dt>
+        <dd>
+          No, si antes los vinculaste: en Mis reportes tocá «Continuar con Apple» o «Continuar con Google». En el
+          teléfono nuevo, tocá lo mismo con la misma cuenta y aparecen tus reportes. Sin vincular, quedan en el teléfono
+          viejo.
+        </dd>
+
+        <dt>Vi un reporte falso u ofensivo</dt>
+        <dd>Abrilo en la app y tocá «Denunciar». Con varias denuncias se oculta del mapa; también podés escribirnos.</dd>
+
+        <dt>No me llegan los avisos</dt>
+        <dd>
+          Fijate en los ajustes del teléfono que las notificaciones de Arreglemos la Calle estén permitidas. Los avisos
+          llegan cuando un reporte tuyo o al que te sumaste se arregla o vuelve a estar roto.
+        </dd>
+
+        <dt>La app no encuentra dónde estoy</dt>
+        <dd>Revisá que tenga permiso de ubicación, o mové el mapa a mano hasta el lugar del problema.</dd>
+
+        <dt>¿Qué datos guardan?</dt>
+        <dd>
+          Lo contamos en la <a href="/privacidad">política de privacidad</a>. No pedimos nombre, email ni teléfono (el email solo si vinculás Apple o Google).
+        </dd>
+      </dl>
     </main>
   );
 }

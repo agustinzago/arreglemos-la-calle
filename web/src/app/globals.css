@@ -91,6 +91,15 @@ h1 { margin: 6px 0 4px; font-weight: 700; font-size: 1.875rem; line-height: 1.1;
 .note { padding-top: 14px; border-top: 1px solid hsl(var(--border)); font-size: 1rem; color: hsl(var(--muted-foreground)); text-wrap: pretty; }
 .gone { max-width: 560px; margin: 0 auto; padding: 40px 20px; }
 
+/* Páginas de texto (/privacidad, /soporte) y pie */
+.doc { max-width: 68ch; margin: 0 auto; padding: 26px 20px 32px; text-wrap: pretty; }
+.doc h2 { margin: 28px 0 8px; font-weight: 700; font-size: 1.375rem; line-height: 1.2; }
+.doc dt { margin-top: 14px; font-weight: 700; }
+.doc dd { margin: 2px 0 0; }
+.doc li + li { margin-top: 6px; }
+.draft { padding: 10px 14px; border-radius: 12px; background: hsl(var(--warning-soft)); color: hsl(var(--warning-ink)); font-weight: 600; }
+.foot { display: flex; justify-content: center; gap: 20px; padding: 20px; font-size: 1rem; }
+
 /* Ranking semanal (/ranking/[municipio]) */
 .ranking { max-width: 960px; margin: 0 auto; padding: 26px 20px 32px; display: flex; flex-direction: column; gap: 24px; }
 .ranking .muted { font-size: 1rem; }
@@ -115,16 +124,6 @@ h1 { margin: 6px 0 4px; font-weight: 700; font-size: 1.875rem; line-height: 1.1;
 .big b { font-weight: 800; font-size: 1.75rem; line-height: 1; }
 .ranking .note { max-width: 68ch; }
 
-/* Páginas de texto (/privacidad, /soporte) */
-.doc { max-width: 68ch; margin: 0 auto; padding: 26px 20px 40px; display: flex; flex-direction: column; gap: 12px; text-wrap: pretty; }
-.doc h2 { margin: 18px 0 0; font-weight: 700; font-size: 1.5rem; line-height: 1.15; }
-.doc h3 { margin: 10px 0 0; font-weight: 700; font-size: 1.125rem; line-height: 1.2; }
-.doc p, .doc ul { margin: 0; }
-.doc section p { margin-top: 4px; }
-.doc li + li { margin-top: 4px; }
-.draft { padding: 10px 14px; border-radius: 12px; background: hsl(var(--warning-soft)); color: hsl(var(--warning-ink)); font-weight: 600; }
-.foot { display: flex; justify-content: center; gap: 20px; padding: 18px 20px 28px; font-size: 1rem; }
-
 /* Impresión: "Imprimir → Guardar como PDF" del ranking da el documento que el operador le manda a la Muni. */
 @page { size: A4; margin: 14mm 14mm 16mm; }
 @media print {
@@ -141,7 +140,7 @@ h1 { margin: 6px 0 4px; font-weight: 700; font-size: 1.875rem; line-height: 1.1;
   html { color-scheme: light; font-size: 13px; }
   body { background: none; }
   .top { padding: 0 0 10px; }
-  .top > .muted { display: none; }
+  .top > .muted, .foot { display: none; }
   .logo { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .ranking { max-width: none; padding: 14px 0 0; gap: 18px; }
   .stat { padding: 8px 12px; }

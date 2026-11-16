@@ -214,7 +214,15 @@ say "eas init crea el proyecto en expo.dev y escribe extra.eas.projectId (y owne
 if grep -q '"projectId"' mobile/app.json; then
   note "mobile/app.json ya tiene un projectId: salteo eas init."
 else
-  (cd mobile && $EAS init)
+  # Con mobile/app.config.ts, eas init puede no escribir app.json solo: muestra el projectId para pegarlo.
+  (cd mobile && $EAS init) || true
+fi
+if ! grep -q '"projectId"' mobile/app.json; then
+  ask EAS_PROJECT_ID "eas init no escribió mobile/app.json. Pegá el projectId (uuid) que mostró:"
+  EAS_PROJECT_ID="$EAS_PROJECT_ID" node -e '
+    const fs = require("fs"); const p = "mobile/app.json"; const j = JSON.parse(fs.readFileSync(p, "utf8"));
+    j.expo.extra = { ...j.expo.extra, eas: { ...j.expo.extra?.eas, projectId: process.env.EAS_PROJECT_ID } };
+    fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");'
 fi
 grep -n '"projectId"' mobile/app.json || { warn "no encontré projectId en mobile/app.json"; exit 1; }
 step "Commiteá mobile/app.json: el projectId no es secreto y la app lo necesita para pedir el token."
@@ -237,7 +245,7 @@ node -e '
   fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");'
 printf '  %s✓ wrote%s android.googleServicesFile → mobile/app.json\n' "$GREEN" "$RESET"
 note "google-services.json identifica el proyecto de Firebase (no es la clave privada). Decidí si lo commiteás;"
-note "si no, EAS Build lo necesita como variable de tipo archivo (eas env:create)."
+note "si no, cargalo en EAS como variable de tipo archivo GOOGLE_SERVICES_JSON (ver README, Lanzamiento)."
 pause
 
 # ── 4 ─────────────────────────────────────────────────────────────────────
@@ -272,7 +280,7 @@ fi
 # ── 6 ─────────────────────────────────────────────────────────────────────
 stage "Build de desarrollo"
 say "Los push no andan en Expo Go en Android: hace falta una build de desarrollo en un teléfono real."
-note "Ojo: el mapa en Android necesita la API key de Google Maps (ver README, Pendiente humano)."
+note "Ojo: el mapa en Android necesita GOOGLE_MAPS_API_KEY en las variables de EAS (ver README, Lanzamiento)."
 if [[ ! -f mobile/eas.json ]] && confirm "No hay mobile/eas.json. ¿Lo creo e instalo expo-dev-client?"; then
   (cd mobile && npx expo install expo-dev-client && $EAS build:configure --platform all)
   note "Revisá que mobile/eas.json tenga el perfil development (developmentClient: true) y commitealo."
