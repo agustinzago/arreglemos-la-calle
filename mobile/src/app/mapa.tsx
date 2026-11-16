@@ -1,6 +1,6 @@
 // Mapa básico: un pin por reporte público. Grupos, filtros, íconos y la hoja con la lista son #9.
 import { categoryLabel, type PublicReport } from '@arreglemos/shared';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -37,6 +37,7 @@ export default function MapScreen() {
             coordinate={{ latitude: r.lat, longitude: r.lng }}
             title={categoryLabel(r.category)}
             description={r.status === 'resolved' ? 'Resuelto' : 'Abierto'}
+            onPress={() => router.push(`/reporte/${r.id}`)}
             pinColor={String(r.id) === params.id ? theme.primary : r.status === 'resolved' ? theme.success : theme.warning}
           />
         ))}

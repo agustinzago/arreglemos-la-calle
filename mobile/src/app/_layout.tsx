@@ -35,6 +35,7 @@ export default function RootLayout() {
         <Stack.Screen name="detalles" options={{ title: 'Revisá y enviá' }} />
         <Stack.Screen name="confirmacion" options={{ headerShown: false }} />
         <Stack.Screen name="mapa" options={{ title: 'Mapa' }} />
+        <Stack.Screen name="reporte/[id]" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
