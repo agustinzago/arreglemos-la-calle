@@ -2,6 +2,7 @@
 // El token de Expo se guarda con enable_notices y la base avisa sola cuando el reporte cambia de estado.
 // Sin projectId de EAS (falta `eas init`, ver scripts/push-setup.sh) o en un simulador no hay token:
 // la confirmación no ofrece los avisos.
+import 'expo-sqlite/localStorage/install';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';

@@ -1,26 +1,27 @@
 // Mis reportes: los que el vecino creó y a los que se sumó, cada uno abre su detalle.
-// Se abre desde la cámara; el pie vuelve a ella. Arriba, "Esperando señal": los guardados en el
-// teléfono sin enviar (#12); se ven aunque no haya red, y al enviarse pasan a "Los que creaste".
+// Se abre desde la cámara; el pie vuelve a ella. Arriba, los reportes sin enviar (#12), guardados en el
+// teléfono: "No se pudieron enviar" (rechazados) y "Esperando señal"; se ven aunque no haya red, y al
+// enviarse pasan a "Los que creaste".
 import { categoryShortLabel } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect } from 'expo-router';
-import { Camera, CloudOff } from 'lucide-react-native';
+import { Camera, CircleAlert, CloudOff, RotateCcw, Trash2 } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, SectionList, View } from 'react-native';
+import { ActivityIndicator, Alert, SectionList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { onPendingChange, pendingReports, type PendingReport } from '@/lib/pending';
 import { myReports, type MyReport } from '@/lib/reports';
+import { discardUnsent, onUnsentChange, retryUnsent, unsentReports, type UnsentReport } from '@/lib/unsent';
 
 export default function MyReportsScreen() {
   const theme = useTheme();
   const [items, setItems] = useState<MyReport[] | null>(null); // null = cargando
   const [failed, setFailed] = useState(false);
-  const [pending, setPending] = useState(pendingReports);
+  const [unsent, setUnsent] = useState(unsentReports);
   const offline = useOffline();
 
   const load = useCallback(() => {
@@ -31,24 +32,25 @@ export default function MyReportsScreen() {
   }, []);
 
   // Al volver del detalle (por ejemplo, después de sumarse) la lista se actualiza; también cuando se
-  // envía un pendiente mientras se está mirando.
+  // envía (o falla) uno sin enviar mientras se está mirando.
   useFocusEffect(
     useCallback(() => {
       load();
-      setPending(pendingReports());
-      return onPendingChange(() => {
-        setPending(pendingReports());
+      setUnsent(unsentReports());
+      return onUnsentChange(() => {
+        setUnsent(unsentReports());
         load();
       });
     }, [load]),
   );
 
   const sections = [
-    { title: 'Esperando señal', data: pending as (PendingReport | MyReport)[] },
+    { title: 'No se pudieron enviar', data: unsent.filter((u) => u.failed) as (UnsentReport | MyReport)[] },
+    { title: 'Esperando señal', data: unsent.filter((u) => !u.failed) as (UnsentReport | MyReport)[] },
     { title: 'Los que creaste', data: failed ? [] : (items?.filter((i) => i.created) ?? []) },
     { title: 'A los que te sumaste', data: failed ? [] : (items?.filter((i) => !i.created) ?? []) },
   ].filter((s) => s.data.length > 0);
-  const empty = items !== null && items.length === 0 && pending.length === 0;
+  const empty = items !== null && items.length === 0 && unsent.length === 0;
 
   return (
     <View className="flex-1 bg-background">
@@ -60,12 +62,12 @@ export default function MyReportsScreen() {
       )}
       <SectionList
         sections={sections}
-        keyExtractor={(i) => ('report' in i ? String(i.report.id) : `pendiente-${i.id}`)}
+        keyExtractor={(i) => ('report' in i ? String(i.report.id) : `sin-enviar-${i.id}`)}
         renderItem={({ item }) =>
           'report' in item ? (
             <ReportRow report={item.report} className="bg-card" onPress={() => router.push(`/reporte/${item.report.id}`)} />
           ) : (
-            <PendingRow item={item} />
+            <UnsentRow item={item} />
           )
         }
         renderSectionHeader={({ section }) => (
@@ -119,29 +121,62 @@ export default function MyReportsScreen() {
   );
 }
 
-/** Fila de un pendiente: como ReportRow, con la foto local, sin abrir detalle (todavía no tiene número). */
-function PendingRow({ item }: { item: PendingReport }) {
+/**
+ * Fila de un reporte sin enviar: como ReportRow, con la foto local, sin abrir detalle (todavía no tiene
+ * número). Si la base lo rechazó (`failed`) lo dice y deja descartarlo o probar de nuevo.
+ */
+function UnsentRow({ item }: { item: UnsentReport }) {
   const theme = useTheme();
   const title = categoryShortLabel(item.category);
-  const meta = 'Se envía cuando vuelva la señal';
+  const meta = item.failed ? 'No lo pudimos enviar. Probá de nuevo o descartalo.' : 'Se envía cuando vuelva la señal';
+
+  function discard() {
+    Alert.alert('¿Descartar este reporte?', 'Se borra del teléfono y no se envía.', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Descartar', style: 'destructive', onPress: () => discardUnsent(item.id) },
+    ]);
+  }
+
   return (
-    <View
-      accessible
-      accessibilityLabel={`${title}, sin enviar, ${item.address ?? 'sin dirección'}. ${meta}`}
-      className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-2.5"
-    >
-      <Image source={item.photoUri} style={{ width: 92, height: 92, borderRadius: 12 }} contentFit="cover" />
-      <View className="flex-1 gap-1">
-        <Text className="font-sans-bold">{title}</Text>
-        <Text variant="muted">{item.address ?? 'Sin dirección'}</Text>
-        <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
-          <View className="flex-row items-center gap-1 self-start rounded-full bg-muted py-[3px] pl-1.5 pr-2.5">
-            <CloudOff size={18} color={theme.foreground} />
-            <Text className="text-xs font-sans-bold">Sin enviar</Text>
+    <View className="gap-2 rounded-xl border border-border bg-card p-2.5">
+      <View
+        accessible
+        accessibilityLabel={`${title}, ${item.failed ? 'no se envió' : 'sin enviar'}, ${item.address ?? 'sin dirección'}. ${meta}`}
+        className="flex-row items-center gap-3"
+      >
+        <Image source={item.photoUri} style={{ width: 92, height: 92, borderRadius: 12 }} contentFit="cover" />
+        <View className="flex-1 gap-1">
+          <Text className="font-sans-bold">{title}</Text>
+          <Text variant="muted">{item.address ?? 'Sin dirección'}</Text>
+          <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
+            <View
+              className={`flex-row items-center gap-1 self-start rounded-full py-[3px] pl-1.5 pr-2.5 ${item.failed ? 'bg-destructive-soft' : 'bg-muted'}`}
+            >
+              {item.failed ? (
+                <CircleAlert size={18} color={theme.destructiveInk} />
+              ) : (
+                <CloudOff size={18} color={theme.foreground} />
+              )}
+              <Text className={`text-xs font-sans-bold ${item.failed ? 'text-destructive-ink' : ''}`}>
+                {item.failed ? 'No se envió' : 'Sin enviar'}
+              </Text>
+            </View>
+            <Text className="text-xs font-sans-semibold text-muted-foreground">{meta}</Text>
           </View>
-          <Text className="text-xs font-sans-semibold text-muted-foreground">{meta}</Text>
         </View>
       </View>
+      {item.failed && (
+        <View className="flex-row flex-wrap gap-2">
+          <Button variant="outline" size="sm" className="flex-1" onPress={() => retryUnsent(item.id)}>
+            <RotateCcw size={20} color={theme.primaryInk} />
+            <Text>Probar de nuevo</Text>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex-1" onPress={discard}>
+            <Trash2 size={20} color={theme.foreground} />
+            <Text>Descartar</Text>
+          </Button>
+        </View>
+      )}
     </View>
   );
 }

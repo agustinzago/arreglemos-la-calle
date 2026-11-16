@@ -2,10 +2,10 @@
 // Bloqueante (instant = false) para que las etiquetas OG estén completas en el <head>.
 export const instant = false;
 
-import { categoryLabel, type PublicMunicipality, type PublicReport } from "@arreglemos/shared";
-import { createClient } from "@supabase/supabase-js";
+import { categoryLabel, STATUS_LABEL, type PublicMunicipality, type PublicReport } from "@arreglemos/shared";
 import type { Metadata } from "next";
 import { cache } from "react";
+import { db, photoUrl } from "@/lib/supabase";
 import ReportNotFound from "../../not-found";
 
 const DAY = 86_400_000;
@@ -15,18 +15,15 @@ const APP_URL = "#descargar";
 /** El reporte y su municipio; null si no existe o está oculto (reports_public no muestra los ocultos). */
 const getReport = cache(async (id: string) => {
   if (!/^\d{1,18}$/.test(id)) return null;
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const supabase = db();
   const { data: report, error } = await supabase.from("reports_public").select("*").eq("id", id).maybeSingle<PublicReport>();
   if (error) throw error;
   if (!report) return null;
-  const muni = report.municipality_id
+  const municipality = report.municipality_id
     ? await supabase.from("municipalities_public").select("*").eq("id", report.municipality_id).maybeSingle<PublicMunicipality>()
     : null;
-  if (muni?.error) throw muni.error;
-  const photo = supabase.storage.from("photos").getPublicUrl(report.photo_path).data.publicUrl;
-  return { report, municipality: muni?.data ?? null, photo };
+  if (municipality?.error) throw municipality.error;
+  return { report, municipality: municipality?.data ?? null, photo: photoUrl(report.photo_path) };
 });
 
 function title(r: PublicReport, m: PublicMunicipality | null) {
@@ -35,13 +32,12 @@ function title(r: PublicReport, m: PublicMunicipality | null) {
 }
 
 const vecinos = (n: number) => (n === 1 ? "1 vecino sumado" : `${n} vecinos sumados`);
-const statusLabel = (r: PublicReport) => (r.status === "resolved" ? "Resuelto" : "Abierto");
 
 export async function generateMetadata({ params }: PageProps<"/r/[id]">): Promise<Metadata> {
   const data = await getReport((await params).id);
   if (!data) return { title: "Este reporte no está disponible", robots: { index: false } };
   const t = title(data.report, data.municipality);
-  const description = `${vecinos(data.report.vecinos_count)} · ${statusLabel(data.report)} · Arreglemos la Calle`;
+  const description = `${vecinos(data.report.vecinos_count)} · ${STATUS_LABEL[data.report.status]} · Arreglemos la Calle`;
   return {
     title: t,
     description,
@@ -75,7 +71,7 @@ export default async function ReportPage({ params }: PageProps<"/r/[id]">) {
         <img src={photo} alt={`Foto: ${title(r, m)}`} />
         <span className={`badge ${resolved ? "resolved" : "open"}`}>
           {resolved ? <Icon d={CHECK} /> : <Icon d={CLOCK} />}
-          {statusLabel(r)}
+          {STATUS_LABEL[r.status]}
         </span>
       </div>
       <div className="body">

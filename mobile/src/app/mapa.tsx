@@ -1,6 +1,6 @@
 // Mapa público: un ícono por reporte, grupos de cercanos (solo visual), filtros por categoría y estado,
 // y una hoja fija (25% / 85%) con la lista de lo que se ve. Nada depende de gestos: la hoja tiene botón.
-import { CATEGORIES, categoryShortLabel, type CategoryCode, type PublicReport } from '@arreglemos/shared';
+import { CATEGORIES, categoryShortLabel, STATUS_LABEL, type CategoryCode, type PublicReport } from '@arreglemos/shared';
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -22,7 +22,7 @@ import MapView, { Marker, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Supercluster from 'supercluster';
 
-import { ReportRow, STATUS_LABEL, useTheme } from '@/components/report';
+import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';

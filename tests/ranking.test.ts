@@ -72,7 +72,8 @@ test('la vista Open311 usa los nombres de GeoReport v2 y no muestra ocultos', as
     long: PLACES.villaAllende.lng,
   });
   expect(Date.parse(data![0].requested_datetime)).not.toBeNaN();
-  expect(data![0].media_url).toMatch(/^\/storage\/v1\/object\/public\/photos\/.+\.jpg$/);
+  // Absoluta (app_settings.api_url del entorno): la misma URL pública que arma supabase-js.
+  expect(data![0].media_url).toBe(admin.storage.from('photos').getPublicUrl(open.photo_path).data.publicUrl);
   expect(data![0]).not.toHaveProperty('device_id');
 
   // Es de solo lectura.

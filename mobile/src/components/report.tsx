@@ -1,6 +1,6 @@
 // Piezas de reporte que se repiten entre pantallas: insignia de estado y la fila de lista
 // (hoja del mapa, Mis reportes). El estado siempre va con ícono y texto, nunca solo con color.
-import { categoryShortLabel, type PublicReport } from '@arreglemos/shared';
+import { categoryShortLabel, STATUS_LABEL, type PublicReport } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { ChevronRight, CircleCheck, Clock, Ellipsis } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -10,8 +10,6 @@ import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
 import { photoUrl } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
-
-export const STATUS_LABEL = { open: 'Abierto', resolved: 'Resuelto', hidden: 'Oculto' } as const;
 
 export function useTheme() {
   return THEME[useColorScheme().colorScheme ?? 'light'];

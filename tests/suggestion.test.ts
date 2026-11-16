@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { parseSuggestion, SUGGESTION_PROMPT } from '../shared/src/suggestion.ts';
+import { parseSuggestion, SUGGESTION_PROMPT } from '../supabase/functions/_shared/suggestion.ts';
 
 test('parseSuggestion: respuestas válidas', () => {
   expect(parseSuggestion('bache')).toBe('bache');

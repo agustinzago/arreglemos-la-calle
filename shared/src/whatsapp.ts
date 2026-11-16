@@ -4,7 +4,7 @@ import { categoryLabel } from './categories';
 export const reportUrl = (webUrl: string, id: number) => `${webUrl.replace(/\/+$/, '')}/r/${id}`;
 
 /** Texto de "Enviar a la Muni" (ADR-0001): categoría, dirección y link a la página pública. */
-export function muniMessage(
+export function municipalityMessage(
   r: { id: number; category: string; address: string | null },
   municipality: string,
   url: string,

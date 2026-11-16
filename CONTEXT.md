@@ -8,6 +8,10 @@ App cívica independiente (no del gobierno) donde los vecinos reportan problemas
 Un problema concreto en la vía pública, con una foto, una ubicación, una categoría y un estado. Es público desde que se crea.
 _Avoid_: reclamo, denuncia, ticket, incidente, alerta
 
+**Reporte sin enviar**:
+Un reporte que el vecino armó pero que todavía no llegó (sin señal, o el servidor falló): queda guardado en su teléfono, sin número ni página pública, y se envía solo cuando se puede. Si el servidor lo rechaza, el vecino lo descarta o prueba de nuevo.
+_Avoid_: pendiente, borrador, en cola
+
 **Categoría**:
 El tipo de problema de un reporte, de una lista fija (Bache, Calle de tierra en mal estado, Anegamiento, Luminaria apagada, Basural, Árbol caído, Semáforo o señal rota, Vereda rota, Cloaca desbordada, Otro). "Otro" exige una descripción.
 _Avoid_: tipo, rubro, servicio

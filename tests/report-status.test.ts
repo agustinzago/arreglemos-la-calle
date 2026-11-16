@@ -151,6 +151,13 @@ describe('operador', () => {
     expect(await ok(b, id, 'sigue_roto')).toMatchObject({ status: 'open', resolved_at: null });
   });
 
+  test('respeta el resolved_at que pone en el mismo cambio', async () => {
+    const id = await nuevoReporte();
+    const at = '2026-11-10T12:00:00+00:00';
+    await admin.from('reports').update({ status: 'resolved', resolved_at: at }).eq('id', id).throwOnError();
+    expect(Date.parse((await estado(id))!.resolved_at)).toBe(Date.parse(at));
+  });
+
   test('reabre a mano un resuelto: los arreglado de antes ya no cuentan', async () => {
     const id = await nuevoReporte();
     await ok(a, id, 'resuelto');

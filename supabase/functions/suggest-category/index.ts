@@ -2,7 +2,7 @@
 // { category: <código> | null }. La API key de Anthropic vive solo acá, como secreto ANTHROPIC_API_KEY.
 // JWT verificado por Supabase (default): solo la llama la app con la sesión del vecino.
 import Anthropic from 'npm:@anthropic-ai/sdk@1.8.0';
-import { parseSuggestion, SUGGESTION_PROMPT } from '../../../shared/src/suggestion.ts';
+import { parseSuggestion, SUGGESTION_PROMPT } from '../_shared/suggestion.ts';
 
 // La app corta a los 2 s; no tiene sentido reintentar ni esperar mucho más.
 const client = new Anthropic({ timeout: 5_000, maxRetries: 0 });

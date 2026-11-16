@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { refreshNoticesToken, useNoticeTaps } from '@/lib/notices';
-import { startSendingPending } from '@/lib/pending';
+import { startSendingUnsent } from '@/lib/unsent';
 import { ensureSession } from '@/lib/supabase';
 import { NAV_THEME } from '@/lib/theme';
 
@@ -29,7 +29,7 @@ export default function RootLayout() {
   }, []);
 
   // Los reportes guardados sin señal se envían solos (#12), aunque la app se haya cerrado mientras tanto.
-  useEffect(startSendingPending, []);
+  useEffect(startSendingUnsent, []);
 
   // Avisos (#13): token al día y tocar un aviso abre el reporte.
   useEffect(() => {

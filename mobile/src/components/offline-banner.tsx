@@ -5,7 +5,7 @@ import { View } from 'react-native';
 
 import { useTheme } from '@/components/report';
 import { Text } from '@/components/ui/text';
-import { isOnline } from '@/lib/pending';
+import { isOnline } from '@/lib/unsent';
 
 export const OFFLINE_TEXT = 'Sin señal, lo enviamos apenas vuelva.';
 

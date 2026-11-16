@@ -3,9 +3,9 @@
 export const instant = false;
 
 import { categoryShortLabel, type PublicMunicipality, type PublicReport } from "@arreglemos/shared";
-import { createClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
 import { cache } from "react";
+import { db, photoUrl } from "@/lib/supabase";
 
 const DAY = 86_400_000;
 const TZ = "America/Argentina/Cordoba";
@@ -18,9 +18,7 @@ const slug = (name: string) =>
 
 /** El municipio (por slug o id) y su ranking; null si no existe o no está activo. */
 const getRanking = cache(async (param: string) => {
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const supabase = db();
   const { data, error } = await supabase.from("municipalities_public").select("*");
   if (error) throw error;
   const munis = data as PublicMunicipality[];
@@ -29,7 +27,7 @@ const getRanking = cache(async (param: string) => {
   if (!m) return null;
   const ranking = await supabase.rpc("weekly_ranking", { p_municipality_id: m.id });
   if (ranking.error) throw ranking.error;
-  const photo = (r: PublicReport) => supabase.storage.from("photos").getPublicUrl(r.photo_path).data.publicUrl;
+  const photo = (r: PublicReport) => photoUrl(r.photo_path);
   return { municipality: m, ranking: ranking.data as Ranking, photo, week: weekLabel(new Date()) };
 });
 

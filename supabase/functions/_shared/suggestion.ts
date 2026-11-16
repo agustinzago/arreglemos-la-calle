@@ -1,5 +1,5 @@
 // Categoría sugerida por IA (#11). Lo usa la Edge Function suggest-category (Deno), por eso el import
-// lleva la extensión .ts y este archivo no se re-exporta desde index.ts (la app no lo necesita).
+// lleva la extensión .ts y shared/ no lo re-exporta (la app no lo necesita).
 import { CATEGORIES, type CategoryCode } from './categories.ts';
 
 // "otro" no se sugiere: obligaría a escribir un texto y no ayuda en nada.

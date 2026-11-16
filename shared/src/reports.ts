@@ -2,6 +2,9 @@ import type { CategoryCode } from './categories';
 
 export type ReportStatus = 'open' | 'resolved' | 'hidden';
 
+/** Nombre del estado (CONTEXT.md) para app y web. Siempre con ícono: reloj abierto, check resuelto. */
+export const STATUS_LABEL: Record<ReportStatus, string> = { open: 'Abierto', resolved: 'Resuelto', hidden: 'Oculto' };
+
 /** Una fila de la vista public.reports_public (y lo que devuelve create_report). */
 export type PublicReport = {
   id: number;

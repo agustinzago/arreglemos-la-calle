@@ -2,7 +2,7 @@
 // Estados (#8): "Ya está arreglado" (con foto opcional), "Sigue roto" (si está resuelto) y "Denunciar".
 import {
   categoryLabel,
-  muniMessage,
+  municipalityMessage,
   reportUrl,
   whatsappLink,
   type PublicMunicipality,
@@ -16,7 +16,6 @@ import {
   ArrowLeft,
   Check,
   CircleCheck,
-  Clock,
   CloudOff,
   Flag,
   ImagePlus,
@@ -44,6 +43,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { StatusBadge } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';
@@ -164,7 +164,7 @@ export default function ReportScreen() {
   }
 
   function sendToMuni() {
-    Linking.openURL(whatsappLink(municipality!.whatsapp!, muniMessage(report, municipality!.name, url))).catch(() =>
+    Linking.openURL(whatsappLink(municipality!.whatsapp!, municipalityMessage(report, municipality!.name, url))).catch(() =>
       Alert.alert('No pudimos abrir WhatsApp', '¿Está instalado en este teléfono?'),
     );
   }
@@ -184,17 +184,8 @@ export default function ReportScreen() {
             contentFit="cover"
             accessibilityLabel={`Foto: ${title}`}
           />
-          <View
-            className={`absolute bottom-3 left-3 flex-row items-center gap-1.5 rounded-full py-1.5 pl-2 pr-3.5 ${resolved ? 'bg-success-soft' : 'bg-warning-soft'}`}
-          >
-            {resolved ? (
-              <CircleCheck color={theme.successInk} size={icon} />
-            ) : (
-              <Clock color={theme.warningInk} size={icon} />
-            )}
-            <Text className={`font-sans-bold text-sm ${resolved ? 'text-success-ink' : 'text-warning-ink'}`}>
-              {resolved ? 'Resuelto' : 'Abierto'}
-            </Text>
+          <View className="absolute bottom-3 left-3">
+            <StatusBadge status={report.status} />
           </View>
           <BackButton />
         </View>

@@ -1,18 +1,18 @@
 // Confirmación con el número de reporte, "Enviar a la Muni por WhatsApp" (ADR-0001) y el aviso de
 // emergencias (ADR-0006). La app solo abre el link de wa.me: no registra si el mensaje se envió.
 // "¿Te avisamos cuando lo arreglen?" (#13): el permiso de notificaciones se pide solo si acepta.
-import { muniMessage, reportUrl, whatsappLink, type PublicMunicipality } from '@arreglemos/shared';
+import { municipalityMessage, reportUrl, whatsappLink, type PublicMunicipality } from '@arreglemos/shared';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bell, BellRing, CircleCheck, Map, MessageCircle } from 'lucide-react-native';
+import { CircleCheck, Map, MessageCircle } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmergencyNotice } from '@/components/emergency-notice';
+import { NoticesCard } from '@/components/notices-card';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { enableNotices, noticesAvailable, noticesEnabled } from '@/lib/notices';
 import { getMunicipality, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -23,22 +23,22 @@ export default function ConfirmationScreen() {
   const theme = THEME[useColorScheme().colorScheme ?? 'light'];
   const { fontScale } = useWindowDimensions();
   // undefined = cargando, null = sin municipio, 'error' = no se pudo leer
-  const [muni, setMuni] = useState<PublicMunicipality | null | 'error'>();
+  const [municipality, setMunicipality] = useState<PublicMunicipality | null | 'error'>();
   const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     const id = Number(params.municipalityId);
-    if (!id) return setMuni(null);
-    getMunicipality(id).then(setMuni, () => setMuni('error'));
+    if (!id) return setMunicipality(null);
+    getMunicipality(id).then(setMunicipality, () => setMunicipality('error'));
   }, [params.municipalityId]);
 
-  const canSend = muni && muni !== 'error' && !!muni.whatsapp;
+  const canSend = municipality && municipality !== 'error' && !!municipality.whatsapp;
 
   function sendToMuni() {
     if (!canSend) return;
     const report = { id: Number(params.id), category: params.category, address: params.address || null };
-    const text = muniMessage(report, muni.name, reportUrl(WEB_URL, report.id));
-    Linking.openURL(whatsappLink(muni.whatsapp!, text)).then(
+    const text = municipalityMessage(report, municipality.name, reportUrl(WEB_URL, report.id));
+    Linking.openURL(whatsappLink(municipality.whatsapp!, text)).then(
       () => setOpened(true),
       () => Alert.alert('No pudimos abrir WhatsApp', '¿Está instalado en este teléfono?'),
     );
@@ -61,7 +61,7 @@ export default function ConfirmationScreen() {
             {params.id}
           </Text>
         </View>
-        {muni === undefined ? (
+        {municipality === undefined ? (
           <ActivityIndicator color={theme.primary} />
         ) : canSend ? (
           opened ? (
@@ -76,15 +76,15 @@ export default function ConfirmationScreen() {
         ) : (
           <View role="note" className="rounded-md bg-muted px-3.5 py-3">
             <Text>
-              {muni === 'error'
+              {municipality === 'error'
                 ? 'No pudimos ver a qué municipio mandárselo. Revisá tu conexión: lo vas a poder mandar desde el detalle del reporte.'
-                : muni
-                  ? `Todavía no tenemos el WhatsApp de ${muni.name} para mandárselo.`
+                : municipality
+                  ? `Todavía no tenemos el WhatsApp de ${municipality.name} para mandárselo.`
                   : 'Este lugar no está dentro de un municipio que tengamos cargado, así que no hay a quién mandárselo.'}
             </Text>
           </View>
         )}
-        {noticesAvailable && <NoticesCard />}
+        <NoticesCard />
         <EmergencyNotice />
       </ScrollView>
       <View className="gap-2 border-t border-border px-screen pb-2 pt-3">
@@ -103,49 +103,5 @@ export default function ConfirmationScreen() {
         </Button>
       </View>
     </SafeAreaView>
-  );
-}
-
-function NoticesCard() {
-  const theme = THEME[useColorScheme().colorScheme ?? 'light'];
-  const [state, setState] = useState<'ask' | 'asking' | 'on' | 'denied' | 'error'>(noticesEnabled() ? 'on' : 'ask');
-
-  function accept() {
-    setState('asking');
-    enableNotices().then(setState, () => setState('error'));
-  }
-
-  // Al volver de Ajustes puede aceptar de nuevo.
-  function openSettings() {
-    Linking.openSettings();
-    setState('ask');
-  }
-
-  if (state === 'on') {
-    return (
-      <View role="status" className="flex-row items-center gap-3 rounded-md bg-success-soft px-3.5 py-3">
-        <BellRing color={theme.successInk} size={24} />
-        <Text className="shrink font-sans-semibold text-success-ink">Listo, te vamos a avisar</Text>
-      </View>
-    );
-  }
-  return (
-    <View className="gap-3 rounded-xl border border-border bg-card p-4">
-      <Text className="font-sans-bold">¿Te avisamos cuando lo arreglen?</Text>
-      {state === 'denied' && (
-        <Text variant="muted">Para avisarte, la app necesita permiso de notificaciones. Lo podés activar en Ajustes.</Text>
-      )}
-      {state === 'error' && <Text variant="muted">No pudimos activar los avisos. Revisá tu conexión y probá de nuevo.</Text>}
-      {state === 'denied' ? (
-        <Button variant="outline" size="sm" className="min-h-[52px] rounded-md" onPress={openSettings}>
-          <Text>Abrir Ajustes</Text>
-        </Button>
-      ) : (
-        <Button variant="outline" size="sm" className="min-h-[52px] rounded-md" disabled={state === 'asking'} onPress={accept}>
-          <Bell color={theme.primaryInk} size={22} />
-          <Text>{state === 'error' ? 'Probar de nuevo' : 'Sí, avisame'}</Text>
-        </Button>
-      )}
-    </View>
   );
 }

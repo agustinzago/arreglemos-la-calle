@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
-import { savePending } from '@/lib/pending';
+import { saveUnsent } from '@/lib/unsent';
 import { createReport } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -65,7 +65,7 @@ export default function DetailsScreen() {
     };
     // Sin señal (o si el servidor falla) se guarda en el teléfono y se envía solo después (#12).
     const keep = async (reason: 'offline' | 'error', photoName?: string) => {
-      await savePending(input, photoName);
+      await saveUnsent(input, photoName);
       router.dismissAll();
       router.push({ pathname: '/guardado', params: { reason } });
     };

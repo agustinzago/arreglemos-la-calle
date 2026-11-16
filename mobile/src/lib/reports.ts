@@ -10,6 +10,15 @@ export async function compressWithoutExif(uri: string) {
   return saved.uri;
 }
 
+/** Sube una foto ya sin EXIF a la carpeta del vecino. Si ya estaba (409: un reintento), la reusa. */
+async function uploadPhoto(userId: string, name: string, uri: string) {
+  const path = `${userId}/${name}.jpg`;
+  const bytes = await new File(uri).arrayBuffer();
+  const upload = await supabase.storage.from('photos').upload(path, bytes, { contentType: 'image/jpeg' });
+  if (upload.error && !('statusCode' in upload.error && upload.error.statusCode === '409')) throw upload.error;
+  return path;
+}
+
 export type NewReport = {
   photoUri: string;
   lat: number;
@@ -30,10 +39,7 @@ export async function createReport(input: NewReport, photoName = String(Date.now
  */
 export async function sendReport(input: NewReport, photoName: string): Promise<PublicReport> {
   const user = await ensureSession();
-  const path = `${user.id}/${photoName}.jpg`;
-  const bytes = await new File(input.photoUri).arrayBuffer();
-  const upload = await supabase.storage.from('photos').upload(path, bytes, { contentType: 'image/jpeg' });
-  if (upload.error && !('statusCode' in upload.error && upload.error.statusCode === '409')) throw upload.error;
+  const path = await uploadPhoto(user.id, photoName, input.photoUri);
 
   const { data, error } = await supabase.rpc('create_report', {
     p_photo_path: path,
@@ -111,13 +117,7 @@ export async function registerEvent(
   photoUri?: string,
 ): Promise<PublicReport> {
   const user = await ensureSession();
-  let path: string | undefined;
-  if (photoUri) {
-    path = `${user.id}/${Date.now()}.jpg`;
-    const bytes = await new File(await compressWithoutExif(photoUri)).arrayBuffer();
-    const upload = await supabase.storage.from('photos').upload(path, bytes, { contentType: 'image/jpeg' });
-    if (upload.error) throw upload.error;
-  }
+  const path = photoUri ? await uploadPhoto(user.id, String(Date.now()), await compressWithoutExif(photoUri)) : undefined;
   const { data, error } = await supabase.rpc('register_event', { p_report_id: reportId, p_type: type, p_photo_path: path });
   if (error) throw error;
   return data as PublicReport;
