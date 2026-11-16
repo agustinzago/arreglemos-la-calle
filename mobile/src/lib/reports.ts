@@ -1,4 +1,4 @@
-import type { CategoryCode, PublicMunicipality, PublicReport, PublicReportEvent } from '@arreglemos/shared';
+import type { CategoryCode, NearbyReport, PublicMunicipality, PublicReport, PublicReportEvent } from '@arreglemos/shared';
 import { File } from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { ensureSession, supabase } from './supabase';
@@ -54,6 +54,14 @@ export async function mapReports(area: Area, filters: MapFilters): Promise<Publi
   });
   if (error) throw error;
   return data as PublicReport[];
+}
+
+/** Operación "reportes cercanos": hasta 3 abiertos de la categoría dentro de su radio de duplicado, del más cercano. */
+export async function nearbyReports(lat: number, lng: number, category: CategoryCode): Promise<NearbyReport[]> {
+  await ensureSession();
+  const { data, error } = await supabase.rpc('nearby_reports', { p_lat: lat, p_lng: lng, p_category: category });
+  if (error) throw error;
+  return data as NearbyReport[];
 }
 
 /** Un reporte público; null si no existe o está oculto. */

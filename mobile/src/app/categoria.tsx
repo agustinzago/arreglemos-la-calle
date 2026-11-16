@@ -45,7 +45,7 @@ export default function CategoryScreen() {
     if (!category) return;
     if (category === 'otro' && !other.trim()) return setMissingOther(true);
     router.push({
-      pathname: '/detalles',
+      pathname: '/cercanos',
       params: { ...params, category, other: category === 'otro' ? other.trim() : '' },
     });
   }
