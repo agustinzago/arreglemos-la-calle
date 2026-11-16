@@ -1,7 +1,7 @@
 // Mis reportes: los que el vecino creó y a los que se sumó, cada uno abre su detalle.
 // Se abre desde la cámara; el pie vuelve a ella. Arriba, los reportes sin enviar (#12), guardados en el
 // teléfono: "No se pudieron enviar" (rechazados) y "Esperando señal"; se ven aunque no haya red, y al
-// enviarse pasan a "Los que creaste".
+// enviarse pasan a "Los que creaste". Al pie, vincular la cuenta (o borrarla, si ya está vinculada).
 import { categoryShortLabel } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect } from 'expo-router';
@@ -10,6 +10,7 @@ import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, SectionList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AccountCard } from '@/components/account-card';
 import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
@@ -78,6 +79,7 @@ export default function MyReportsScreen() {
             {section.title}
           </Text>
         )}
+        ListFooterComponent={<AccountCard onChange={load} />}
         contentContainerClassName="flex-grow gap-2 px-screen pb-5"
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center gap-3 py-10">
