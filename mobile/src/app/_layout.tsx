@@ -11,6 +11,7 @@ import {
 import { Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ensureSession } from '@/lib/supabase';
 import { NAV_THEME } from '@/lib/theme';
@@ -28,12 +29,15 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      <Stack screenOptions={{ headerTitleStyle: { fontFamily: 'Rubik_700Bold' }, headerBackButtonDisplayMode: 'minimal' }}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="categoria" options={{ title: '¿Qué problema es?' }} />
-        <Stack.Screen name="mapa" options={{ title: 'Mapa' }} />
-      </Stack>
-    </ThemeProvider>
+    // La hoja fija del mapa (@gorhom/bottom-sheet) necesita el root de gestos.
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+        <Stack screenOptions={{ headerTitleStyle: { fontFamily: 'Rubik_700Bold' }, headerBackButtonDisplayMode: 'minimal' }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="categoria" options={{ title: '¿Qué problema es?' }} />
+          <Stack.Screen name="mapa" options={{ title: 'Mapa', headerShown: false }} />
+        </Stack>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

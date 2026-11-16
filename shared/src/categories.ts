@@ -16,3 +16,14 @@ export const CATEGORIES = [
 export type CategoryCode = (typeof CATEGORIES)[number]['code'];
 
 export const categoryLabel = (code: string) => CATEGORIES.find((c) => c.code === code)?.label ?? code;
+
+// Nombres cortos para listas, mapa y filtros (diseño). Los que no están acá usan el nombre completo.
+const SHORT_LABELS: Partial<Record<CategoryCode, string>> = {
+  calle_tierra: 'Calle de tierra',
+  anegamiento: 'Anegamiento',
+  basural: 'Basural',
+  arbol_caido: 'Árbol caído',
+  semaforo_senal: 'Semáforo roto',
+};
+
+export const categoryShortLabel = (code: string) => SHORT_LABELS[code as CategoryCode] ?? categoryLabel(code);

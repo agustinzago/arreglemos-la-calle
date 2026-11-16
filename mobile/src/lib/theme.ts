@@ -13,7 +13,13 @@ export const THEME = {
     warning: 'hsl(45 100% 51%)',
     warningForeground: 'hsl(224 32% 12%)',
     success: 'hsl(152 60% 24%)',
+    successForeground: 'hsl(0 0% 100%)',
+    successInk: 'hsl(152 60% 18%)',
+    warningInk: 'hsl(36 90% 22%)',
+    primaryInk: 'hsl(226 75% 32%)',
+    mutedForeground: 'hsl(222 12% 34%)',
     destructive: 'hsl(356 72% 42%)',
+    destructiveInk: 'hsl(356 75% 34%)',
   },
   dark: {
     background: 'hsl(224 24% 8%)',
@@ -25,7 +31,13 @@ export const THEME = {
     warning: 'hsl(46 100% 58%)',
     warningForeground: 'hsl(224 32% 10%)',
     success: 'hsl(146 50% 60%)',
+    successForeground: 'hsl(150 40% 8%)',
+    successInk: 'hsl(146 52% 72%)',
+    warningInk: 'hsl(46 95% 68%)',
+    primaryInk: 'hsl(224 100% 80%)',
+    mutedForeground: 'hsl(220 14% 72%)',
     destructive: 'hsl(356 90% 72%)',
+    destructiveInk: 'hsl(356 92% 78%)',
   },
 };
 
