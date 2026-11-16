@@ -17,6 +17,8 @@ const projectId: string | undefined = Constants.expoConfig?.extra?.eas?.projectI
 
 export const noticesAvailable = Device.isDevice && !!projectId;
 export const noticesEnabled = () => localStorage.getItem(KEY) === '1';
+/** Al borrar la cuenta el token se borra con ella: la confirmación vuelve a ofrecer los avisos. */
+export const forgetNotices = () => localStorage.removeItem(KEY);
 
 // Con la app abierta, el aviso también se muestra.
 Notifications.setNotificationHandler({

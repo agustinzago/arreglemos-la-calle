@@ -81,9 +81,39 @@ de punta a punta) están en un asistente:
 bash scripts/push-setup.sh
 ```
 
+## Cuentas (vincular Apple o Google)
+
+El vecino es anónimo (ADR-0004). En Mis reportes puede vincular Apple (solo iOS) o Google: la app pide el id token
+nativo (`expo-apple-authentication`, `@react-native-google-signin/google-signin`) y llama
+`supabase.auth.linkIdentity({ provider, token })` sobre la sesión anónima, así que el `auth.uid()` no cambia y conserva
+todo lo que hizo. En otro teléfono el mismo botón falla con `identity_already_exists` y la app ofrece entrar con esa
+cuenta (`signInWithIdToken`), que trae sus reportes. Con la cuenta vinculada aparece "Borrar mi cuenta" (Apple lo
+exige): borra las fotos de su carpeta con la API de Storage y llama `delete_my_account` (migración
+`*_delete_account.sql`). Google no anda en Expo Go (hace falta un build de desarrollo); sin los client IDs la app no lo
+ofrece. Apple anda en Expo Go si se agrega `host.exp.Exponent` a los Client IDs de Apple en Supabase.
+
 ## Pendiente humano
 
 - Avisos push: correr `scripts/push-setup.sh` (ver Avisos push).
 - Desplegar `suggest-category` y cargar el secreto `ANTHROPIC_API_KEY` (ver Edge Functions).
 - Android fuera de Expo Go necesita una API key de Google Maps (plugin `react-native-maps` en `mobile/app.json`).
 - Ícono y splash de la app todavía son los del template de Expo.
+- Cuentas de Apple y Google (ver Cuentas). Hasta hacerlo, la tarjeta "No pierdas tus reportes" no vincula nada:
+  1. Supabase → Authentication → Sign In / Providers: activar **Allow manual linking** (lo usa `linkIdentity`).
+  2. Apple Developer → Identifiers → App ID `ar.arreglemoslacalle.app`: activar la capability **Sign in with Apple**
+     (EAS también la sincroniza en el primer build, por el plugin `expo-apple-authentication` de `mobile/app.json`).
+     Solo app nativa: no hacen falta Services ID, clave .p8 ni secreto.
+  3. Supabase → Providers → Apple: activar, y en **Client IDs** poner `ar.arreglemoslacalle.app` (más
+     `host.exp.Exponent` para probar en Expo Go).
+  4. Google Cloud Console → APIs & Services: configurar la pantalla de consentimiento (OAuth consent screen) y crear
+     tres OAuth client IDs: **Web** (es el `webClientId`), **iOS** (bundle `ar.arreglemoslacalle.app`) y **Android**
+     (paquete `ar.arreglemoslacalle.app` con el SHA-1 del certificado de firma: `npx eas-cli@latest credentials`; uno
+     por cada certificado, el de EAS y el de Play App Signing).
+  5. Supabase → Providers → Google: activar, en **Client IDs** poner el web primero y después el de iOS y el de
+     Android, separados por coma, y activar **Skip nonce checks** (el SDK de Google en iOS manda un nonce que la app no
+     ve). El client secret no hace falta para el flujo nativo.
+  6. `mobile/.env` (y las variables de entorno de EAS): `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` y
+     `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`. En `mobile/app.json`, el `iosUrlScheme` del plugin de Google es el client ID
+     de iOS al revés: `com.googleusercontent.apps.<lo que va antes de .apps.googleusercontent.com>`.
+  7. Build de desarrollo (`npx eas-cli@latest build --profile development`) y probar: vincular en un teléfono, ver
+     "Cuenta vinculada", entrar con la misma cuenta en otro y ver los mismos reportes; después "Borrar mi cuenta".
