@@ -59,7 +59,7 @@ export default function DetailsScreen() {
         lng: Number(params.lng),
         category: params.category,
         description: description || undefined,
-        address: params.address,
+        address: params.address || undefined,
       });
       router.dismissAll();
       router.push({ pathname: '/confirmacion', params: { id: report.id, lat: report.lat, lng: report.lng } });

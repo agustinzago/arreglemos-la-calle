@@ -39,6 +39,14 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Para elegir una foto del problema.",
+          "cameraPermission": "Para sacarle una foto al problema.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "Para saber en qué calle está el problema. Solo mientras usás la app."

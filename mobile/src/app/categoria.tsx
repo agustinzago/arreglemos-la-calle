@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 export default function CategoryScreen() {
   // Lo que traen los pasos anteriores (foto, punto, dirección…) sigue de largo hasta la revisión.
-  const params = useLocalSearchParams<{ photoUri: string; lat: string; lng: string }>();
+  const params = useLocalSearchParams<{ photoUri: string; lat: string; lng: string; address?: string }>();
   const theme = THEME[useColorScheme().colorScheme ?? 'light'];
   const { fontScale } = useWindowDimensions();
   const [category, setCategory] = useState<CategoryCode>();
