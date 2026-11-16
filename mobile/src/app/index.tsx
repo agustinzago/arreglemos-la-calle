@@ -1,5 +1,6 @@
 // Cámara: la app abre acá. Antes, si faltan permisos, la pantalla de permisos.
-// La foto (de la cámara o de la galería) sigue a /ubicacion, que toma el GPS o el EXIF.
+// La foto (de la cámara o de la galería) sigue a /ubicacion, que toma el GPS o el EXIF. En paralelo
+// sale el pedido de categoría sugerida (#11).
 import { gpsFromExif } from '@arreglemos/shared';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -15,6 +16,7 @@ import { EmergencyNotice } from '@/components/emergency-notice';
 import { PermissionsScreen } from '@/components/permissions-screen';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { startSuggestion } from '@/lib/suggestion';
 import { THEME } from '@/lib/theme';
 
 async function pickFromGallery() {
@@ -23,6 +25,7 @@ async function pickFromGallery() {
   const asset = result.assets[0];
   // Sin GPS en la foto, /ubicacion arranca sin pin y el vecino lo tiene que poner.
   const gps = gpsFromExif(asset.exif);
+  startSuggestion(asset.uri);
   router.push({ pathname: '/ubicacion', params: { photoUri: asset.uri, source: 'gallery', ...gps } });
 }
 
@@ -64,6 +67,7 @@ export default function CameraScreen() {
     setBusy(true);
     try {
       const photo = await camera.current!.takePictureAsync({ quality: 0.8, exif: false });
+      startSuggestion(photo.uri);
       router.push({ pathname: '/ubicacion', params: { photoUri: photo.uri, source: 'camera' } });
     } catch (e) {
       Alert.alert('No pudimos sacar la foto', e instanceof Error ? e.message : String(e));
