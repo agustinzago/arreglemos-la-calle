@@ -1,0 +1,9 @@
+{
+  "name": "arreglemos-la-calle",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "test": "pnpm --filter @arreglemos/tests test",
+    "typecheck": "pnpm --filter mobile typecheck"
+  }
+}
