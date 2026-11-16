@@ -6,7 +6,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { Camera, Images, Map } from 'lucide-react-native';
+import { Camera, Images, List, Map } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, View } from 'react-native';
@@ -95,6 +95,10 @@ export default function CameraScreen() {
           <Button variant="ghost" size="sm" className="flex-1" onPress={() => router.push('/mapa')}>
             <Map color="white" size={24} />
             <Text className="text-white">Mapa</Text>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex-1" onPress={() => router.push('/mis-reportes')}>
+            <List color="white" size={24} />
+            <Text className="text-white">Mis reportes</Text>
           </Button>
         </View>
       </View>

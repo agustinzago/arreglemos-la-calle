@@ -86,3 +86,14 @@ export async function joinReport(reportId: number): Promise<PublicReport> {
 }
 
 export const photoUrl = (path: string) => supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+
+/** Un reporte de "Mis reportes": `created` = lo creó este vecino; si no, se sumó. */
+export type MyReport = { report: PublicReport; created: boolean };
+
+/** Operación "mis reportes": los que creó y a los que se sumó, del más reciente al más viejo (sin ocultos). */
+export async function myReports(): Promise<MyReport[]> {
+  await ensureSession();
+  const { data, error } = await supabase.rpc('my_reports');
+  if (error) throw error;
+  return data as MyReport[];
+}
