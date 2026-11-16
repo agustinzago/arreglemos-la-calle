@@ -9,6 +9,7 @@ import { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { EmergencyNotice } from '@/components/emergency-notice';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { THEME } from '@/lib/theme';
@@ -58,6 +59,9 @@ export default function CameraScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#0b0d12]">
+      <View className="px-screen pb-2">
+        <EmergencyNotice tone="solid" />
+      </View>
       <CameraView ref={camera} facing="back" style={{ flex: 1 }} />
       <View className="gap-3 px-screen py-4">
         <Button onPress={shoot} disabled={busy} accessibilityLabel="Sacar foto">

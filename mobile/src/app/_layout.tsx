@@ -32,6 +32,8 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerTitleStyle: { fontFamily: 'Rubik_700Bold' }, headerBackButtonDisplayMode: 'minimal' }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="categoria" options={{ title: '¿Qué problema es?' }} />
+        <Stack.Screen name="detalles" options={{ title: 'Revisá y enviá' }} />
+        <Stack.Screen name="confirmacion" options={{ headerShown: false }} />
         <Stack.Screen name="mapa" options={{ title: 'Mapa' }} />
       </Stack>
     </ThemeProvider>

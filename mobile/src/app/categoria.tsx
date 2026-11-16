@@ -1,60 +1,111 @@
-// Elegir la categoría y crear el reporte. Los chips con íconos, "Otro", la revisión y la
-// confirmación son #4; la sugerencia de IA es #11.
+// Paso "¿Qué problema es?": chips grandes con ícono y texto. "Otro" pide un texto obligatorio, que
+// pasa a ser la descripción del reporte (la base también lo exige). La sugerencia de IA es #11.
 import { CATEGORIES, type CategoryCode } from '@arreglemos/shared';
 import { router, useLocalSearchParams } from 'expo-router';
+import { ArrowRight, CircleAlert, CircleCheck } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, useWindowDimensions, View } from 'react-native';
 
+import { FormScreen } from '@/components/form-screen';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { createReport } from '@/lib/reports';
-
-// "Otro" necesita un campo de descripción (#4); hasta entonces no se ofrece.
-const CHOICES = CATEGORIES.filter((c) => c.code !== 'otro');
+import { CATEGORY_ICONS } from '@/lib/categories';
+import { THEME } from '@/lib/theme';
+import { cn } from '@/lib/utils';
 
 export default function CategoryScreen() {
+  // Lo que traen los pasos anteriores (foto, punto, dirección…) sigue de largo hasta la revisión.
   const params = useLocalSearchParams<{ photoUri: string; lat: string; lng: string }>();
+  const theme = THEME[useColorScheme().colorScheme ?? 'light'];
+  const { fontScale } = useWindowDimensions();
   const [category, setCategory] = useState<CategoryCode>();
-  const [sending, setSending] = useState(false);
+  const [other, setOther] = useState('');
+  const [missingOther, setMissingOther] = useState(false);
+  const iconSize = 28 * Math.min(fontScale, 1.5);
 
-  async function send() {
+  function next() {
     if (!category) return;
-    setSending(true);
-    try {
-      const report = await createReport({
-        photoUri: params.photoUri,
-        lat: Number(params.lat),
-        lng: Number(params.lng),
-        category,
-      });
-      router.replace({ pathname: '/mapa', params: { id: report.id, lat: report.lat, lng: report.lng } });
-    } catch (e) {
-      Alert.alert('No pudimos enviarlo', e instanceof Error ? e.message : String(e));
-      setSending(false);
-    }
+    if (category === 'otro' && !other.trim()) return setMissingOther(true);
+    router.push({
+      pathname: '/detalles',
+      params: { ...params, category, other: category === 'otro' ? other.trim() : '' },
+    });
   }
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-background">
-      <ScrollView contentContainerClassName="gap-3 px-screen py-4">
-        {CHOICES.map((c) => (
-          <Button
-            key={c.code}
-            variant={category === c.code ? 'default' : 'outline'}
-            onPress={() => setCategory(c.code)}
-            aria-selected={category === c.code}
-          >
-            <Text>{c.label}</Text>
-          </Button>
-        ))}
-      </ScrollView>
-      <View className="border-t border-border px-screen pt-3">
-        <Button onPress={send} disabled={!category || sending}>
-          {sending && <ActivityIndicator />}
-          <Text>{sending ? 'Enviando…' : 'Enviar reporte'}</Text>
+    <FormScreen
+      footer={
+        <Button onPress={next} disabled={!category}>
+          <Text>Continuar</Text>
+          <ArrowRight color={theme.primaryForeground} size={24} />
         </Button>
+      }
+    >
+      <View role="radiogroup" className="flex-row flex-wrap gap-2.5">
+        {CATEGORIES.map((c) => {
+          const selected = category === c.code;
+          const Icon = CATEGORY_ICONS[c.code];
+          return (
+            <Pressable
+              key={c.code}
+              role="radio"
+              aria-checked={selected}
+              onPress={() => {
+                setCategory(c.code);
+                setMissingOther(false);
+              }}
+              className={cn(
+                'min-h-[92px] gap-2 rounded-lg border-2 p-3',
+                // Dos columnas; con la letra grande, una sola.
+                fontScale >= 1.5 ? 'basis-full' : 'grow basis-[40%]',
+                selected ? 'border-primary bg-primary-soft' : 'border-border bg-card',
+              )}
+            >
+              <View className="flex-row flex-wrap items-start justify-between gap-1">
+                <Icon color={selected ? theme.primaryInk : theme.foreground} size={iconSize} />
+                {selected && (
+                  <View className="flex-row items-center gap-1">
+                    <CircleCheck color={theme.primaryInk} size={18 * Math.min(fontScale, 1.5)} />
+                    <Text className="text-xs font-sans-bold text-primary-ink">Elegido</Text>
+                  </View>
+                )}
+              </View>
+              <Text className={cn('font-sans-semibold', selected && 'text-primary-ink')}>{c.label}</Text>
+            </Pressable>
+          );
+        })}
       </View>
-    </SafeAreaView>
+
+      {category === 'otro' && (
+        <View className="gap-2">
+          <Text nativeID="otro-label" className="font-sans-bold">
+            Contanos qué problema es <Text className="text-muted-foreground">(obligatorio)</Text>
+          </Text>
+          <Input
+            aria-labelledby="otro-label"
+            invalid={missingOther}
+            value={other}
+            onChangeText={(text) => {
+              setOther(text);
+              if (text.trim()) setMissingOther(false);
+            }}
+            placeholder="Por ejemplo: cartel caído"
+            autoFocus
+            returnKeyType="next"
+            onSubmitEditing={next}
+          />
+          {missingOther && (
+            <View role="alert" className="flex-row items-center gap-2">
+              <CircleAlert color={theme.destructiveInk} size={24} />
+              <Text className="shrink text-sm font-sans-semibold text-destructive-ink">
+                Escribí qué problema es para poder seguir.
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+    </FormScreen>
   );
 }
