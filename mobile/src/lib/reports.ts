@@ -1,0 +1,140 @@
+import type { CategoryCode, NearbyReport, PublicMunicipality, PublicReport, PublicReportEvent } from '@arreglemos/shared';
+import { File } from 'expo-file-system';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { ensureSession, supabase } from './supabase';
+
+/** Achica la foto y la vuelve a codificar como JPEG: el archivo nuevo no lleva EXIF (Ley 25.326). */
+export async function compressWithoutExif(uri: string) {
+  const image = await ImageManipulator.manipulate(uri).resize({ width: 1280 }).renderAsync();
+  const saved = await image.saveAsync({ compress: 0.6, format: SaveFormat.JPEG });
+  return saved.uri;
+}
+
+/** Sube una foto ya sin EXIF a la carpeta del vecino. Si ya estaba (409: un reintento), la reusa. */
+async function uploadPhoto(userId: string, name: string, uri: string) {
+  const path = `${userId}/${name}.jpg`;
+  const bytes = await new File(uri).arrayBuffer();
+  const upload = await supabase.storage.from('photos').upload(path, bytes, { contentType: 'image/jpeg' });
+  if (upload.error && !('statusCode' in upload.error && upload.error.statusCode === '409')) throw upload.error;
+  return path;
+}
+
+export type NewReport = {
+  photoUri: string;
+  lat: number;
+  lng: number;
+  category: CategoryCode;
+  description?: string;
+  address?: string;
+};
+
+/** Operación "crear reporte" del contrato: sube la foto a la carpeta del vecino y llama a create_report. */
+export async function createReport(input: NewReport, photoName = String(Date.now())): Promise<PublicReport> {
+  return sendReport({ ...input, photoUri: await compressWithoutExif(input.photoUri) }, photoName);
+}
+
+/**
+ * Como createReport, con la foto ya comprimida. Reintentar con el mismo `photoName` no duplica: la foto
+ * ya subida se reusa y create_report rechaza una segunda vez la misma foto (23505).
+ */
+export async function sendReport(input: NewReport, photoName: string): Promise<PublicReport> {
+  const user = await ensureSession();
+  const path = await uploadPhoto(user.id, photoName, input.photoUri);
+
+  const { data, error } = await supabase.rpc('create_report', {
+    p_photo_path: path,
+    p_lat: input.lat,
+    p_lng: input.lng,
+    p_category: input.category,
+    p_description: input.description,
+    p_address: input.address,
+  });
+  if (error) throw error;
+  return data as PublicReport;
+}
+
+export type Area = { west: number; south: number; east: number; north: number };
+export type MapFilters = { category: CategoryCode | null; status: 'open' | 'resolved' | null };
+
+/** Operación "mapa" del contrato: reportes no ocultos del área visible, de más a menos vecinos. */
+export async function mapReports(area: Area, filters: MapFilters): Promise<PublicReport[]> {
+  const { data, error } = await supabase.rpc('map_reports', {
+    p_west: area.west,
+    p_south: area.south,
+    p_east: area.east,
+    p_north: area.north,
+    p_category: filters.category,
+    p_status: filters.status,
+  });
+  if (error) throw error;
+  return data as PublicReport[];
+}
+
+/** Operación "reportes cercanos": hasta 3 abiertos de la categoría dentro de su radio de duplicado, del más cercano. */
+export async function nearbyReports(lat: number, lng: number, category: CategoryCode): Promise<NearbyReport[]> {
+  await ensureSession();
+  const { data, error } = await supabase.rpc('nearby_reports', { p_lat: lat, p_lng: lng, p_category: category });
+  if (error) throw error;
+  return data as NearbyReport[];
+}
+
+/** Un reporte público; null si no existe o está oculto. */
+export async function getReport(id: number): Promise<PublicReport | null> {
+  const { data, error } = await supabase.from('reports_public').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data as PublicReport | null;
+}
+
+/** La historia del reporte, en orden. Con sesión, `mine` marca los eventos de este vecino. */
+export async function listEvents(reportId: number): Promise<PublicReportEvent[]> {
+  await ensureSession();
+  const { data, error } = await supabase.from('report_events_public').select('*').eq('report_id', reportId).order('id');
+  if (error) throw error;
+  return data as PublicReportEvent[];
+}
+
+export async function getMunicipality(id: number): Promise<PublicMunicipality | null> {
+  const { data, error } = await supabase.from('municipalities_public').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data as PublicMunicipality | null;
+}
+
+/** Operación "registrar evento": sumarse. Si ya estaba sumado, el error es `duplicate_event`. */
+export async function joinReport(reportId: number): Promise<PublicReport> {
+  await ensureSession();
+  const { data, error } = await supabase.rpc('register_event', { p_report_id: reportId, p_type: 'sumate' });
+  if (error) throw error;
+  return data as PublicReport;
+}
+
+/**
+ * Operación "registrar evento" para marcar arreglado (foto opcional, sin EXIF), sigue roto o denunciar.
+ * Devuelve el reporte con el estado recalculado. Errores: `duplicate_event`, `not_open`, `not_resolved`.
+ */
+export async function registerEvent(
+  reportId: number,
+  type: 'resuelto' | 'sigue_roto' | 'denuncia',
+  photoUri?: string,
+): Promise<PublicReport> {
+  const user = await ensureSession();
+  const path = photoUri ? await uploadPhoto(user.id, String(Date.now()), await compressWithoutExif(photoUri)) : undefined;
+  const { data, error } = await supabase.rpc('register_event', { p_report_id: reportId, p_type: type, p_photo_path: path });
+  if (error) throw error;
+  return data as PublicReport;
+}
+
+export const photoUrl = (path: string) => supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+
+/** Un reporte de "Mis reportes": `created` = lo creó este vecino; si no, se sumó. */
+export type MyReport = { report: PublicReport; created: boolean };
+
+/** Operación "mis reportes": los que creó y a los que se sumó, del más reciente al más viejo (sin ocultos). */
+export async function myReports(): Promise<MyReport[]> {
+  await ensureSession();
+  const { data, error } = await supabase.rpc('my_reports');
+  if (error) throw error;
+  return data as MyReport[];
+}
+
+// ponytail: dominio sin decidir; EXPO_PUBLIC_WEB_URL (mobile/.env) lo pisa. Base del link a /r/[id].
+export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://arreglemoslacalle.example';

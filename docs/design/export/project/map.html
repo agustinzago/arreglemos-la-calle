@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa — Arreglemos la Calle</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+:root{--ink:#151a28;--paper:#fff;--pri:#1d3fb0;--warn:#ffc105;--warn-ink:#151a28;--ok:#186240;--ok-ink:#fff}
+.dark{--ink:#edf0f7;--paper:#1b1f2a;--pri:#7e9ffc;--warn:#ffcd29;--ok:#66cc92;--ok-ink:#0d2a1c}
+html,body,#m{height:100%;margin:0}
+body{background:#e6e8ee}
+body.dark{background:#14161d}
+.leaflet-container{background:transparent;font-family:'Rubik',system-ui,sans-serif}
+.leaflet-tile-pane{filter:saturate(.55) brightness(1.03)}
+.dark .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) saturate(.5) brightness(.85) contrast(.92)}
+.ms{font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1,'wght' 500;line-height:1;font-style:normal}
+.mk{position:absolute;left:-23px;top:-23px;width:46px;height:46px;box-sizing:border-box;border-radius:50%;border:3px solid var(--paper);display:grid;place-items:center;font-size:24px;box-shadow:0 2px 8px rgba(10,15,35,.35);cursor:pointer}
+.mk.abierto{background:var(--warn);color:var(--warn-ink)}
+.mk.resuelto{background:var(--ok);color:var(--ok-ink)}
+.mk .ck{position:absolute;right:-8px;top:-8px;width:20px;height:20px;border-radius:50%;background:var(--paper);color:var(--ok);font-size:20px;display:grid;place-items:center}
+.pill{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;display:flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border-radius:99px;background:var(--ink);color:var(--paper);border:2px solid var(--paper);font-size:15px;font-weight:700;box-shadow:0 2px 10px rgba(10,15,35,.35);cursor:pointer}
+.pill b{min-width:30px;height:30px;border-radius:50%;background:var(--warn);color:var(--warn-ink);display:grid;place-items:center;font-size:16px}
+.pin{position:absolute;left:-26px;top:-63px;width:52px;height:52px;box-sizing:border-box;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--pri);border:4px solid var(--paper);box-shadow:-3px 3px 10px rgba(10,15,35,.4);display:grid;place-items:center}
+.pin i{width:16px;height:16px;border-radius:50%;background:var(--paper)}
+.leaflet-bar{border:0!important;box-shadow:0 2px 10px rgba(10,15,35,.25)!important;border-radius:14px!important;overflow:hidden}
+.leaflet-bar a{width:48px!important;height:48px!important;line-height:48px!important;font-size:26px!important;background:var(--paper)!important;color:var(--ink)!important;border-color:rgba(110,118,140,.3)!important}
+.leaflet-control-attribution{font-size:10px;background:var(--paper)!important;color:var(--ink)!important;opacity:.85}
+.leaflet-control-attribution a{color:inherit!important}
+</style>
+</head>
+<body>
+<div id="m"></div>
+<script>
+const post = m => parent.postMessage(Object.assign({ alc: 1 }, m), '*');
+const map = L.map('m', { zoomControl: false, zoomSnap: .5 }).setView([-31.344, -64.3352], 16);
+map.attributionControl.setPrefix(false);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+const zoomCtl = L.control.zoom({ position: 'bottomright', zoomInTitle: 'Acercar', zoomOutTitle: 'Alejar' });
+const layer = L.layerGroup().addTo(map);
+let cfg = null, viewKey = '', pinLL = null;
+const icon = html => L.divIcon({ className: '', html, iconSize: [0, 0] });
+const HANDLERS = ['dragging', 'touchZoom', 'doubleClickZoom', 'scrollWheelZoom', 'boxZoom', 'keyboard'];
+function draw() {
+  layer.clearLayers();
+  if (!cfg) return;
+  if (cfg.mode === 'public') {
+    const rs = cfg.reports.filter(r => (cfg.cat === 'todas' || r.cat === cfg.cat) && (cfg.st === 'todos' || r.st === cfg.st));
+    const single = r => L.marker([r.lat, r.lng], { icon: icon('<div class="mk ' + r.st + '"><span class="ms">' + r.icon + '</span>' + (r.st === 'resuelto' ? '<span class="ms ck">check_circle</span>' : '') + '</div>'), title: r.label })
+      .on('click', () => post({ ev: 'open', id: r.id })).addTo(layer);
+    if (map.getZoom() >= 17.5) { rs.forEach(single); return; }
+    const g = {};
+    rs.forEach(r => (g[r.block] = g[r.block] || []).push(r));
+    Object.values(g).forEach(a => {
+      if (a.length === 1) { single(a[0]); return; }
+      const lat = a.reduce((s, r) => s + r.lat, 0) / a.length, lng = a.reduce((s, r) => s + r.lng, 0) / a.length, vec = a.reduce((s, r) => s + r.vec, 0);
+      L.marker([lat, lng], { icon: icon('<div class="pill"><b>' + a.length + '</b>reportes · ' + vec + ' vecinos</div>') })
+        .on('click', () => map.setView([lat, lng], 18)).addTo(layer);
+    });
+  } else {
+    if (cfg.mode === 'pick' && cfg.located) L.circle(cfg.center, { radius: 24, weight: 1, color: '#1d3fb0', fillOpacity: .12, interactive: false }).addTo(layer);
+    const mk = L.marker(pinLL || cfg.center, { icon: icon('<div class="pin"><i></i></div>'), draggable: cfg.mode === 'pick', autoPan: true }).addTo(layer);
+    if (cfg.mode === 'pick') mk.on('dragend', () => { pinLL = mk.getLatLng(); post({ ev: 'pin', lat: pinLL.lat, lng: pinLL.lng }); });
+  }
+}
+map.on('click', e => { if (cfg && cfg.mode === 'pick') { pinLL = e.latlng; draw(); post({ ev: 'pin', lat: pinLL.lat, lng: pinLL.lng }); } });
+map.on('zoomend', () => { if (cfg && cfg.mode === 'public') draw(); });
+addEventListener('message', e => {
+  const d = e.data;
+  if (!d || d.alc !== 'init') return;
+  cfg = d;
+  document.body.classList.toggle('dark', d.theme === 'dark');
+  const k = d.mode + '|' + d.center + '|' + d.zoom;
+  if (k !== viewKey) {
+    viewKey = k; pinLL = null;
+    map.setView(d.center, d.zoom, { animate: false });
+    HANDLERS.forEach(h => map[h][d.mode === 'static' ? 'disable' : 'enable']());
+    if (d.mode === 'static') zoomCtl.remove(); else zoomCtl.addTo(map);
+  }
+  draw();
+});
+addEventListener('resize', () => map.invalidateSize());
+post({ ev: 'ready' });
+</script>
+</body>
+</html>
