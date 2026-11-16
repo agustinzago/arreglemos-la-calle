@@ -39,13 +39,19 @@ export async function createReport(input: NewReport): Promise<PublicReport> {
   return data as PublicReport;
 }
 
-/** Lectura pública para el mapa básico. El mapa con área visible y filtros es #9. */
-export async function listReports(): Promise<PublicReport[]> {
-  const { data, error } = await supabase
-    .from('reports_public')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(500);
+export type Area = { west: number; south: number; east: number; north: number };
+export type MapFilters = { category: CategoryCode | null; status: 'open' | 'resolved' | null };
+
+/** Operación "mapa" del contrato: reportes no ocultos del área visible, de más a menos vecinos. */
+export async function mapReports(area: Area, filters: MapFilters): Promise<PublicReport[]> {
+  const { data, error } = await supabase.rpc('map_reports', {
+    p_west: area.west,
+    p_south: area.south,
+    p_east: area.east,
+    p_north: area.north,
+    p_category: filters.category,
+    p_status: filters.status,
+  });
   if (error) throw error;
   return data as PublicReport[];
 }
