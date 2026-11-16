@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "ar.arreglemoslacalle.app"
+      "bundleIdentifier": "ar.arreglemoslacalle.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "ar.arreglemoslacalle.app",
