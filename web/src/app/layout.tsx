@@ -29,6 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <span className="muted">App vecinal independiente</span>
         </header>
         {children}
+        <footer className="foot">
+          <a href="/privacidad">Privacidad</a>
+          <a href="/soporte">Soporte</a>
+        </footer>
       </body>
     </html>
   );
