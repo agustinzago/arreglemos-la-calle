@@ -1,9 +1,9 @@
 // Confirmación con el número de reporte, "Enviar a la Muni por WhatsApp" (ADR-0001) y el aviso de
 // emergencias (ADR-0006). La app solo abre el link de wa.me: no registra si el mensaje se envió.
-// "¿Te avisamos cuando lo arreglen?" es #13.
+// "¿Te avisamos cuando lo arreglen?" (#13): el permiso de notificaciones se pide solo si acepta.
 import { muniMessage, reportUrl, whatsappLink, type PublicMunicipality } from '@arreglemos/shared';
 import { router, useLocalSearchParams } from 'expo-router';
-import { CircleCheck, Map, MessageCircle } from 'lucide-react-native';
+import { Bell, BellRing, CircleCheck, Map, MessageCircle } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, useWindowDimensions, View } from 'react-native';
@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmergencyNotice } from '@/components/emergency-notice';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { enableNotices, noticesAvailable, noticesEnabled } from '@/lib/notices';
 import { getMunicipality, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -83,6 +84,7 @@ export default function ConfirmationScreen() {
             </Text>
           </View>
         )}
+        {noticesAvailable && <NoticesCard />}
         <EmergencyNotice />
       </ScrollView>
       <View className="gap-2 border-t border-border px-screen pb-2 pt-3">
@@ -101,5 +103,49 @@ export default function ConfirmationScreen() {
         </Button>
       </View>
     </SafeAreaView>
+  );
+}
+
+function NoticesCard() {
+  const theme = THEME[useColorScheme().colorScheme ?? 'light'];
+  const [state, setState] = useState<'ask' | 'asking' | 'on' | 'denied' | 'error'>(noticesEnabled() ? 'on' : 'ask');
+
+  function accept() {
+    setState('asking');
+    enableNotices().then(setState, () => setState('error'));
+  }
+
+  // Al volver de Ajustes puede aceptar de nuevo.
+  function openSettings() {
+    Linking.openSettings();
+    setState('ask');
+  }
+
+  if (state === 'on') {
+    return (
+      <View role="status" className="flex-row items-center gap-3 rounded-md bg-success-soft px-3.5 py-3">
+        <BellRing color={theme.successInk} size={24} />
+        <Text className="shrink font-sans-semibold text-success-ink">Listo, te vamos a avisar</Text>
+      </View>
+    );
+  }
+  return (
+    <View className="gap-3 rounded-xl border border-border bg-card p-4">
+      <Text className="font-sans-bold">¿Te avisamos cuando lo arreglen?</Text>
+      {state === 'denied' && (
+        <Text variant="muted">Para avisarte, la app necesita permiso de notificaciones. Lo podés activar en Ajustes.</Text>
+      )}
+      {state === 'error' && <Text variant="muted">No pudimos activar los avisos. Revisá tu conexión y probá de nuevo.</Text>}
+      {state === 'denied' ? (
+        <Button variant="outline" size="sm" className="min-h-[52px] rounded-md" onPress={openSettings}>
+          <Text>Abrir Ajustes</Text>
+        </Button>
+      ) : (
+        <Button variant="outline" size="sm" className="min-h-[52px] rounded-md" disabled={state === 'asking'} onPress={accept}>
+          <Bell color={theme.primaryInk} size={22} />
+          <Text>{state === 'error' ? 'Probar de nuevo' : 'Sí, avisame'}</Text>
+        </Button>
+      )}
+    </View>
   );
 }

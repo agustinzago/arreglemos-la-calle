@@ -66,8 +66,24 @@ npx supabase@3.1.0 functions deploy suggest-category --use-api --remote=<project
 La key de Anthropic va solo como secreto de la función, nunca en la app ni en `.env`. Dejar la verificación de JWT
 activada (default): la app la llama con la sesión anónima del vecino.
 
+## Avisos push
+
+Cuando un reporte pasa a resuelto o vuelve a abierto, un trigger de la base (`notify_status_change`,
+migración `*_notices.sql`) avisa a quienes lo crearon o se sumaron y aceptaron los avisos: guarda cada aviso
+en `public.notices` y los manda a la API de push de Expo con `pg_net`. No hay Edge Function que desplegar.
+Las respuestas de Expo quedan en `net._http_response`.
+
+La app solo ofrece "¿Te avisamos cuando lo arreglen?" si tiene `extra.eas.projectId` y corre en un teléfono
+real. Los pasos humanos (cuenta de Expo, `eas init`, Firebase/FCM, APNs, build de desarrollo y la prueba
+de punta a punta) están en un asistente:
+
+```sh
+bash scripts/push-setup.sh
+```
+
 ## Pendiente humano
 
+- Avisos push: correr `scripts/push-setup.sh` (ver Avisos push).
 - Desplegar `suggest-category` y cargar el secreto `ANTHROPIC_API_KEY` (ver Edge Functions).
 - Android fuera de Expo Go necesita una API key de Google Maps (plugin `react-native-maps` en `mobile/app.json`).
 - Ícono y splash de la app todavía son los del template de Expo.
