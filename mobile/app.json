@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "ar.arreglemoslacalle.app"
+      "bundleIdentifier": "ar.arreglemoslacalle.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "ar.arreglemoslacalle.app",
@@ -55,13 +58,7 @@
       "expo-sqlite",
       "expo-font",
       "expo-notifications",
-      "expo-apple-authentication",
-      [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.REEMPLAZAR-POR-EL-IOS-CLIENT-ID"
-        }
-      ]
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

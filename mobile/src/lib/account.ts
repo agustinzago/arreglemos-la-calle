@@ -16,8 +16,8 @@ export type Provider = 'apple' | 'google';
 
 const googleWebClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
-// Google necesita un build de desarrollo (no anda en Expo Go) y los client IDs (en iOS, también el
-// iosUrlScheme del plugin en app.json).
+// Google necesita un build de desarrollo (no anda en Expo Go) y los client IDs (con el de iOS,
+// app.config.ts suma el plugin con su iosUrlScheme).
 const googleAvailable =
   Constants.executionEnvironment !== ExecutionEnvironment.StoreClient &&
   !!googleWebClientId &&

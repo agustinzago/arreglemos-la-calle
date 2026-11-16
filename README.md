@@ -9,7 +9,7 @@ mobile/     App Expo (SDK 58, Expo Router, NativeWind v4, React Native Reusables
 shared/     @arreglemos/shared: código TS sin build que usan la app, la web y los tests (categorías, tipos)
 supabase/   migrations/ (SQL con timestamp) y scripts/ (generador de municipios desde IDECOR)
 tests/      Tests del contrato del backend: vitest + supabase-js contra el proyecto de Supabase de test
-web/        Next.js 16 (solo lectura): /r/[id], la página pública del reporte con Open Graph. Lee el .env de la raíz
+web/        Next.js 16 (solo lectura): /r/[id] (reporte con Open Graph), /ranking/[municipio], /privacidad, /soporte. Lee el .env de la raíz
 ```
 
 Workspace de pnpm (`nodeLinker: hoisted`, lo necesita NativeWind). Node 24, pnpm 11.
@@ -90,30 +90,150 @@ todo lo que hizo. En otro teléfono el mismo botón falla con `identity_already_
 cuenta (`signInWithIdToken`), que trae sus reportes. Con la cuenta vinculada aparece "Borrar mi cuenta" (Apple lo
 exige): borra las fotos de su carpeta con la API de Storage y llama `delete_my_account` (migración
 `*_delete_account.sql`). Google no anda en Expo Go (hace falta un build de desarrollo); sin los client IDs la app no lo
-ofrece. Apple anda en Expo Go si se agrega `host.exp.Exponent` a los Client IDs de Apple en Supabase.
+ofrece, y `mobile/app.config.ts` suma el plugin de Google solo si está `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`. Apple anda en Expo Go si se agrega `host.exp.Exponent` a los Client IDs de Apple en Supabase.
 
-## Pendiente humano
+## Builds de la app
 
-- Avisos push: correr `scripts/push-setup.sh` (ver Avisos push).
-- Desplegar `suggest-category` y cargar el secreto `ANTHROPIC_API_KEY` (ver Edge Functions).
-- Android fuera de Expo Go necesita una API key de Google Maps (plugin `react-native-maps` en `mobile/app.json`).
-- Ícono y splash de la app todavía son los del template de Expo.
-- Cuentas de Apple y Google (ver Cuentas). Hasta hacerlo, la tarjeta "No pierdas tus reportes" no vincula nada:
-  1. Supabase → Authentication → Sign In / Providers: activar **Allow manual linking** (lo usa `linkIdentity`).
-  2. Apple Developer → Identifiers → App ID `ar.arreglemoslacalle.app`: activar la capability **Sign in with Apple**
-     (EAS también la sincroniza en el primer build, por el plugin `expo-apple-authentication` de `mobile/app.json`).
-     Solo app nativa: no hacen falta Services ID, clave .p8 ni secreto.
-  3. Supabase → Providers → Apple: activar, y en **Client IDs** poner `ar.arreglemoslacalle.app` (más
-     `host.exp.Exponent` para probar en Expo Go).
-  4. Google Cloud Console → APIs & Services: configurar la pantalla de consentimiento (OAuth consent screen) y crear
-     tres OAuth client IDs: **Web** (es el `webClientId`), **iOS** (bundle `ar.arreglemoslacalle.app`) y **Android**
-     (paquete `ar.arreglemoslacalle.app` con el SHA-1 del certificado de firma: `npx eas-cli@latest credentials`; uno
-     por cada certificado, el de EAS y el de Play App Signing).
-  5. Supabase → Providers → Google: activar, en **Client IDs** poner el web primero y después el de iOS y el de
-     Android, separados por coma, y activar **Skip nonce checks** (el SDK de Google en iOS manda un nonce que la app no
-     ve). El client secret no hace falta para el flujo nativo.
-  6. `mobile/.env` (y las variables de entorno de EAS): `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` y
-     `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`. En `mobile/app.json`, el `iosUrlScheme` del plugin de Google es el client ID
-     de iOS al revés: `com.googleusercontent.apps.<lo que va antes de .apps.googleusercontent.com>`.
-  7. Build de desarrollo (`npx eas-cli@latest build --profile development`) y probar: vincular en un teléfono, ver
-     "Cuenta vinculada", entrar con la misma cuenta en otro y ver los mismos reportes; después "Borrar mi cuenta".
+`mobile/eas.json` tiene tres perfiles de EAS Build:
+
+- `development`: dev client (expo-dev-client), instalación interna. Se usa con `npx expo start --dev-client`.
+- `preview`: build normal para probar en teléfonos (APK en Android), instalación interna.
+- `production`: para las tiendas (AAB en Android). Sube solo el número de build.
+
+`mobile/.env` no se commitea, así que en EAS Build no existe: las `EXPO_PUBLIC_*` salen de las variables de
+EAS del environment del perfil (`development`, `preview`, `production`; ver Lanzamiento). `mobile/app.config.ts`
+suma a `app.json` lo que viene de variables: `GOOGLE_MAPS_API_KEY` (mapa en Android) y `GOOGLE_SERVICES_JSON`
+(Firebase, para los avisos) y, con `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`, el plugin de Google Sign-In. La config que queda: `cd mobile && npx expo config --type public`.
+
+Versiones: `appVersionSource: "remote"`, así que EAS guarda el `buildNumber` de iOS y el `versionCode` de Android
+y `production` los sube en cada build (`autoIncrement`). La versión que ve la gente es `expo.version` en
+`mobile/app.json`: subirla a mano en cada release a las tiendas (1.0.0 → 1.0.1 o 1.1.0).
+
+```sh
+cd mobile
+npx eas-cli@latest build --profile production --platform all
+npx eas-cli@latest submit --profile production --platform ios     # y --platform android
+```
+
+## Lanzamiento
+
+Lo que es código ya está. Esto es lo que hace una persona, más o menos en este orden.
+
+### Supabase de producción
+
+- [ ] Crear el proyecto de producción (el de test queda para los tests) y aplicar todas las migraciones en orden
+      con su `SUPABASE_DB_URL` (ver Migraciones).
+- [ ] Auth → Sign In / Providers: activar "Allow anonymous sign-ins" y "Allow manual linking" (vincular cuenta, ver
+      Cuentas).
+- [ ] Auth → Rate Limits: dejar el límite de inicios de sesión anónimos por IP en el default (30 por hora). Si
+      vecinos de una misma red móvil (comparten IP) reciben error al abrir la app por primera vez, subirlo.
+- [ ] Auth → Attack Protection: **no** activar el CAPTCHA todavía. Con CAPTCHA, `signInAnonymously` tiene que
+      mandar un `captchaToken` y la app no lo hace: nadie podría entrar. Activarlo requiere sumar Turnstile o
+      hCaptcha a la app primero.
+- [ ] Desplegar `suggest-category` en producción (ver Edge Functions).
+- [ ] Cargar el WhatsApp de cada municipio activo. Número con código de país, como lo pide wa.me (549 + característica
+      sin 0 + número sin 15). Sin número la app no muestra "Enviar a la Muni":
+
+  ```sql
+  update public.municipalities set whatsapp = '5493543000000' where name = 'La Calera';
+  select name, whatsapp from public.municipalities where active and whatsapp is not null;
+  ```
+
+### Dominio y web (Vercel)
+
+- [ ] Comprar el dominio.
+- [ ] Vercel → Add New Project → importar el repo, Root Directory `web` (Next.js, pnpm y Node 24 los detecta solo).
+- [ ] Variables del proyecto (Production): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` de producción,
+      `SITE_URL=https://<dominio>` (og:url y links absolutos) y `CONTACT_EMAIL` (la casilla de /privacidad y /soporte).
+- [ ] Settings → Domains: agregar el dominio y cargar los registros DNS que pide Vercel.
+- [ ] Crear la casilla de `CONTACT_EMAIL` (un reenvío del dominio alcanza) y probar que llegue.
+- [ ] Abrir `https://<dominio>/privacidad`, `/soporte`, `/r/<id>` y `/ranking/la-calera`.
+
+### EAS (app)
+
+- [ ] `bash scripts/push-setup.sh`: cuenta de Expo, `eas init` (projectId), Firebase/FCM y APNs.
+- [ ] Google Maps para Android: Google Cloud Console → habilitar "Maps SDK for Android" → Credenciales → crear una
+      API key restringida a apps de Android con el paquete `ar.arreglemoslacalle.app` y los SHA-1 del certificado de
+      EAS (`npx eas-cli@latest credentials --platform android`) y de Play (Play Console → Integridad de la app).
+- [ ] Variables de EAS (desde `mobile/`). `EXPO_PUBLIC_*` van en el bundle, así que no son secretas:
+
+  ```sh
+  ENVS="--environment production --environment preview --environment development"
+  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_SUPABASE_URL --value https://<ref>.supabase.co --visibility plaintext
+  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY --value sb_publishable_… --visibility plaintext
+  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_WEB_URL --value https://<dominio> --visibility plaintext
+  npx eas-cli@latest env:set $ENVS --name GOOGLE_MAPS_API_KEY --value AIza… --visibility sensitive
+  npx eas-cli@latest env:set $ENVS --name GOOGLE_SERVICES_JSON --type file --value ./google-services.json --visibility secret
+  ```
+
+  Si `development` y `preview` tienen que apuntar al Supabase de test, cargar esos con sus propios valores.
+- [ ] `npx eas-cli@latest build --profile preview --platform android` y probar en un teléfono: mapa, foto,
+      reporte, compartir (link al dominio) y avisos.
+
+### Cuentas de Apple y Google (vincular cuenta)
+
+Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (o no vincula). Ver Cuentas.
+
+- [ ] Apple: el primer `eas build` de iOS crea el App ID `ar.arreglemoslacalle.app` con la capability **Sign in with
+      Apple** (por el plugin `expo-apple-authentication`). Solo app nativa: no hacen falta Services ID, clave .p8 ni
+      secreto.
+- [ ] Supabase → Providers → Apple: activar, y en **Client IDs** poner `ar.arreglemoslacalle.app` (más
+      `host.exp.Exponent` para probar en Expo Go).
+- [ ] Google Cloud Console (la misma cuenta que Play y Firebase) → APIs & Services: pantalla de consentimiento (OAuth
+      consent screen) con el dominio autorizado (verificarlo antes en Google Search Console) y la URL de
+      `/privacidad`. Crear tres OAuth client IDs: **Web** (es el `webClientId`), **iOS** (bundle
+      `ar.arreglemoslacalle.app`) y **Android** (paquete `ar.arreglemoslacalle.app` y SHA-1: uno con el certificado de
+      EAS, `npx eas-cli@latest credentials --platform android`, y otro con el de Play → Integridad de la app).
+- [ ] Supabase → Providers → Google: activar, en **Client IDs** el web primero y después el de iOS y los de Android,
+      separados por coma, y activar **Skip nonce checks** (el SDK de Google en iOS manda un nonce que la app no ve).
+      El client secret no hace falta para el flujo nativo.
+- [ ] Variables de EAS (y `mobile/.env` para desarrollo local). `app.config.ts` arma con la de iOS el `iosUrlScheme`
+      del plugin de Google:
+
+  ```sh
+  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID --value <n>-<…>.apps.googleusercontent.com --visibility plaintext
+  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID --value <n>-<…>.apps.googleusercontent.com --visibility plaintext
+  ```
+
+- [ ] Build de desarrollo o preview y probar: vincular en un teléfono, ver "Cuenta vinculada", entrar con la misma
+      cuenta en otro y ver los mismos reportes; después "Borrar mi cuenta".
+
+### Arte
+
+- [ ] Ícono y splash: siguen siendo los del template de Expo. Reemplazar `mobile/assets/expo.icon` (iOS),
+      `mobile/assets/images/icon.png`, `android-icon-foreground.png`, `android-icon-background.png`,
+      `android-icon-monochrome.png` y `splash-icon.png`.
+- [ ] Capturas para las tiendas (iPhone 6.9" y teléfono Android), ícono de Play de 512×512 y gráfico destacado de
+      1024×500.
+
+### App Store
+
+- [ ] Apple Developer Program (USD 99/año).
+- [ ] `npx eas-cli@latest build --profile production --platform ios`: EAS crea el App ID y los certificados.
+- [ ] App Store Connect → Apps → nueva app con el bundle `ar.arreglemoslacalle.app`, idioma principal Español (México).
+- [ ] `npx eas-cli@latest submit --profile production --platform ios` y probar por TestFlight.
+- [ ] Ficha: nombre, subtítulo, descripción, palabras clave, capturas, categoría, URL de soporte
+      `https://<dominio>/soporte` y URL de privacidad `https://<dominio>/privacidad`.
+- [ ] Privacidad de la app (las respuestas siguen `/privacidad`): sin rastreo (tracking: no). Datos recopilados,
+      todos para "Funcionalidad de la app" y vinculados al usuario (por la cuenta anónima):
+      Ubicación precisa; Fotos o videos; Otro contenido del usuario (descripción); ID de usuario (cuenta anónima);
+      ID del dispositivo (token de avisos); Dirección de correo (solo si vincula Apple o Google, opcional).
+- [ ] Cifrado: no hace falta responder, `ios.config.usesNonExemptEncryption: false` ya está en `app.json` (solo HTTPS).
+- [ ] Notas para la revisión: contar que la cuenta es anónima, que los reportes son públicos y que vincular Apple o
+      Google es opcional (en Mis reportes); "Borrar mi cuenta" aparece ahí una vez vinculada.
+
+### Google Play
+
+- [ ] Cuenta de Play Console (USD 25). Las cuentas personales nuevas tienen que hacer una prueba cerrada con al
+      menos 12 testers durante 14 días antes de poder publicar en producción: arrancarla temprano.
+- [ ] Crear la app, `npx eas-cli@latest build --profile production --platform android` y subir el primer AAB a mano
+      (Play no acepta el primero por API). Después, `eas submit` con una cuenta de servicio de Google Play.
+- [ ] Ficha: descripción, capturas, ícono, gráfico destacado, mail de contacto y política de privacidad
+      `https://<dominio>/privacidad`.
+- [ ] Seguridad de los datos: recopila datos: sí; comparte con terceros: no (Supabase, Expo y Anthropic son
+      proveedores de servicio); cifrados en tránsito: sí; se puede pedir el borrado: sí ("Borrar mi cuenta" en la app y `https://<dominio>/soporte`).
+      Tipos, todos para "Funcionalidad de la app": Ubicación precisa; Fotos; Otro contenido generado por el usuario
+      (descripción); ID del dispositivo u otros IDs (cuenta anónima y token de avisos, opcional); Dirección de correo
+      (solo si vincula Apple o Google, opcional).
+- [ ] Clasificación de contenido: el contenido lo generan los usuarios y es público (hay "Denunciar" y un operador
+      que oculta reportes). Público objetivo: 13 años o más. Sin anuncios.
