@@ -19,11 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <header className="top">
           <div className="brand">
-            <span className="logo" aria-hidden="true">
-              <i className="hole" />
-              <i className="pin" />
-              <i className="dot" />
-            </span>
+            <img className="logo" src="/logo.png" alt="" width={34} height={34} />
             Arreglemos la Calle
           </div>
           <span className="muted">App vecinal independiente</span>

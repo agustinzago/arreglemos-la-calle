@@ -29,16 +29,34 @@ describe('crear reporte', () => {
     expect(data.lng).toBeCloseTo(PLACES.laCalera.lng, 6);
   });
 
-  test('un reporte dentro de un polígono queda con ese municipio', async () => {
-    for (const [place, name] of [
-      [PLACES.laCalera, 'La Calera'],
-      [PLACES.cordoba, 'Córdoba'],
-      [PLACES.villaAllende, 'Villa Allende'],
-    ] as const) {
-      const { data, error } = await createReport(v, place);
-      expect(error).toBeNull();
-      expect(data.municipality_id).toBe(municipalityIds[name]);
-    }
+  // Un punto en el centro de cada municipio cargado, verificado contra los polígonos de IDECOR.
+  const CENTROS: Record<string, { lat: number; lng: number }> = {
+    Córdoba: PLACES.cordoba,
+    'La Calera': PLACES.laCalera,
+    'Villa Allende': PLACES.villaAllende,
+    Unquillo: { lat: -31.2306, lng: -64.3164 },
+    Mendiolaza: { lat: -31.2667, lng: -64.3 },
+    'Río Ceballos': { lat: -31.165, lng: -64.322 },
+    Saldán: { lat: -31.3105, lng: -64.3125 },
+    Salsipuedes: { lat: -31.137, lng: -64.295 },
+    'Agua de Oro': { lat: -31.067, lng: -64.3 },
+    'Estación Juárez Celman': { lat: -31.26, lng: -64.168 },
+    'Malvinas Argentinas': { lat: -31.373, lng: -64.053 },
+    Malagueño: { lat: -31.465, lng: -64.358 },
+    'Villa Carlos Paz': { lat: -31.424, lng: -64.4978 },
+    'Alta Gracia': { lat: -31.656, lng: -64.429 },
+    'Jesús María': { lat: -30.9817, lng: -64.0942 },
+    'Colonia Caroya': { lat: -31.016, lng: -64.095 },
+  };
+
+  test('cada municipio cargado tiene su punto de prueba', () => {
+    expect(Object.keys(municipalityIds).sort()).toEqual(Object.keys(CENTROS).sort());
+  });
+
+  test.each(Object.entries(CENTROS))('un reporte en %s queda con ese municipio', async (name, place) => {
+    const { data, error } = await createReport(v, place);
+    expect(error).toBeNull();
+    expect(data.municipality_id).toBe(municipalityIds[name]);
   });
 
   test('un reporte fuera de todo polígono queda sin municipio', async () => {
