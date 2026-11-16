@@ -61,6 +61,24 @@ describe('crear reporte', () => {
     expect(error?.code).toBe('23514');
   });
 
+  test('"Otro" exige una descripción', async () => {
+    for (const description of [undefined, '   ']) {
+      const { data, error } = await createReport(v, { ...PLACES.laCalera, category: 'otro', description });
+      expect(data).toBeNull();
+      expect(error?.code).toBe('23514');
+      expect(error?.message).toContain('reports_otro_needs_description');
+    }
+    const { data, error } = await createReport(v, { ...PLACES.laCalera, category: 'otro', description: 'Cartel caído' });
+    expect(error).toBeNull();
+    expect(data.description).toBe('Cartel caído');
+  });
+
+  test('las demás categorías no exigen descripción', async () => {
+    const { data, error } = await createReport(v, { ...PLACES.laCalera, category: 'bache' });
+    expect(error).toBeNull();
+    expect(data.description).toBeNull();
+  });
+
   test('rechaza una foto que no está en la carpeta del vecino', async () => {
     const otro = await vecino();
     const { error } = await v.client.rpc('create_report', {
