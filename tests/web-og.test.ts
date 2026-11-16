@@ -64,3 +64,25 @@ test('un id inexistente o un reporte oculto no está disponible', async () => {
   expect(html).toContain(GONE);
   expect(html).not.toContain('og:image');
 });
+
+test('el ranking semanal se elige por municipio, linkea a cada reporte y tiene Open Graph', async () => {
+  const v = await vecino();
+  const { data: report } = await createReport(v, { ...PLACES.laCalera, address: 'Belgrano 120' });
+  // Base compartida: lo envejece para que encabece "más días abiertos".
+  const old = new Date(Date.now() - 3650 * 86_400_000).toISOString();
+  await admin.from('reports').update({ created_at: old }).eq('id', report.id).throwOnError();
+
+  const html = await (await fetch(`${BASE}/ranking/la-calera`, { headers: WHATSAPP })).text();
+  const [head, body] = html.split('</head>');
+  expect(head).toContain('<meta property="og:title" content="Ranking semanal de La Calera"');
+  expect(head).toMatch(/<meta property="og:description" content="\d+ reportes? abiertos? · [^"]+ · Semana del [^"]+"/);
+  expect(head).toMatch(/<meta property="og:image" content="https:\/\/[^"]+\/photos\/[^"]+\.jpg"/);
+  expect(body).toContain('<h1>Reportes vecinales de La Calera</h1>');
+  expect(body).toContain('Con más vecinos sumados');
+  expect(body).toContain('Con más días abiertos');
+  expect(body).toContain(`href="/r/${report.id}"`);
+  expect(body).toContain('Belgrano 120');
+
+  const gone = await (await fetch(`${BASE}/ranking/no-existe`, { headers: WHATSAPP })).text();
+  expect(gone).toContain('<h1>Este ranking no está disponible</h1>');
+});
