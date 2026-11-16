@@ -150,8 +150,6 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
       probar que llegue.
 - [ ] Verificar el dominio en Google Search Console (la misma cuenta de Google que Play y Google Cloud): lo pide la
       pantalla de consentimiento de OAuth de Google Sign-In para ponerlo como dominio autorizado.
-- [ ] Revisar `/privacidad` (`web/src/app/privacidad/page.tsx`): es un borrador; al aprobarlo, sacar el aviso
-      "Borrador" y el comentario `ponytail:`.
 - [ ] Abrir `https://arreglemoslacalle.app/privacidad`, `/soporte`, `/r/<id>` y `/ranking/la-calera`.
 
 ### EAS (app)
