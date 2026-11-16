@@ -62,7 +62,17 @@ export default function DetailsScreen() {
         address: params.address,
       });
       router.dismissAll();
-      router.push({ pathname: '/confirmacion', params: { id: report.id, lat: report.lat, lng: report.lng } });
+      router.push({
+        pathname: '/confirmacion',
+        params: {
+          id: report.id,
+          lat: report.lat,
+          lng: report.lng,
+          category: report.category,
+          address: report.address ?? '',
+          municipalityId: report.municipality_id ?? '',
+        },
+      });
     } catch (e) {
       Alert.alert('No pudimos enviarlo', e instanceof Error ? e.message : String(e));
       setSending(false);

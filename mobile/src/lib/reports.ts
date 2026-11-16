@@ -1,4 +1,4 @@
-import type { CategoryCode, PublicReport } from '@arreglemos/shared';
+import type { CategoryCode, PublicMunicipality, PublicReport } from '@arreglemos/shared';
 import { File } from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { ensureSession, supabase } from './supabase';
@@ -49,3 +49,12 @@ export async function listReports(): Promise<PublicReport[]> {
   if (error) throw error;
   return data as PublicReport[];
 }
+
+export async function getMunicipality(id: number): Promise<PublicMunicipality | null> {
+  const { data, error } = await supabase.from('municipalities_public').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data as PublicMunicipality | null;
+}
+
+// ponytail: dominio sin decidir; EXPO_PUBLIC_WEB_URL (mobile/.env) lo pisa. Base del link a /r/[id].
+export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://arreglemoslacalle.example';
