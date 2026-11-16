@@ -1,4 +1,4 @@
-import type { CategoryCode, PublicReport } from '@arreglemos/shared';
+import type { CategoryCode, PublicMunicipality, PublicReport, PublicReportEvent } from '@arreglemos/shared';
 import { File } from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { ensureSession, supabase } from './supabase';
@@ -49,3 +49,34 @@ export async function listReports(): Promise<PublicReport[]> {
   if (error) throw error;
   return data as PublicReport[];
 }
+
+/** Un reporte público; null si no existe o está oculto. */
+export async function getReport(id: number): Promise<PublicReport | null> {
+  const { data, error } = await supabase.from('reports_public').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data as PublicReport | null;
+}
+
+/** La historia del reporte, en orden. Con sesión, `mine` marca los eventos de este vecino. */
+export async function listEvents(reportId: number): Promise<PublicReportEvent[]> {
+  await ensureSession();
+  const { data, error } = await supabase.from('report_events_public').select('*').eq('report_id', reportId).order('id');
+  if (error) throw error;
+  return data as PublicReportEvent[];
+}
+
+export async function getMunicipality(id: number): Promise<PublicMunicipality | null> {
+  const { data, error } = await supabase.from('municipalities_public').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data as PublicMunicipality | null;
+}
+
+/** Operación "registrar evento": sumarse. Si ya estaba sumado, el error es `duplicate_event`. */
+export async function joinReport(reportId: number): Promise<PublicReport> {
+  await ensureSession();
+  const { data, error } = await supabase.rpc('register_event', { p_report_id: reportId, p_type: 'sumate' });
+  if (error) throw error;
+  return data as PublicReport;
+}
+
+export const photoUrl = (path: string) => supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;

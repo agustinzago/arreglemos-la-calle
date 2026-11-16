@@ -33,6 +33,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="categoria" options={{ title: '¿Qué problema es?' }} />
         <Stack.Screen name="mapa" options={{ title: 'Mapa' }} />
+        <Stack.Screen name="reporte/[id]" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
