@@ -18,3 +18,19 @@ export type PublicReport = {
   updated_at: string;
   resolved_at: string | null;
 };
+
+export type ReportEventType = 'sumate' | 'resuelto' | 'sigue_roto' | 'denuncia';
+
+/** Una fila de public.report_events_public: la historia del reporte, sin decir quién. */
+export type PublicReportEvent = {
+  id: number;
+  report_id: number;
+  type: ReportEventType;
+  photo_path: string | null;
+  created_at: string;
+  /** true si el evento es del vecino que pregunta. */
+  mine: boolean;
+};
+
+/** Una fila de public.municipalities_public. whatsapp null = todavía no lo tenemos. */
+export type PublicMunicipality = { id: number; name: string; whatsapp: string | null };
