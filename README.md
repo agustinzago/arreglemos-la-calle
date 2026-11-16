@@ -9,6 +9,7 @@ mobile/     App Expo (SDK 58, Expo Router, NativeWind v4, React Native Reusables
 shared/     @arreglemos/shared: código TS sin build que usan la app, la web y los tests (categorías, tipos)
 supabase/   migrations/ (SQL con timestamp) y scripts/ (generador de municipios desde IDECOR)
 tests/      Tests del contrato del backend: vitest + supabase-js contra el proyecto de Supabase de test
+web/        Next.js 16 (solo lectura): /r/[id], la página pública del reporte con Open Graph. Lee el .env de la raíz
 ```
 
 Workspace de pnpm (`nodeLinker: hoisted`, lo necesita NativeWind). Node 24, pnpm 11.
@@ -27,7 +28,8 @@ En el proyecto de Supabase: activar "Allow anonymous sign-ins" y subir el límit
 
 ```sh
 pnpm test          # tests del contrato (lee .env o las variables de entorno)
-pnpm typecheck     # tsc de la app
+pnpm typecheck     # tsc de la app y de la web
+pnpm --filter web dev                            # web en localhost:3000 (el test de OG hace next build + start solo)
 
 cd mobile
 npx expo start                                   # desarrollo (Expo Go o dev build)

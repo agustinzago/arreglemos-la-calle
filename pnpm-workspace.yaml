@@ -2,5 +2,6 @@ packages:
   - mobile
   - shared
   - tests
+  - web
 # NativeWind needs a hoisted node_modules (pnpm 11 ignores node-linker in .npmrc).
 nodeLinker: hoisted
