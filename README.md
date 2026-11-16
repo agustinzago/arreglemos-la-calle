@@ -49,7 +49,24 @@ psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -1 -f supabase/migrations/<archivo>.s
 - La base de test es compartida: nunca borrar ni resetear el esquema; los tests crean sus datos y los borran al terminar.
 - Municipios: `node supabase/scripts/municipalities-sql.mjs > supabase/migrations/<timestamp>_municipalities.sql`.
 
+## Edge Functions
+
+`supabase/functions/suggest-category`: recibe la foto y le pide a Claude Haiku 5.5 la categoría sugerida. Importa
+`shared/src/suggestion.ts` (prompt y parser, con test en `tests/suggestion.test.ts`). Si no está desplegada, la app
+sigue igual: ningún chip aparece marcado. Desplegar es un paso humano (hace falta un access token de Supabase):
+
+```sh
+export SUPABASE_ACCESS_TOKEN=sbp_…   # Dashboard → Account → Access Tokens
+npx supabase@3.1.0 secrets set ANTHROPIC_API_KEY=sk-ant-… --remote=<project-ref> --yes
+npx supabase@3.1.0 functions deploy suggest-category --use-api --remote=<project-ref> --yes
+```
+
+La key de Anthropic va solo como secreto de la función, nunca en la app ni en `.env`. Dejar la verificación de JWT
+activada (default): la app la llama con la sesión anónima del vecino.
+
 ## Pendiente humano
+
+- Desplegar `suggest-category` y cargar el secreto `ANTHROPIC_API_KEY` (ver Edge Functions).
 
 - Android fuera de Expo Go necesita una API key de Google Maps (plugin `react-native-maps` en `mobile/app.json`).
 - Ícono y splash de la app todavía son los del template de Expo.
