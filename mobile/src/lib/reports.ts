@@ -4,7 +4,7 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { ensureSession, supabase } from './supabase';
 
 /** Achica la foto y la vuelve a codificar como JPEG: el archivo nuevo no lleva EXIF (Ley 25.326). */
-async function compressWithoutExif(uri: string) {
+export async function compressWithoutExif(uri: string) {
   const image = await ImageManipulator.manipulate(uri).resize({ width: 1280 }).renderAsync();
   const saved = await image.saveAsync({ compress: 0.6, format: SaveFormat.JPEG });
   return saved.uri;
@@ -20,12 +20,20 @@ export type NewReport = {
 };
 
 /** Operación "crear reporte" del contrato: sube la foto a la carpeta del vecino y llama a create_report. */
-export async function createReport(input: NewReport): Promise<PublicReport> {
+export async function createReport(input: NewReport, photoName = String(Date.now())): Promise<PublicReport> {
+  return sendReport({ ...input, photoUri: await compressWithoutExif(input.photoUri) }, photoName);
+}
+
+/**
+ * Como createReport, con la foto ya comprimida. Reintentar con el mismo `photoName` no duplica: la foto
+ * ya subida se reusa y create_report rechaza una segunda vez la misma foto (23505).
+ */
+export async function sendReport(input: NewReport, photoName: string): Promise<PublicReport> {
   const user = await ensureSession();
-  const path = `${user.id}/${Date.now()}.jpg`;
-  const bytes = await new File(await compressWithoutExif(input.photoUri)).arrayBuffer();
+  const path = `${user.id}/${photoName}.jpg`;
+  const bytes = await new File(input.photoUri).arrayBuffer();
   const upload = await supabase.storage.from('photos').upload(path, bytes, { contentType: 'image/jpeg' });
-  if (upload.error) throw upload.error;
+  if (upload.error && !('statusCode' in upload.error && upload.error.statusCode === '409')) throw upload.error;
 
   const { data, error } = await supabase.rpc('create_report', {
     p_photo_path: path,

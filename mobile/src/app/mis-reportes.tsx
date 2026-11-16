@@ -1,21 +1,27 @@
 // Mis reportes: los que el vecino creó y a los que se sumó, cada uno abre su detalle.
-// Se abre desde la cámara; el pie vuelve a ella. #12 agrega arriba una sección "Esperando señal"
-// con los pendientes del teléfono: alcanza con anteponerla a `sections`.
+// Se abre desde la cámara; el pie vuelve a ella. Arriba, "Esperando señal": los guardados en el
+// teléfono sin enviar (#12); se ven aunque no haya red, y al enviarse pasan a "Los que creaste".
+import { categoryShortLabel } from '@arreglemos/shared';
+import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { Camera, CloudOff } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, SectionList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { onPendingChange, pendingReports, type PendingReport } from '@/lib/pending';
 import { myReports, type MyReport } from '@/lib/reports';
 
 export default function MyReportsScreen() {
   const theme = useTheme();
   const [items, setItems] = useState<MyReport[] | null>(null); // null = cargando
   const [failed, setFailed] = useState(false);
+  const [pending, setPending] = useState(pendingReports);
+  const offline = useOffline();
 
   const load = useCallback(() => {
     setFailed(false);
@@ -24,24 +30,44 @@ export default function MyReportsScreen() {
       .catch(() => setFailed(true));
   }, []);
 
-  // Al volver del detalle (por ejemplo, después de sumarse) la lista se actualiza.
-  useFocusEffect(load);
+  // Al volver del detalle (por ejemplo, después de sumarse) la lista se actualiza; también cuando se
+  // envía un pendiente mientras se está mirando.
+  useFocusEffect(
+    useCallback(() => {
+      load();
+      setPending(pendingReports());
+      return onPendingChange(() => {
+        setPending(pendingReports());
+        load();
+      });
+    }, [load]),
+  );
 
   const sections = [
-    { title: 'Los que creaste', data: items?.filter((i) => i.created) ?? [] },
-    { title: 'A los que te sumaste', data: items?.filter((i) => !i.created) ?? [] },
+    { title: 'Esperando señal', data: pending as (PendingReport | MyReport)[] },
+    { title: 'Los que creaste', data: failed ? [] : (items?.filter((i) => i.created) ?? []) },
+    { title: 'A los que te sumaste', data: failed ? [] : (items?.filter((i) => !i.created) ?? []) },
   ].filter((s) => s.data.length > 0);
-  const empty = items !== null && items.length === 0;
+  const empty = items !== null && items.length === 0 && pending.length === 0;
 
   return (
     <View className="flex-1 bg-background">
       <Stack.Screen options={{ title: 'Mis reportes' }} />
+      {offline && (
+        <View className="px-screen pt-3">
+          <OfflineBanner />
+        </View>
+      )}
       <SectionList
-        sections={failed ? [] : sections}
-        keyExtractor={(i) => String(i.report.id)}
-        renderItem={({ item }) => (
-          <ReportRow report={item.report} className="bg-card" onPress={() => router.push(`/reporte/${item.report.id}`)} />
-        )}
+        sections={sections}
+        keyExtractor={(i) => ('report' in i ? String(i.report.id) : `pendiente-${i.id}`)}
+        renderItem={({ item }) =>
+          'report' in item ? (
+            <ReportRow report={item.report} className="bg-card" onPress={() => router.push(`/reporte/${item.report.id}`)} />
+          ) : (
+            <PendingRow item={item} />
+          )
+        }
         renderSectionHeader={({ section }) => (
           <Text variant="h2" className="bg-background pb-1 pt-4">
             {section.title}
@@ -89,6 +115,33 @@ export default function MyReportsScreen() {
           </Button>
         </View>
       </SafeAreaView>
+    </View>
+  );
+}
+
+/** Fila de un pendiente: como ReportRow, con la foto local, sin abrir detalle (todavía no tiene número). */
+function PendingRow({ item }: { item: PendingReport }) {
+  const theme = useTheme();
+  const title = categoryShortLabel(item.category);
+  const meta = 'Se envía cuando vuelva la señal';
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${title}, sin enviar, ${item.address ?? 'sin dirección'}. ${meta}`}
+      className="flex-row items-center gap-3 rounded-xl border border-border bg-card p-2.5"
+    >
+      <Image source={item.photoUri} style={{ width: 92, height: 92, borderRadius: 12 }} contentFit="cover" />
+      <View className="flex-1 gap-1">
+        <Text className="font-sans-bold">{title}</Text>
+        <Text variant="muted">{item.address ?? 'Sin dirección'}</Text>
+        <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
+          <View className="flex-row items-center gap-1 self-start rounded-full bg-muted py-[3px] pl-1.5 pr-2.5">
+            <CloudOff size={18} color={theme.foreground} />
+            <Text className="text-xs font-sans-bold">Sin enviar</Text>
+          </View>
+          <Text className="text-xs font-sans-semibold text-muted-foreground">{meta}</Text>
+        </View>
+      </View>
     </View>
   );
 }
