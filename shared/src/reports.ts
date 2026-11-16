@@ -34,3 +34,6 @@ export type PublicReportEvent = {
 
 /** Una fila de public.municipalities_public. whatsapp null = todavía no lo tenemos. */
 export type PublicMunicipality = { id: number; name: string; whatsapp: string | null };
+
+/** Una fila de public.nearby_reports: un reporte abierto cerca del pin, con su distancia en metros. */
+export type NearbyReport = PublicReport & { distance_m: number };
