@@ -34,6 +34,13 @@ export default function LocationScreen() {
   const [address, setAddress] = useState<string | null | undefined>(undefined);
   const region = useRef<Region>({ ...(fromExif ?? LA_CALERA), latitudeDelta: fromExif ? CLOSE : 0.03, longitudeDelta: fromExif ? CLOSE : 0.03 });
   const moved = useRef(false);
+  const pinRef = useRef(pin); // el pin para onMapReady, que no ve el estado nuevo
+  pinRef.current = pin;
+
+  // Si el GPS llega antes de que el mapa termine de cargar, iOS ignora el movimiento: onMapReady lo repite.
+  function center(to: LatLng) {
+    map.current?.animateToRegion({ ...to, latitudeDelta: CLOSE, longitudeDelta: CLOSE });
+  }
 
   function movePin(to: LatLng) {
     moved.current = true;
@@ -53,7 +60,7 @@ export default function LocationScreen() {
       // Si el vecino ya tocó el mapa mientras esperábamos, no le movemos el pin.
       if (!moved.current) {
         setPin(here);
-        map.current?.animateToRegion({ ...here, latitudeDelta: CLOSE, longitudeDelta: CLOSE });
+        center(here);
       }
       setGps('ok');
     } catch {
@@ -143,6 +150,7 @@ export default function LocationScreen() {
             ref={map}
             style={{ flex: 1 }}
             initialRegion={region.current}
+            onMapReady={() => pinRef.current && center(pinRef.current)}
             onRegionChangeComplete={(r) => (region.current = r)}
             onPress={(e) => e.nativeEvent.action !== 'marker-press' && movePin(e.nativeEvent.coordinate)}
             showsUserLocation={params.source === 'camera' && gps === 'ok'}
