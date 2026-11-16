@@ -69,7 +69,7 @@ describe('sumarse', () => {
     expect(direct.error?.code).toBe('42501');
   });
 
-  test('rechaza otros tipos de evento por ahora, un reporte inexistente u oculto, y sin sesión', async () => {
+  test('rechaza tipos de evento desconocidos, un reporte inexistente u oculto, y sin sesión', async () => {
     const id = await nuevoReporte();
     expect((await otro.client.rpc('register_event', { p_report_id: id, p_type: 'votar' })).error?.message).toBe(
       'invalid_event',
