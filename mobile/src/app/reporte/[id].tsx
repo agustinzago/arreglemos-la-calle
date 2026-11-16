@@ -1,5 +1,5 @@
 // Detalle del reporte: foto, datos, historia, "Me sumo", "Enviar a la Muni" y "Compartir".
-// "Ya está arreglado", "Sigue roto" y "Denunciar" son #8; el ícono de la categoría llega con #4.
+// Estados (#8): "Ya está arreglado" (con foto opcional), "Sigue roto" (si está resuelto) y "Denunciar".
 import {
   categoryLabel,
   muniMessage,
@@ -10,6 +10,7 @@ import {
   type PublicReportEvent,
 } from '@arreglemos/shared';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeft,
@@ -17,6 +18,8 @@ import {
   CircleCheck,
   Clock,
   CloudOff,
+  Flag,
+  ImagePlus,
   MapPin,
   MessageCircle,
   Share2,
@@ -24,6 +27,7 @@ import {
   TriangleAlert,
   UserPlus,
   Users,
+  X,
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useEffect, useState } from 'react';
@@ -31,6 +35,7 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  Modal,
   Pressable,
   ScrollView,
   Share,
@@ -41,10 +46,13 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getMunicipality, getReport, joinReport, listEvents, photoUrl, WEB_URL } from '@/lib/reports';
+import { getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
 const DAY = 86_400_000;
+// El estado cambió desde otro lado (otro vecino, el operador): recargar alcanza.
+const STALE = ['duplicate_event', 'not_open', 'not_resolved'];
+const errorMessage = (e: unknown) => (e && typeof e === 'object' && 'message' in e ? String(e.message) : '');
 
 type Data = { report: PublicReport; events: PublicReportEvent[]; municipality: PublicMunicipality | null };
 
@@ -54,7 +62,9 @@ export default function ReportScreen() {
   const icon = Math.min(useWindowDimensions().fontScale, 1.5) * 24;
   const [data, setData] = useState<Data | null | undefined>(); // undefined = cargando, null = no disponible
   const [failed, setFailed] = useState(false);
-  const [joining, setJoining] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [fixing, setFixing] = useState(false);
+  const [denounced, setDenounced] = useState(false);
 
   const load = useCallback(async () => {
     setFailed(false);
@@ -112,21 +122,45 @@ export default function ReportScreen() {
   );
   const isMine = events[0]?.mine ?? false; // el primer evento es el sumate del creador
   const joined = events.some((e) => e.type === 'sumate' && e.mine);
+  // Marcó arreglado en esta vuelta (desde el último "sigue roto"): falta que otro vecino lo confirme.
+  const reopenedAt = events.map((e) => e.type).lastIndexOf('sigue_roto');
+  const markedFixed = !resolved && events.slice(reopenedAt + 1).some((e) => e.type === 'resuelto' && e.mine);
   const url = reportUrl(WEB_URL, report.id);
   const title = categoryLabel(report.category);
 
-  async function join() {
-    setJoining(true);
+  async function act(run: () => Promise<unknown>, failTitle: string) {
+    setBusy(true);
     try {
-      await joinReport(report.id);
+      await run();
     } catch (e) {
-      // duplicate_event: ya estaba sumado (desde otro lado); recargar alcanza.
-      if (!(e && typeof e === 'object' && 'message' in e && e.message === 'duplicate_event')) {
-        Alert.alert('No pudimos sumarte', 'Revisá tu conexión y probá de nuevo.');
-      }
+      if (!STALE.includes(errorMessage(e))) Alert.alert(failTitle, 'Revisá tu conexión y probá de nuevo.');
     }
     await load();
-    setJoining(false);
+    setBusy(false);
+  }
+
+  async function markFixed(photoUri?: string) {
+    await act(() => registerEvent(report.id, 'resuelto', photoUri), 'No pudimos guardar tu aviso');
+    setFixing(false);
+  }
+
+  function denounce() {
+    Alert.alert('¿Denunciar este reporte?', 'Hacelo si es falso, ofensivo o no es un problema de la calle.', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Denunciar',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await registerEvent(report.id, 'denuncia');
+            setDenounced(true);
+          } catch (e) {
+            if (errorMessage(e) === 'duplicate_event') setDenounced(true);
+            else Alert.alert('No pudimos enviar la denuncia', 'Revisá tu conexión y probá de nuevo.');
+          }
+        },
+      },
+    ]);
   }
 
   function sendToMuni() {
@@ -221,6 +255,21 @@ export default function ReportScreen() {
           </Text>
           <Timeline events={events} />
 
+          {!resolved &&
+            (markedFixed ? (
+              <View role="note" className="flex-row items-center gap-2.5 rounded-md bg-success-soft px-3.5 py-3">
+                <CircleCheck color={theme.successInk} size={icon} />
+                <Text className="flex-1 text-success-ink">
+                  Gracias. Falta que otro vecino confirme que está arreglado.
+                </Text>
+              </View>
+            ) : (
+              <Button variant="outline" onPress={() => setFixing(true)} disabled={busy}>
+                <CircleCheck color={theme.primaryInk} size={icon} />
+                <Text>Ya está arreglado</Text>
+              </Button>
+            ))}
+
           <View role="note" className="flex-row items-center gap-2.5 rounded-md bg-warning-soft px-3.5 py-3">
             <Siren color={theme.warningInk} size={icon} />
             <Text className="flex-1 text-sm text-warning-ink">
@@ -228,11 +277,38 @@ export default function ReportScreen() {
               <Text className="font-sans-bold text-sm text-warning-ink">Llamá al 911 o al 103</Text>
             </Text>
           </View>
+
+          {denounced ? (
+            <Text role="alert" className="py-3 text-center font-sans-semibold text-muted-foreground">
+              Gracias. Vamos a revisar este reporte.
+            </Text>
+          ) : (
+            <Pressable
+              role="button"
+              onPress={denounce}
+              className="min-h-touch flex-row items-center justify-center gap-2 self-center px-3"
+            >
+              <Flag color={theme.mutedForeground} size={icon * 0.8} />
+              <Text className="font-sans-semibold text-muted-foreground underline">Denunciar este reporte</Text>
+            </Pressable>
+          )}
         </View>
       </ScrollView>
 
       <SafeAreaView edges={['bottom']} className="border-t border-border bg-background px-screen pt-3">
-        {isMine || joined ? (
+        {resolved ? (
+          <Button
+            onPress={() => act(() => registerEvent(report.id, 'sigue_roto'), 'No pudimos guardar tu aviso')}
+            disabled={busy}
+          >
+            {busy ? (
+              <ActivityIndicator color={theme.primaryForeground} />
+            ) : (
+              <TriangleAlert color={theme.primaryForeground} size={icon} />
+            )}
+            <Text>Sigue roto</Text>
+          </Button>
+        ) : isMine || joined ? (
           <View className="min-h-button flex-row items-center justify-center gap-2.5 rounded-lg bg-success-soft px-5 py-3.5">
             <Check color={theme.successInk} size={icon} />
             <Text className="font-sans-bold text-lg text-success-ink">
@@ -240,8 +316,8 @@ export default function ReportScreen() {
             </Text>
           </View>
         ) : (
-          <Button onPress={join} disabled={joining}>
-            {joining ? (
+          <Button onPress={() => act(() => joinReport(report.id), 'No pudimos sumarte')} disabled={busy}>
+            {busy ? (
               <ActivityIndicator color={theme.primaryForeground} />
             ) : (
               <UserPlus color={theme.primaryForeground} size={icon} />
@@ -250,7 +326,78 @@ export default function ReportScreen() {
           </Button>
         )}
       </SafeAreaView>
+
+      <FixSheet visible={fixing} busy={busy} onClose={() => setFixing(false)} onConfirm={markFixed} />
     </View>
+  );
+}
+
+/** "¿Ya lo arreglaron?": confirma el arreglado, con una foto opcional de cómo quedó. */
+function FixSheet({
+  visible,
+  busy,
+  onClose,
+  onConfirm,
+}: {
+  visible: boolean;
+  busy: boolean;
+  onClose: () => void;
+  onConfirm: (photoUri?: string) => void;
+}) {
+  const theme = THEME[useColorScheme().colorScheme ?? 'light'];
+  const [photo, setPhoto] = useState<string>();
+
+  async function addPhoto() {
+    // Está frente al arreglo: cámara. Sin permiso de cámara, la galería.
+    const camera = await ImagePicker.requestCameraPermissionsAsync();
+    const result = camera.granted
+      ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 1 })
+      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
+    if (!result.canceled) setPhoto(result.assets[0].uri);
+  }
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View className="flex-1 justify-end">
+        <Pressable accessibilityLabel="Cancelar" onPress={onClose} className="absolute inset-0 bg-black/40" />
+        <View className="max-h-[90%] rounded-t-2xl bg-card">
+          <ScrollView contentContainerClassName="gap-4 px-screen pb-10 pt-5">
+            <Text variant="h2">¿Ya lo arreglaron?</Text>
+            <Text>Si querés, sumá una foto de cómo quedó. Es opcional.</Text>
+            {photo ? (
+              <View className="flex-row flex-wrap items-center gap-3 rounded-lg bg-success-soft p-2.5">
+                <Image source={photo} style={{ width: 64, height: 64, borderRadius: 8 }} accessibilityLabel="Tu foto" />
+                <Text className="flex-1 font-sans-bold text-success-ink">Foto agregada</Text>
+                <Button variant="ghost" size="sm" onPress={() => setPhoto(undefined)}>
+                  <X color={theme.foreground} size={20} />
+                  <Text>Quitar</Text>
+                </Button>
+              </View>
+            ) : (
+              <Pressable
+                role="button"
+                onPress={addPhoto}
+                className="min-h-button flex-row items-center justify-center gap-2.5 rounded-lg border-2 border-dashed border-border px-5 py-3.5 active:bg-muted"
+              >
+                <ImagePlus color={theme.foreground} size={24} />
+                <Text className="font-sans-bold text-lg">Agregar foto</Text>
+              </Pressable>
+            )}
+            <Button variant="success" onPress={() => onConfirm(photo)} disabled={busy}>
+              {busy ? (
+                <ActivityIndicator color={theme.successForeground} />
+              ) : (
+                <CircleCheck color={theme.successForeground} size={24} />
+              )}
+              <Text>Sí, está arreglado</Text>
+            </Button>
+            <Pressable role="button" onPress={onClose} className="min-h-touch items-center justify-center">
+              <Text className="font-sans-semibold underline">Cancelar</Text>
+            </Pressable>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -290,7 +437,14 @@ const LABELS: Record<PublicReportEvent['type'], [mine: string, other: string]> =
 
 /** Arma la historia, más nueva primero. Los sumate seguidos de otros vecinos van juntos. */
 function timeline(events: PublicReportEvent[]) {
-  type Item = { key: number; kind: 'creado' | PublicReportEvent['type']; text: string; at: string; others: number };
+  type Item = {
+    key: number;
+    kind: 'creado' | PublicReportEvent['type'];
+    text: string;
+    at: string;
+    others: number;
+    photo?: string | null;
+  };
   const items: Item[] = [];
   events.forEach((e, i) => {
     const last = items[items.length - 1];
@@ -308,7 +462,14 @@ function timeline(events: PublicReportEvent[]) {
       last.at = e.created_at;
     } else {
       const others = e.type === 'sumate' && !e.mine ? 1 : 0;
-      items.push({ key: e.id, kind: e.type, text: LABELS[e.type][e.mine ? 0 : 1], at: e.created_at, others });
+      items.push({
+        key: e.id,
+        kind: e.type,
+        text: LABELS[e.type][e.mine ? 0 : 1],
+        at: e.created_at,
+        others,
+        photo: e.photo_path,
+      });
     }
   });
   return items.reverse();
@@ -344,6 +505,14 @@ function Timeline({ events }: { events: PublicReportEvent[] }) {
             <View className="flex-1 pb-4 pt-1.5">
               <Text className="font-sans-semibold">{item.text}</Text>
               <Text variant="muted">{when(item.at)}</Text>
+              {item.photo ? (
+                <Image
+                  source={photoUrl(item.photo)}
+                  style={{ width: 160, height: 120, borderRadius: 12, marginTop: 8 }}
+                  contentFit="cover"
+                  accessibilityLabel="Foto de cómo quedó"
+                />
+              ) : null}
             </View>
           </View>
         );

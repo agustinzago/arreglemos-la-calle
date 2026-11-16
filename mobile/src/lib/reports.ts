@@ -93,6 +93,28 @@ export async function joinReport(reportId: number): Promise<PublicReport> {
   return data as PublicReport;
 }
 
+/**
+ * Operación "registrar evento" para marcar arreglado (foto opcional, sin EXIF), sigue roto o denunciar.
+ * Devuelve el reporte con el estado recalculado. Errores: `duplicate_event`, `not_open`, `not_resolved`.
+ */
+export async function registerEvent(
+  reportId: number,
+  type: 'resuelto' | 'sigue_roto' | 'denuncia',
+  photoUri?: string,
+): Promise<PublicReport> {
+  const user = await ensureSession();
+  let path: string | undefined;
+  if (photoUri) {
+    path = `${user.id}/${Date.now()}.jpg`;
+    const bytes = await new File(await compressWithoutExif(photoUri)).arrayBuffer();
+    const upload = await supabase.storage.from('photos').upload(path, bytes, { contentType: 'image/jpeg' });
+    if (upload.error) throw upload.error;
+  }
+  const { data, error } = await supabase.rpc('register_event', { p_report_id: reportId, p_type: type, p_photo_path: path });
+  if (error) throw error;
+  return data as PublicReport;
+}
+
 export const photoUrl = (path: string) => supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
 
 /** Un reporte de "Mis reportes": `created` = lo creó este vecino; si no, se sumó. */
