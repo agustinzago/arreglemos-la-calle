@@ -1,54 +1,69 @@
-// Cámara: la app abre acá. Al sacar la foto se toma la ubicación del GPS en ese momento.
-// La pantalla de permisos, el pin arrastrable y la galería son #3.
+// Cámara: la app abre acá. Antes, si faltan permisos, la pantalla de permisos.
+// La foto (de la cámara o de la galería) sigue a /ubicacion, que toma el GPS o el EXIF.
+import { gpsFromExif } from '@arreglemos/shared';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { Camera, Map } from 'lucide-react-native';
+import { Camera, Images, Map } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-import { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, AppState, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PermissionsScreen } from '@/components/permissions-screen';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { THEME } from '@/lib/theme';
 
+async function pickFromGallery() {
+  const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], exif: true, quality: 1 });
+  if (result.canceled) return;
+  const asset = result.assets[0];
+  // Sin GPS en la foto, /ubicacion arranca sin pin y el vecino lo tiene que poner.
+  const gps = gpsFromExif(asset.exif);
+  router.push({ pathname: '/ubicacion', params: { photoUri: asset.uri, source: 'gallery', ...gps } });
+}
+
 export default function CameraScreen() {
   const camera = useRef<CameraView>(null);
-  const [permission, requestPermission] = useCameraPermissions();
+  const [cameraPermission, requestCamera, getCamera] = useCameraPermissions();
+  const [locationPermission, requestLocation, getLocation] = Location.useForegroundPermissions();
   const [busy, setBusy] = useState(false);
   const onPrimary = THEME[useColorScheme().colorScheme ?? 'light'].primaryForeground;
 
-  if (!permission) return <View className="flex-1 bg-[#0b0d12]" />;
+  // Al volver de Ajustes, releer los permisos.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        getCamera();
+        getLocation();
+      }
+    });
+    return () => sub.remove();
+  }, [getCamera, getLocation]);
 
-  if (!permission.granted) {
+  if (!cameraPermission || !locationPermission) return <View className="flex-1 bg-[#0b0d12]" />;
+
+  if (!cameraPermission.granted || locationPermission.status === 'undetermined') {
     return (
-      <SafeAreaView className="flex-1 justify-center gap-6 bg-background px-screen">
-        <Text variant="h1">Necesitamos la cámara</Text>
-        <Text>Para sacarle una foto al problema.</Text>
-        <Button onPress={requestPermission}>
-          <Text>Permitir la cámara</Text>
-        </Button>
-      </SafeAreaView>
+      <PermissionsScreen
+        camera={cameraPermission.status}
+        location={locationPermission.status}
+        onStart={async () => {
+          await requestCamera();
+          await requestLocation();
+        }}
+        onGallery={pickFromGallery}
+      />
     );
   }
 
   async function shoot() {
     setBusy(true);
     try {
-      const location = await Location.requestForegroundPermissionsAsync();
-      if (!location.granted) {
-        Alert.alert('Falta la ubicación', 'Sin la ubicación no sabemos en qué calle está el problema.');
-        return;
-      }
-      const [photo, position] = await Promise.all([
-        camera.current!.takePictureAsync({ quality: 0.8, exif: false }),
-        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
-      ]);
-      router.push({
-        pathname: '/categoria',
-        params: { photoUri: photo.uri, lat: position.coords.latitude, lng: position.coords.longitude },
-      });
+      const photo = await camera.current!.takePictureAsync({ quality: 0.8, exif: false });
+      router.push({ pathname: '/ubicacion', params: { photoUri: photo.uri, source: 'camera' } });
     } catch (e) {
       Alert.alert('No pudimos sacar la foto', e instanceof Error ? e.message : String(e));
     } finally {
@@ -64,10 +79,16 @@ export default function CameraScreen() {
           {busy ? <ActivityIndicator color={onPrimary} /> : <Camera color={onPrimary} size={28} />}
           <Text>Sacar foto</Text>
         </Button>
-        <Button variant="ghost" size="sm" onPress={() => router.push('/mapa')}>
-          <Map color="white" size={24} />
-          <Text className="text-white">Mapa</Text>
-        </Button>
+        <View className="flex-row flex-wrap gap-3">
+          <Button variant="ghost" size="sm" className="flex-1" onPress={pickFromGallery}>
+            <Images color="white" size={24} />
+            <Text className="text-white">Galería</Text>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex-1" onPress={() => router.push('/mapa')}>
+            <Map color="white" size={24} />
+            <Text className="text-white">Mapa</Text>
+          </Button>
+        </View>
       </View>
     </SafeAreaView>
   );

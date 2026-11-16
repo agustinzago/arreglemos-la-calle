@@ -14,7 +14,7 @@ import { createReport } from '@/lib/reports';
 const CHOICES = CATEGORIES.filter((c) => c.code !== 'otro');
 
 export default function CategoryScreen() {
-  const params = useLocalSearchParams<{ photoUri: string; lat: string; lng: string }>();
+  const params = useLocalSearchParams<{ photoUri: string; lat: string; lng: string; address?: string }>();
   const [category, setCategory] = useState<CategoryCode>();
   const [sending, setSending] = useState(false);
 
@@ -27,6 +27,7 @@ export default function CategoryScreen() {
         lat: Number(params.lat),
         lng: Number(params.lng),
         category,
+        address: params.address || undefined,
       });
       router.replace({ pathname: '/mapa', params: { id: report.id, lat: report.lat, lng: report.lng } });
     } catch (e) {
