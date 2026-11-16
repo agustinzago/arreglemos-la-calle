@@ -87,3 +87,14 @@ bash scripts/push-setup.sh
 - Desplegar `suggest-category` y cargar el secreto `ANTHROPIC_API_KEY` (ver Edge Functions).
 - Android fuera de Expo Go necesita una API key de Google Maps (plugin `react-native-maps` en `mobile/app.json`).
 - Ícono y splash de la app todavía son los del template de Expo.
+- Dominio `arreglemoslacalle.app`: apuntar el DNS al host de la web (Vercel) y en producción poner
+  `SITE_URL=https://arreglemoslacalle.app` (web) y `EXPO_PUBLIC_WEB_URL=https://arreglemoslacalle.app` (variables de
+  entorno de EAS). Sin ellas, los dos ya usan ese dominio por defecto.
+- Crear la casilla `hola@arreglemoslacalle.app`: es el contacto de `/soporte` y `/privacidad`.
+- Verificar el dominio en Google Search Console, para poder ponerlo como dominio autorizado en la pantalla de
+  consentimiento de OAuth de Google.
+- Revisar `/privacidad` (`web/src/app/privacidad/page.tsx`): es un borrador; al aprobarlo, sacar el aviso
+  "Borrador" y el comentario `ponytail:`.
+- En App Store Connect, Play Console y la pantalla de consentimiento de OAuth, usar
+  `https://arreglemoslacalle.app/privacidad` como política de privacidad y `https://arreglemoslacalle.app/soporte` como
+  URL de soporte.

@@ -115,6 +115,16 @@ h1 { margin: 6px 0 4px; font-weight: 700; font-size: 1.875rem; line-height: 1.1;
 .big b { font-weight: 800; font-size: 1.75rem; line-height: 1; }
 .ranking .note { max-width: 68ch; }
 
+/* Páginas de texto (/privacidad, /soporte) */
+.doc { max-width: 68ch; margin: 0 auto; padding: 26px 20px 40px; display: flex; flex-direction: column; gap: 12px; text-wrap: pretty; }
+.doc h2 { margin: 18px 0 0; font-weight: 700; font-size: 1.5rem; line-height: 1.15; }
+.doc h3 { margin: 10px 0 0; font-weight: 700; font-size: 1.125rem; line-height: 1.2; }
+.doc p, .doc ul { margin: 0; }
+.doc section p { margin-top: 4px; }
+.doc li + li { margin-top: 4px; }
+.draft { padding: 10px 14px; border-radius: 12px; background: hsl(var(--warning-soft)); color: hsl(var(--warning-ink)); font-weight: 600; }
+.foot { display: flex; justify-content: center; gap: 20px; padding: 18px 20px 28px; font-size: 1rem; }
+
 /* Impresión: "Imprimir → Guardar como PDF" del ranking da el documento que el operador le manda a la Muni. */
 @page { size: A4; margin: 14mm 14mm 16mm; }
 @media print {
