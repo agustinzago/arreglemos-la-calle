@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
+import { useOffline } from '@/components/offline-banner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
@@ -26,6 +27,7 @@ export default function CategoryScreen() {
   const [other, setOther] = useState('');
   const [missingOther, setMissingOther] = useState(false);
   const [suggested, setSuggested] = useState<CategoryCode | null>(null);
+  const offline = useOffline();
   const iconSize = 28 * Math.min(fontScale, 1.5);
 
   // Nunca se espera: los chips se muestran ya y la sugerencia se marca si llega (y si no eligió antes).
@@ -45,7 +47,8 @@ export default function CategoryScreen() {
     if (!category) return;
     if (category === 'otro' && !other.trim()) return setMissingOther(true);
     router.push({
-      pathname: '/cercanos',
+      // Sin señal no se pueden buscar los cercanos: directo a la revisión (#12).
+      pathname: offline ? '/detalles' : '/cercanos',
       params: { ...params, category, other: category === 'otro' ? other.trim() : '' },
     });
   }

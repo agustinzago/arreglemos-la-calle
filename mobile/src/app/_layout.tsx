@@ -13,6 +13,7 @@ import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { startSendingPending } from '@/lib/pending';
 import { ensureSession } from '@/lib/supabase';
 import { NAV_THEME } from '@/lib/theme';
 
@@ -25,6 +26,9 @@ export default function RootLayout() {
   useEffect(() => {
     ensureSession().catch(() => {});
   }, []);
+
+  // Los reportes guardados sin señal se envían solos (#12), aunque la app se haya cerrado mientras tanto.
+  useEffect(startSendingPending, []);
 
   if (!fontsLoaded) return null;
 

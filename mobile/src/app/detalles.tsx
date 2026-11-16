@@ -1,6 +1,6 @@
 // Paso "Revisá y enviá": resumen de foto, lugar y problema (cada uno con "Cambiar"), una
 // descripción opcional y "Enviar reporte". Al enviar, la confirmación queda sobre la cámara.
-import { categoryLabel, type CategoryCode } from '@arreglemos/shared';
+import { categoryLabel, isRejection, type CategoryCode } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { MapPin, Send } from 'lucide-react-native';
@@ -9,10 +9,12 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
+import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
+import { savePending } from '@/lib/pending';
 import { createReport } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -24,6 +26,7 @@ export default function DetailsScreen() {
   const { fontScale } = useWindowDimensions();
   const [extra, setExtra] = useState('');
   const [sending, setSending] = useState(false);
+  const offline = useOffline();
   const iconSize = 30 * Math.min(fontScale, 1.5);
   const CategoryIcon = CATEGORY_ICONS[params.category];
 
@@ -51,16 +54,26 @@ export default function DetailsScreen() {
 
   async function send() {
     setSending(true);
+    const description = [params.other, extra.trim()].filter(Boolean).join('\n');
+    const input = {
+      photoUri: params.photoUri,
+      lat: Number(params.lat),
+      lng: Number(params.lng),
+      category: params.category,
+      description: description || undefined,
+      address: params.address || undefined,
+    };
+    // Sin señal (o si el servidor falla) se guarda en el teléfono y se envía solo después (#12).
+    const keep = async (reason: 'offline' | 'error', photoName?: string) => {
+      await savePending(input, photoName);
+      router.dismissAll();
+      router.push({ pathname: '/guardado', params: { reason } });
+    };
+    if (offline) return keep('offline').catch(failed);
+    // Mismo nombre de foto si queda pendiente: si este envío llegó y se cortó la respuesta, no se duplica.
+    const photoName = String(Date.now());
     try {
-      const description = [params.other, extra.trim()].filter(Boolean).join('\n');
-      const report = await createReport({
-        photoUri: params.photoUri,
-        lat: Number(params.lat),
-        lng: Number(params.lng),
-        category: params.category,
-        description: description || undefined,
-        address: params.address || undefined,
-      });
+      const report = await createReport(input, photoName);
       router.dismissAll();
       router.push({
         pathname: '/confirmacion',
@@ -74,9 +87,14 @@ export default function DetailsScreen() {
         },
       });
     } catch (e) {
-      Alert.alert('No pudimos enviarlo', e instanceof Error ? e.message : String(e));
-      setSending(false);
+      if (isRejection(e)) return failed(e);
+      await keep('error', photoName).catch(failed);
     }
+  }
+
+  function failed(e: unknown) {
+    Alert.alert('No pudimos enviarlo', e instanceof Error ? e.message : String(e));
+    setSending(false);
   }
 
   return (
@@ -88,6 +106,7 @@ export default function DetailsScreen() {
         </Button>
       }
     >
+      {offline && <OfflineBanner />}
       <View className="rounded-xl border border-border bg-card">
         {rows.map((row, i) => (
           <View
