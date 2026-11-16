@@ -55,12 +55,15 @@ export default function MyReportsScreen() {
   return (
     <View className="flex-1 bg-background">
       <Stack.Screen options={{ title: 'Mis reportes' }} />
-      {offline && (
-        <View className="px-screen pt-3">
-          <OfflineBanner />
-        </View>
-      )}
       <SectionList
+        contentInsetAdjustmentBehavior="automatic"
+        ListHeaderComponent={
+          offline ? (
+            <View className="pt-3">
+              <OfflineBanner />
+            </View>
+          ) : undefined
+        }
         sections={sections}
         keyExtractor={(i) => ('report' in i ? String(i.report.id) : `sin-enviar-${i.id}`)}
         renderItem={({ item }) =>

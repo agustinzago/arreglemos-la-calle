@@ -1,11 +1,11 @@
 // Paso "¿Ya lo reportaron?", entre la categoría y la revisión: hasta 3 reportes abiertos de la
 // misma categoría cerca del pin. El vecino decide (ADR-0003): sumarse a uno o crear uno nuevo.
-// Sin cercanos (o si la búsqueda falla) se reemplaza por la revisión, así no queda en el historial.
+// La búsqueda la hace la categoría: acá solo se llega si hay alguno (llegan en el parámetro nearby).
 import { categoryShortLabel, type CategoryCode, type NearbyReport } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Circle, CircleDot, Ellipsis, Navigation, UserPlus, Users } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
@@ -13,33 +13,27 @@ import { useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
-import { joinReport, nearbyReports, photoUrl } from '@/lib/reports';
+import { joinReport, photoUrl } from '@/lib/reports';
 import { cn } from '@/lib/utils';
 
-type Params = { photoUri: string; lat: string; lng: string; address?: string; category: CategoryCode; other: string };
+type Params = { photoUri: string; lat: string; lng: string; address?: string; category: CategoryCode; other: string; nearby: string };
 
 const title = { title: '¿Ya lo reportaron?' };
 
 export default function NearbyScreen() {
-  const params = useLocalSearchParams<Params>();
+  const { nearby, ...params } = useLocalSearchParams<Params>();
   const theme = useTheme();
   const { fontScale } = useWindowDimensions();
-  const [reports, setReports] = useState<NearbyReport[]>();
+  const [reports] = useState<NearbyReport[]>(() => JSON.parse(nearby));
   const [selected, setSelected] = useState(0); // el más cercano, como en el diseño
   const [joining, setJoining] = useState(false);
   const small = 18 * Math.min(fontScale, 1.5);
 
+  // Reemplaza este paso, así volver desde la revisión lleva a la categoría.
   const createNew = () => router.replace({ pathname: '/detalles', params });
 
-  useEffect(() => {
-    nearbyReports(Number(params.lat), Number(params.lng), params.category)
-      .then((found) => (found.length ? setReports(found) : createNew()))
-      // ponytail: si la búsqueda falla, se sigue a la revisión en vez de trabar el reporte.
-      .catch(createNew);
-  }, []); // una sola búsqueda al entrar
-
   async function join() {
-    const id = reports![selected].id;
+    const id = reports[selected].id;
     setJoining(true);
     try {
       await joinReport(id);
@@ -53,20 +47,6 @@ export default function NearbyScreen() {
     // Como al enviar un reporte: volver desde el detalle lleva a la cámara.
     router.dismissAll();
     router.push(`/reporte/${id}`);
-  }
-
-  if (!reports) {
-    return (
-      <View className="flex-1 gap-3 bg-background px-screen py-5">
-        <Stack.Screen options={title} />
-        <View className="flex-row items-center gap-2.5">
-          <ActivityIndicator color={theme.mutedForeground} />
-          <Text className="font-sans-semibold text-muted-foreground">Buscando reportes cerca…</Text>
-        </View>
-        <View className="h-[124px] rounded-xl bg-muted" />
-        <View className="h-[124px] rounded-xl bg-muted" />
-      </View>
-    );
   }
 
   return (

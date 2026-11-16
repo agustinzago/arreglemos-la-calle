@@ -113,7 +113,7 @@ export default function LocationScreen() {
   return (
     <SafeAreaView edges={['bottom']} className="flex-1 bg-background">
       <Stack.Screen options={{ title: 'Paso 1 de 4' }} />
-      <ScrollView contentContainerClassName="flex-grow gap-3 px-screen pt-4">
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="flex-grow gap-3 px-screen pt-4">
         <Text variant="h1">¿Dónde está el problema?</Text>
 
         {gps === 'error' && (

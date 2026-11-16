@@ -6,7 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowRight, CircleAlert, CircleCheck, Sparkles } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Pressable, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
 import { useOffline } from '@/components/offline-banner';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
+import { nearbyReports } from '@/lib/reports';
 import { suggestionFor } from '@/lib/suggestion';
 import { THEME } from '@/lib/theme';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ export default function CategoryScreen() {
   const [missingOther, setMissingOther] = useState(false);
   const [suggested, setSuggested] = useState<CategoryCode | null>(null);
   const offline = useOffline();
+  const [searching, setSearching] = useState(false);
   const iconSize = 28 * Math.min(fontScale, 1.5);
 
   // Nunca se espera: los chips se muestran ya y la sugerencia se marca si llega (y si no eligió antes).
@@ -43,22 +45,29 @@ export default function CategoryScreen() {
     };
   }, [params.photoUri]);
 
-  function next() {
-    if (!category) return;
+  async function next() {
+    if (!category || searching) return;
     if (category === 'otro' && !other.trim()) return setMissingOther(true);
-    router.push({
-      // Sin señal no se pueden buscar los cercanos: directo a la revisión (#12).
-      pathname: offline ? '/detalles' : '/cercanos',
-      params: { ...params, category, other: category === 'otro' ? other.trim() : '' },
-    });
+    const nextParams = { ...params, category, other: category === 'otro' ? other.trim() : '' };
+    // Los cercanos se buscan acá: "¿Ya lo reportaron?" solo aparece si hay alguno. Sin señal no se
+    // pueden buscar (#12), y si la búsqueda falla se sigue igual a la revisión.
+    setSearching(true);
+    const nearby = offline ? [] : await nearbyReports(Number(params.lat), Number(params.lng), category).catch(() => []);
+    setSearching(false);
+    if (nearby.length) router.push({ pathname: '/cercanos', params: { ...nextParams, nearby: JSON.stringify(nearby) } });
+    else router.push({ pathname: '/detalles', params: nextParams });
   }
 
   return (
     <FormScreen
       footer={
-        <Button onPress={next} disabled={!category}>
-          <Text>Continuar</Text>
-          <ArrowRight color={theme.primaryForeground} size={24} />
+        <Button onPress={next} disabled={!category || searching}>
+          <Text>{searching ? 'Buscando reportes cerca…' : 'Continuar'}</Text>
+          {searching ? (
+            <ActivityIndicator color={theme.primaryForeground} />
+          ) : (
+            <ArrowRight color={theme.primaryForeground} size={24} />
+          )}
         </Button>
       }
     >

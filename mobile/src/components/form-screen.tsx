@@ -12,7 +12,12 @@ export function FormScreen({ children, footer }: { children: React.ReactNode; fo
       keyboardVerticalOffset={headerHeight}
       className="flex-1 bg-background"
     >
-      <ScrollView contentContainerClassName="gap-5 px-screen py-5" keyboardShouldPersistTaps="handled">
+      {/* iOS 26: la cabecera es de vidrio y el contenido pasa por debajo; "automatic" lo corre hacia abajo. */}
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerClassName="gap-5 px-screen py-5"
+        keyboardShouldPersistTaps="handled"
+      >
         {children}
       </ScrollView>
       <SafeAreaView edges={['bottom']} className="border-t border-border bg-background">
