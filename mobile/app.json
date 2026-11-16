@@ -8,7 +8,10 @@
     "scheme": "arreglemos",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "ar.arreglemoslacalle.app"
+      "bundleIdentifier": "ar.arreglemoslacalle.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "ar.arreglemoslacalle.app",
@@ -58,7 +61,8 @@
       ],
       "expo-sqlite",
       "expo-font",
-      "expo-notifications"
+      "expo-notifications",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,
