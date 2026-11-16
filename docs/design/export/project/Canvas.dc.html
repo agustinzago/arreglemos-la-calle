@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap">
+<style>html,body{background:hsl(220 16% 88%)}body{margin:0;color:hsl(224 32% 12%);font-family:'Rubik',system-ui,sans-serif}a{color:hsl(226 75% 32%)}a:hover{color:hsl(226 72% 40%)}</style>
+</helmet>
+
+<section id="intro" style="padding:56px 56px 40px;max-width:1500px">
+  <div style="font:700 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:hsl(226 75% 32%)">Piloto · La Calera, Córdoba</div>
+  <h1 style="margin:10px 0 0;font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:64px;line-height:1;letter-spacing:-.02em">Arreglemos la Calle</h1>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px 40px;margin-top:28px;font-size:18px;line-height:1.45">
+    <div><b>Una sola familia: Rubik.</b> Gratis (Google Fonts), usada en todo el mundo y con esquinas apenas redondeadas: cálida sin perder claridad. Cuerpo de 18 px; escala hasta 200% y los títulos hasta 150%.</div>
+    <div><b>Los colores de la calle.</b> Azul señal para actuar, amarillo vial para "abierto" y verde para "resuelto", siempre con ícono y etiqueta, sobre grises de hormigón y asfalto. Nada de celeste ni escudos.</div>
+    <div><b>Una pregunta por pantalla.</b> Patrón GOV.UK, con revisión antes de enviar. Un solo botón principal, abajo, a todo el ancho y de 58 px de alto.</div>
+    <div><b>Nada depende de un gesto.</b> La hoja del mapa tiene botón "Ver lista"; el pin también se mueve tocando el mapa; el zoom tiene botones.</div>
+    <div><b>Qué es real y qué no.</b> El mapa es OpenStreetMap centrado en La Calera. Fotos, direcciones y números son de ejemplo. Los íconos son Material Symbols como referencia: en código van sus equivalentes de Lucide.</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px">
+    <a href="Prototipo.dc.html" style="display:inline-flex;align-items:center;min-height:52px;padding:0 22px;border-radius:14px;background:hsl(226 72% 40%);color:hsl(0 0% 100%);font-weight:700;font-size:18px;text-decoration:none">Abrir el prototipo navegable →</a>
+    <a href="tailwind.config.js" style="display:inline-flex;align-items:center;min-height:52px;padding:0 18px;border-radius:14px;border:2px solid hsl(226 72% 40%);font-weight:700;font-size:16px;text-decoration:none;font-family:ui-monospace,Menlo,monospace">tailwind.config.js</a>
+    <a href="global.css" style="display:inline-flex;align-items:center;min-height:52px;padding:0 18px;border-radius:14px;border:2px solid hsl(226 72% 40%);font-weight:700;font-size:16px;text-decoration:none;font-family:ui-monospace,Menlo,monospace">global.css</a>
+  </div>
+</section>
+
+<sc-for list="{{ sections }}" as="sec" hint-placeholder-count="2">
+<section id="{{ sec.id }}" style="box-sizing:border-box;min-width:2712px;padding:44px 56px 52px;border-top:1px solid hsl(220 14% 78%)">
+  <h2 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:34px;line-height:1.1">{{ sec.title }}</h2>
+  <div style="margin:6px 0 28px;font-size:17px;color:hsl(222 12% 34%)">{{ sec.note }}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:44px 40px;align-items:flex-start;width:2600px">
+    <sc-for list="{{ sec.boards }}" as="b" hint-placeholder-count="5">
+      <div data-screen-label="{{ b.label }}" style="flex:none;display:flex;flex-direction:column;gap:12px">
+        <div style="font:600 13px/1.3 ui-monospace,Menlo,monospace;color:hsl(224 32% 12%)">{{ b.label }}</div>
+        <sc-if value="{{ b.ios }}" hint-placeholder-val="{{ true }}">
+          <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" dark="{{ b.sbDark }}" bg="{{ b.bg }}" hint-size="390px,844px">
+            <dc-import name="App" screen="{{ b.screen }}" variant="{{ b.variant }}" theme="{{ b.theme }}" font-scale="{{ b.fs }}" platform="ios" locked="{{ true }}" hint-size="100%,100%" style="display:block;height:100%"></dc-import>
+          </x-import>
+        </sc-if>
+        <sc-if value="{{ b.android }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="428px" height="931px" dark="{{ b.sbDark }}" bg="{{ b.bg }}" hint-size="428px,931px">
+            <dc-import name="App" screen="{{ b.screen }}" variant="{{ b.variant }}" theme="{{ b.theme }}" font-scale="{{ b.fs }}" platform="android" locked="{{ true }}" hint-size="100%,100%" style="display:block;height:100%"></dc-import>
+          </x-import>
+        </sc-if>
+        <sc-if value="{{ b.web }}" hint-placeholder-val="{{ false }}">
+          <div style="width:{{ b.w }};border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(15,22,45,.16),0 0 0 1px rgba(15,22,45,.14)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:hsl(220 16% 93%);font:13px/1.2 ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)"><span style="flex:none;width:10px;height:10px;border-radius:50%;background:hsl(220 10% 70%)"></span>{{ b.url }}</div>
+            <dc-import name="App" screen="{{ b.screen }}" theme="{{ b.theme }}" locked="{{ true }}" hint-size="100%,600px"></dc-import>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</sc-for>
+
+<section id="tokens" style="box-sizing:border-box;min-width:2712px;padding:44px 56px 52px;border-top:1px solid hsl(220 14% 78%)">
+  <h2 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:34px;line-height:1.1">Tokens de diseño</h2>
+  <div style="margin:6px 0 28px;font-size:17px;color:hsl(222 12% 34%)">Los mismos valores están en <a href="tailwind.config.js">tailwind.config.js</a> y <a href="global.css">global.css</a>, listos para NativeWind v4. Cada color muestra claro (izquierda) y oscuro (derecha).</div>
+  <div style="display:flex;flex-wrap:wrap;gap:48px 64px;align-items:flex-start">
+    <div style="display:grid;grid-template-columns:repeat(4,200px);gap:18px">
+      <sc-for list="{{ colors }}" as="t" hint-placeholder-count="14">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;height:64px;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px rgba(15,22,45,.16)"><div style="flex:1;background:{{ t.lc }}"></div><div style="flex:1;background:{{ t.dc }}"></div></div>
+          <div style="font-weight:700;font-size:15px">{{ t.name }}</div>
+          <div style="font:12px/1.4 ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">{{ t.l }}<br>{{ t.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="width:560px;display:flex;flex-direction:column;gap:10px">
+      <div style="font:700 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:hsl(222 12% 34%);margin-bottom:6px">Tipografía</div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">3xl · 38</span><span style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05">LC-0482</span></div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">2xl · 30</span><span style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:30px;line-height:1.1">¿Qué problema es?</span></div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">xl · 24</span><span style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:24px;line-height:1.15">Qué pasó hasta ahora</span></div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">lg · 20</span><span style="font-weight:700;font-size:20px">Enviar reporte</span></div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">base · 18</span><span style="font-size:18px">Para sacarle una foto al problema.</span></div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">sm · 16</span><span style="font-size:16px;color:hsl(222 12% 34%)">La Calera, Córdoba</span></div>
+      <div style="display:grid;grid-template-columns:90px 1fr;align-items:baseline;gap:12px"><span style="font:12px ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">xs · 15</span><span style="font-size:15px;font-weight:700">Abierto · 12 vecinos</span></div>
+    </div>
+    <div style="width:520px;display:flex;flex-direction:column;gap:14px">
+      <div style="font:700 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:hsl(222 12% 34%)">Radios</div>
+      <div style="display:flex;gap:14px;align-items:flex-end;font:12px/1.3 ui-monospace,Menlo,monospace;color:hsl(222 12% 34%)">
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="width:72px;height:72px;border-radius:10px;background:hsl(224 90% 94%);border:2px solid hsl(226 72% 40%)"></div>sm · 10</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="width:72px;height:72px;border-radius:14px;background:hsl(224 90% 94%);border:2px solid hsl(226 72% 40%)"></div>md · 14</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="width:72px;height:72px;border-radius:16px;background:hsl(224 90% 94%);border:2px solid hsl(226 72% 40%)"></div>lg · 16</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="width:72px;height:72px;border-radius:18px;background:hsl(224 90% 94%);border:2px solid hsl(226 72% 40%)"></div>xl · 18</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="width:72px;height:72px;border-radius:24px;background:hsl(224 90% 94%);border:2px solid hsl(226 72% 40%)"></div>2xl · 24</div>
+      </div>
+      <div style="font:700 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:hsl(222 12% 34%);margin-top:12px">Espaciado y tamaños táctiles</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:16px">
+        <div style="display:flex;align-items:center;gap:12px"><div style="flex:none;width:58px;height:58px;border-radius:16px;background:hsl(226 72% 40%)"></div><span><b>58 px</b> · alto mínimo del botón principal (button)</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="flex:none;width:48px;height:48px;margin:0 5px;border-radius:12px;background:hsl(220 14% 80%)"></div><span><b>48 px</b> · área táctil mínima (touch)</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="flex:none;width:20px;height:48px;margin:0 19px;background:hsl(220 14% 80%)"></div><span><b>20 px</b> · margen lateral de pantalla (screen); el resto usa la escala de 4</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="icono" style="box-sizing:border-box;min-width:2712px;padding:44px 56px 72px;border-top:1px solid hsl(220 14% 78%)">
+  <h2 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:34px;line-height:1.1">Ícono de la app</h2>
+  <div style="margin:6px 0 28px;font-size:17px;color:hsl(222 12% 34%)">Un pin clavado en el bache, sobre azul señal y con un punto de amarillo vial. Formas simples, para que se reconozca chico y al sol. Debajo del ícono se lee "Arreglemos".</div>
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+    <div data-screen-label="Ícono 1024" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:600 13px/1.3 ui-monospace,Menlo,monospace">Ícono · 1024×1024</div>
+      <div style="position:relative;width:1024px;height:1024px;border-radius:22.4%;background:hsl(226 72% 42%);overflow:hidden">
+        <div style="position:absolute;left:27%;top:69%;width:46%;height:14%;border-radius:50%;background:hsl(228 60% 20%)"></div>
+        <div style="position:absolute;left:30%;top:22%;width:40%;height:40%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(0 0% 100%)"></div>
+        <div style="position:absolute;left:42%;top:34%;width:16%;height:16%;border-radius:50%;background:hsl(45 100% 51%)"></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:40px">
+      <div data-screen-label="Ícono monocromático" style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:600 13px/1.3 ui-monospace,Menlo,monospace">Monocromático · capa del ícono adaptativo de Android (zona segura al 61%)</div>
+        <div style="display:flex;gap:24px">
+          <div style="position:relative;width:432px;height:432px;background:hsl(220 16% 95%);box-shadow:0 0 0 1px rgba(15,22,45,.16)">
+            <div style="position:absolute;inset:19.5%;border:2px dashed hsl(220 12% 70%);border-radius:50%"></div>
+            <div style="position:absolute;left:19.5%;top:19.5%;width:61%;height:61%">
+              <div style="position:absolute;left:22%;top:72%;width:56%;height:17%;box-sizing:border-box;border-radius:50%;border:14px solid hsl(224 32% 12%)"></div>
+              <div style="position:absolute;left:27%;top:14%;width:46%;height:46%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(224 32% 12%)"></div>
+              <div style="position:absolute;left:41%;top:28%;width:18%;height:18%;border-radius:50%;background:hsl(220 16% 95%)"></div>
+            </div>
+          </div>
+          <div style="position:relative;width:432px;height:432px;border-radius:50%;background:hsl(150 30% 82%)">
+            <div style="position:absolute;left:19.5%;top:19.5%;width:61%;height:61%">
+              <div style="position:absolute;left:22%;top:72%;width:56%;height:17%;box-sizing:border-box;border-radius:50%;border:14px solid hsl(152 50% 18%)"></div>
+              <div style="position:absolute;left:27%;top:14%;width:46%;height:46%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(152 50% 18%)"></div>
+              <div style="position:absolute;left:41%;top:28%;width:18%;height:18%;border-radius:50%;background:hsl(150 30% 82%)"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:15px;color:hsl(222 12% 34%)">Izquierda: la capa sola. Derecha: cómo la tiñe Android con los colores del fondo de pantalla.</div>
+      </div>
+      <div data-screen-label="Ícono en la pantalla de inicio" style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:600 13px/1.3 ui-monospace,Menlo,monospace">En la pantalla de inicio · 60 px</div>
+        <div style="display:flex;gap:20px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 26px;border-radius:20px;background:hsl(220 14% 74%)">
+            <div style="position:relative;width:60px;height:60px;border-radius:22.4%;background:hsl(226 72% 42%);overflow:hidden">
+              <div style="position:absolute;left:27%;top:69%;width:46%;height:14%;border-radius:50%;background:hsl(228 60% 20%)"></div>
+              <div style="position:absolute;left:30%;top:22%;width:40%;height:40%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(0 0% 100%)"></div>
+              <div style="position:absolute;left:42%;top:34%;width:16%;height:16%;border-radius:50%;background:hsl(45 100% 51%)"></div>
+            </div>
+            <div style="font:500 12px system-ui,sans-serif;color:#fff">Arreglemos</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 26px;border-radius:20px;background:hsl(224 22% 14%)">
+            <div style="position:relative;width:60px;height:60px;border-radius:50%;background:hsl(226 72% 42%);overflow:hidden">
+              <div style="position:absolute;left:27%;top:69%;width:46%;height:14%;border-radius:50%;background:hsl(228 60% 20%)"></div>
+              <div style="position:absolute;left:30%;top:22%;width:40%;height:40%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(0 0% 100%)"></div>
+              <div style="position:absolute;left:42%;top:34%;width:16%;height:16%;border-radius:50%;background:hsl(45 100% 51%)"></div>
+            </div>
+            <div style="font:500 12px system-ui,sans-serif;color:#fff">Arreglemos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const B = (label, screen, variant, o) => {
+      o = o || {};
+      const theme = o.theme || 'light', kind = o.kind || 'ios', cam = screen === 'camara';
+      return {
+        label, screen, variant: variant || 'default', theme, fs: o.fs || '1',
+        ios: kind === 'ios', android: kind === 'android', web: kind === 'web', w: o.w || '390px', url: o.url || '',
+        sbDark: theme === 'dark' || cam, bg: cam ? '#0b0d12' : theme === 'dark' ? 'hsl(224 24% 8%)' : 'hsl(220 20% 96%)',
+      };
+    };
+    const dark = { theme: 'dark' }, big = { fs: '2' }, and = { kind: 'android' };
+    const sections = [
+      { id: 'pantallas', title: 'Pantallas', note: 'iPhone 390×844 · modo claro. El aviso del 911 (pantalla 11) vive arriba de la cámara y en el detalle del reporte.', boards: [
+        B('01 Permisos', 'permisos'), B('02 Cámara (pantalla inicial)', 'camara'), B('03 Ubicación', 'ubicacion'), B('04 Categoría', 'categoria'), B('05 ¿Ya lo reportaron?', 'duplicados'),
+        B('06 Detalles y envío', 'detalles'), B('07 Confirmación', 'confirmacion'), B('08 Mapa público', 'mapa'), B('09 Detalle del reporte', 'detalle'), B('10 Mis reportes', 'mis'),
+      ] },
+      { id: 'estados', title: 'Estados', note: 'Vacío, carga, error, sin conexión y permiso denegado, donde corresponde.', boards: [
+        B('01 Permisos · permiso denegado', 'permisos', 'denegado'),
+        B('03 Ubicación · carga', 'ubicacion', 'cargando'), B('03 Ubicación · error, sin GPS', 'ubicacion', 'error'),
+        B('04 Categoría · carga', 'categoria', 'cargando'), B('04 Categoría · Otro', 'categoria', 'otro'), B('04 Categoría · Otro, error', 'categoria', 'otro-error'),
+        B('05 ¿Ya lo reportaron? · carga', 'duplicados', 'cargando'),
+        B('06 Detalles · sin conexión', 'detalles', 'sin-conexion'), B('06 Detalles · enviando', 'detalles', 'enviando'), B('06 Detalles · error', 'detalles', 'error'),
+        B('07 Confirmación · sin conexión', 'confirmacion', 'sin-conexion'), B('07 Confirmación · mensaje de WhatsApp', 'confirmacion', 'whatsapp'),
+        B('08 Mapa · lista, hoja al 85%', 'mapa', 'lista'), B('08 Mapa · filtro por problema', 'mapa', 'filtro'), B('08 Mapa · carga', 'mapa', 'cargando'),
+        B('08 Mapa · vacío', 'mapa', 'vacio'), B('08 Mapa · sin conexión', 'mapa', 'sin-conexion'), B('08 Mapa · error', 'mapa', 'error'),
+        B('09 Detalle · resuelto', 'detalle', 'resuelto'), B('09 Detalle · "Ya está arreglado"', 'detalle', 'arreglado'), B('09 Detalle · carga', 'detalle', 'cargando'), B('09 Detalle · error', 'detalle', 'error'),
+        B('10 Mis reportes · vacío', 'mis', 'vacio'), B('10 Mis reportes · carga', 'mis', 'cargando'), B('10 Mis reportes · sin conexión', 'mis', 'sin-conexion'),
+      ] },
+      { id: 'oscuro', title: 'Modo oscuro', note: 'Mismos tokens, variante .dark.', boards: [
+        B('02 Cámara · oscuro', 'camara', '', dark), B('03 Ubicación · oscuro', 'ubicacion', '', dark), B('04 Categoría · oscuro', 'categoria', '', dark),
+        B('07 Confirmación · oscuro', 'confirmacion', '', dark), B('08 Mapa · oscuro', 'mapa', '', dark), B('09 Detalle · oscuro', 'detalle', '', dark), B('10 Mis reportes · oscuro', 'mis', '', dark),
+      ] },
+      { id: 'fuente', title: 'Fuente al 200%', note: 'Cuerpo y botones al 200%, títulos al 150%. Los chips pasan a una columna, los botones crecen y el contenido se desplaza.', boards: [
+        B('02 Cámara · 200%', 'camara', '', big), B('04 Categoría · 200%', 'categoria', '', big), B('09 Detalle · 200%', 'detalle', '', big), B('07 Confirmación · 200%', 'confirmacion', '', big),
+      ] },
+      { id: 'android', title: 'Android', note: '412×915 · pantallas clave.', boards: [
+        B('02 Cámara · Android', 'camara', '', and), B('04 Categoría · Android', 'categoria', '', and), B('07 Confirmación · Android', 'confirmacion', '', and), B('08 Mapa · Android', 'mapa', '', and), B('09 Detalle · Android', 'detalle', '', and),
+      ] },
+      { id: 'web', title: 'Web', note: 'Mobile-first (Next.js). El ranking se repite a 960 px porque la Muni lo va a abrir en una computadora.', boards: [
+        B('12 Página pública del reporte · /r/[id]', 'web-reporte', '', { kind: 'web', url: 'arreglemoslacalle.ar/r/LC-0431' }),
+        B('13 Ranking semanal · móvil', 'web-ranking', '', { kind: 'web', url: 'arreglemoslacalle.ar/ranking/la-calera' }),
+        B('13 Ranking semanal · escritorio', 'web-ranking', '', { kind: 'web', w: '960px', url: 'arreglemoslacalle.ar/ranking/la-calera' }),
+      ] },
+    ];
+    const C = (name, l, d) => ({ name, l, d, lc: 'hsl(' + l + ')', dc: 'hsl(' + d + ')' });
+    const colors = [
+      C('background', '220 20% 96%', '224 24% 8%'),
+      C('card', '0 0% 100%', '224 20% 13%'),
+      C('foreground', '224 32% 12%', '220 25% 94%'),
+      C('muted-foreground', '222 12% 34%', '220 14% 72%'),
+      C('muted', '220 18% 91%', '224 16% 18%'),
+      C('border', '220 14% 80%', '224 12% 30%'),
+      C('primary · azul señal', '226 72% 40%', '224 95% 74%'),
+      C('primary-soft', '224 90% 94%', '226 45% 20%'),
+      C('success · resuelto', '152 60% 24%', '146 50% 60%'),
+      C('success-soft', '146 45% 90%', '150 30% 15%'),
+      C('warning · abierto', '45 100% 51%', '46 100% 58%'),
+      C('warning-soft', '48 100% 86%', '44 50% 16%'),
+      C('destructive', '356 72% 42%', '356 90% 72%'),
+      C('destructive-soft', '356 80% 94%', '356 40% 17%'),
+    ];
+    return { sections, colors };
+  }
+}
+
+</script>
+</body>
+</html>

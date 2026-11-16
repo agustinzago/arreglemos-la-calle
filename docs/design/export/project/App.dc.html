@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap">
+<style>
+@keyframes alcSpin{to{transform:rotate(360deg)}}
+[data-alc]{--fs:1;--fsh:1;--sat:0px;--sab:0px;
+--bg:hsl(220 20% 96%);--card:hsl(0 0% 100%);--fg:hsl(224 32% 12%);--mfg:hsl(222 12% 34%);--muted:hsl(220 18% 91%);--border:hsl(220 14% 80%);
+--pri:hsl(226 72% 40%);--pri-fg:hsl(0 0% 100%);--pri-soft:hsl(224 90% 94%);--pri-ink:hsl(226 75% 32%);
+--ok:hsl(152 60% 24%);--ok-fg:hsl(0 0% 100%);--ok-soft:hsl(146 45% 90%);--ok-ink:hsl(152 60% 18%);
+--warn:hsl(45 100% 51%);--warn-fg:hsl(224 32% 12%);--warn-soft:hsl(48 100% 86%);--warn-ink:hsl(36 90% 22%);
+--bad:hsl(356 72% 42%);--bad-soft:hsl(356 80% 94%);--bad-ink:hsl(356 75% 34%);
+--ph1:hsl(220 14% 80%);--ph2:hsl(220 14% 85%);--scrim:hsl(224 32% 8% / .55);--shadow:0 1px 2px hsl(224 40% 20% / .1),0 6px 20px hsl(224 40% 20% / .1);
+--t-xs:calc(15px*var(--fs));--t-sm:calc(16px*var(--fs));--t-body:calc(18px*var(--fs));--t-lg:calc(20px*var(--fs));--t-xl:calc(24px*var(--fsh));--t-2xl:calc(30px*var(--fsh));--t-3xl:calc(38px*var(--fsh));--i:calc(24px*var(--fsh));--i-lg:calc(30px*var(--fsh))}
+[data-alc][data-theme="dark"]{--bg:hsl(224 24% 8%);--card:hsl(224 20% 13%);--fg:hsl(220 25% 94%);--mfg:hsl(220 14% 72%);--muted:hsl(224 16% 18%);--border:hsl(224 12% 30%);
+--pri:hsl(224 95% 74%);--pri-fg:hsl(224 40% 10%);--pri-soft:hsl(226 45% 20%);--pri-ink:hsl(224 100% 80%);
+--ok:hsl(146 50% 60%);--ok-fg:hsl(150 40% 8%);--ok-soft:hsl(150 30% 15%);--ok-ink:hsl(146 52% 72%);
+--warn:hsl(46 100% 58%);--warn-fg:hsl(224 32% 10%);--warn-soft:hsl(44 50% 16%);--warn-ink:hsl(46 95% 68%);
+--bad:hsl(356 90% 72%);--bad-soft:hsl(356 40% 17%);--bad-ink:hsl(356 92% 78%);
+--ph1:hsl(224 12% 20%);--ph2:hsl(224 12% 25%);--scrim:hsl(0 0% 0% / .65);--shadow:0 1px 2px hsl(0 0% 0% / .4),0 6px 20px hsl(0 0% 0% / .35)}
+[data-alc] a{color:var(--pri-ink)}[data-alc] a:hover{color:var(--pri)}
+[data-alc][data-fs="1.5"]{--fs:1.5;--fsh:1.3}
+[data-alc][data-fs="2"]{--fs:2;--fsh:1.5}
+[data-alc][data-plat="ios"]{--sat:56px;--sab:22px}
+</style>
+</helmet>
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+<div data-alc="1" data-theme="{{ theme }}" data-fs="{{ fs }}" data-plat="{{ plat }}" style="position:relative;width:100%;max-width:430px;height:100%;min-height:min(844px,100vh);margin:0 auto;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Rubik',system-ui,sans-serif;font-size:var(--t-body);line-height:1.4;-webkit-font-smoothing:antialiased">
+
+<sc-if value="{{ isPermisos }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="01 Permisos" style="position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat)">
+  <div style="flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding:24px 22px;display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="position:relative;width:48px;height:48px;flex:none;border-radius:24%;background:hsl(226 72% 42%);overflow:hidden">
+        <div style="position:absolute;left:27%;top:69%;width:46%;height:14%;border-radius:50%;background:hsl(228 60% 20%)"></div>
+        <div style="position:absolute;left:30%;top:22%;width:40%;height:40%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(0 0% 100%)"></div>
+        <div style="position:absolute;left:42%;top:34%;width:16%;height:16%;border-radius:50%;background:hsl(45 100% 51%)"></div>
+      </div>
+      <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-lg);line-height:1.1">Arreglemos la Calle</div>
+    </div>
+    <sc-if value="{{ permOk }}" hint-placeholder-val="{{ true }}">
+      <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">Para empezar, necesitamos dos permisos</h1>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--border)">
+          <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i-lg);color:var(--pri-ink);padding:9px;border-radius:12px;background:var(--pri-soft)">photo_camera</span>
+          <div><div style="font-weight:700;font-size:var(--t-lg);line-height:1.2">Cámara</div><div style="color:var(--mfg);margin-top:2px">Para sacarle una foto al problema.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--border)">
+          <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i-lg);color:var(--pri-ink);padding:9px;border-radius:12px;background:var(--pri-soft)">location_on</span>
+          <div><div style="font-weight:700;font-size:var(--t-lg);line-height:1.2">Ubicación</div><div style="color:var(--mfg);margin-top:2px">Para saber en qué calle está. Solo mientras usás la app.</div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;color:var(--mfg);font-size:var(--t-sm)">
+        <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">verified_user</span>
+        <span>No hace falta crear cuenta. Somos vecinos: esta app no es de la Municipalidad.</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ permDenied }}" hint-placeholder-val="{{ false }}">
+      <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">Falta el permiso de la cámara</h1>
+      <p style="margin:0;color:var(--mfg)">Sin la cámara no podemos sacar la foto. Se activa en un minuto:</p>
+      <div style="display:flex;flex-direction:column;border-radius:18px;background:var(--card);border:1px solid var(--border)">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:14px 16px;border-bottom:1px solid var(--border)">
+          <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">photo_camera</span>
+          <span style="flex:1;font-weight:700">Cámara</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px 4px 7px;border-radius:99px;background:var(--bad-soft);color:var(--bad-ink);font-size:var(--t-xs);font-weight:700"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">block</span>No permitida</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:14px 16px">
+          <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">location_on</span>
+          <span style="flex:1;font-weight:700">Ubicación</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px 4px 7px;border-radius:99px;background:var(--ok-soft);color:var(--ok-ink);font-size:var(--t-xs);font-weight:700"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">check_circle</span>Permitida</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:12px;align-items:center"><span style="flex:none;width:34px;height:34px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-weight:700">1</span><span>Tocá <b>Abrir Ajustes</b>, acá abajo.</span></div>
+        <div style="display:flex;gap:12px;align-items:center"><span style="flex:none;width:34px;height:34px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-weight:700">2</span><span>Activá <b>Cámara</b>.</span></div>
+        <div style="display:flex;gap:12px;align-items:center"><span style="flex:none;width:34px;height:34px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-weight:700">3</span><span>Volvé a Arreglemos.</span></div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="flex:none;display:flex;flex-direction:column;gap:10px;padding:12px 20px calc(12px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+    <sc-if value="{{ permOk }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ start }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)">Empezar<span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">arrow_forward</span></button>
+    </sc-if>
+    <sc-if value="{{ permDenied }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ retryPerm }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">settings</span>Abrir Ajustes</button>
+      <button onClick="{{ toGallery }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:12px 20px;border:2px solid var(--pri);border-radius:16px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-body);line-height:1.2;text-align:center;cursor:pointer" style-active="background:var(--pri-soft)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">photo_library</span>Elegir una foto de la galería</button>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCamara }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="02 Cámara" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#0b0d12;color:#fff">
+  <div style="position:relative;flex:1;min-height:110px;background:repeating-linear-gradient(135deg,#232733 0 14px,#1d202a 14px 28px);display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:10px;padding:calc(var(--sat) + 8px) 12px 14px">
+    <div role="note" style="align-self:stretch;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:var(--warn);color:var(--warn-fg);font-size:var(--t-sm);line-height:1.25">
+      <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">emergency</span>
+      <span>¿Hay riesgo para personas? <b>Llamá al 911 o al 103</b></span>
+    </div>
+    <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:rgba(255,255,255,.55)">vista de cámara en vivo</span>
+    <div style="padding:8px 16px;border-radius:99px;background:rgba(11,13,18,.72);font-weight:600;font-size:var(--t-sm);text-align:center">Apuntá al problema y sacá la foto</div>
+    <div style="position:absolute;inset:0;background:#fff;pointer-events:none;transition:opacity .22s;opacity:{{ flashOp }}"></div>
+  </div>
+  <div style="flex:none;display:flex;flex-direction:column;gap:14px;padding:16px 20px calc(12px + var(--sab))">
+    <div style="display:grid;grid-template-columns:minmax(min-content,1fr) auto minmax(0,1fr);align-items:center;gap:8px">
+      <button onClick="{{ toGallery }}" style="justify-self:start;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:64px;min-height:56px;padding:6px 8px;border:0;border-radius:14px;background:transparent;color:#fff;font-family:inherit;font-weight:600;font-size:var(--t-sm);cursor:pointer" style-active="background:rgba(255,255,255,.14)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i-lg)">photo_library</span>Galería</button>
+      <button onClick="{{ shoot }}" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;border:0;background:transparent;color:#fff;font-family:inherit;font-weight:700;font-size:calc(20px*var(--fsh));line-height:1.1;cursor:pointer" style-active="transform:scale(.95)">
+        <span style="width:88px;height:88px;box-sizing:border-box;border-radius:50%;border:5px solid #fff;padding:5px;display:block"><span style="width:100%;height:100%;border-radius:50%;background:hsl(226 82% 54%);display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:36px;font-variation-settings:'FILL' 1">photo_camera</span></span></span>
+        Sacar foto
+      </button>
+      <span></span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <button onClick="{{ toMapa }}" style="flex:1 1 calc(140px*var(--fs));display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:10px 14px;border:0;border-radius:16px;background:rgba(255,255,255,.14);color:#fff;font-family:inherit;font-weight:700;font-size:var(--t-body);cursor:pointer" style-active="background:rgba(255,255,255,.26)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">map</span>Mapa</button>
+      <button onClick="{{ toMis }}" style="flex:1 1 calc(140px*var(--fs));display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:10px 14px;border:0;border-radius:16px;background:rgba(255,255,255,.14);color:#fff;font-family:inherit;font-weight:700;font-size:var(--t-body);cursor:pointer" style-active="background:rgba(255,255,255,.26)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">list_alt</span>Mis reportes</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStep }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat)">
+  <div style="flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 12px;padding:4px 20px 8px 10px">
+    <button onClick="{{ back }}" style="display:flex;align-items:center;gap:6px;min-height:48px;padding:0 12px 0 8px;border:0;border-radius:12px;background:transparent;color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-body);cursor:pointer" style-active="background:var(--muted)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">arrow_back</span>Atrás</button>
+    <div style="font-size:var(--t-sm);font-weight:600;color:var(--mfg)">Paso {{ stepN }} de 4</div>
+  </div>
+  <div style="flex:none;display:flex;gap:6px;padding:0 20px">
+    <sc-for list="{{ segs }}" as="g" hint-placeholder-count="4"><div style="flex:1;height:6px;border-radius:3px;background:{{ g.bg }}"></div></sc-for>
+  </div>
+  <div style="position:relative;flex:1;min-height:0">
+
+    <sc-if value="{{ isUbicacion }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="03 Ubicación" style="position:absolute;inset:0;display:flex;flex-direction:column">
+      <div style="flex:none;padding:16px 20px 12px"><h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">¿Dónde está el problema?</h1></div>
+      <div style="position:relative;flex:1;min-height:150px;margin:0 20px;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--muted)">
+        <sc-if value="{{ ubiMap }}" hint-placeholder-val="{{ false }}"><iframe title="Mapa para marcar el lugar" src="map.html" ref="{{ mapRef }}" style="position:absolute;inset:0;display:block;width:100%;height:100%;border:0"></iframe></sc-if>
+        <sc-if value="{{ ubiLoading }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mfg);font-weight:600">{{ spinLg }}Buscando dónde estás…</div></sc-if>
+        <div style="position:absolute;left:10px;top:10px;width:76px;height:76px;box-sizing:border-box;border-radius:14px;border:3px solid var(--card);box-shadow:var(--shadow);background:repeating-linear-gradient(135deg,var(--ph1) 0 8px,var(--ph2) 8px 16px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--fg)">tu foto</span></div>
+        <sc-if value="{{ ubiMap }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:96px;right:10px;top:10px;display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);font-size:var(--t-sm);font-weight:600;line-height:1.2"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);color:var(--pri-ink)">touch_app</span>Tocá el mapa o arrastrá el pin</div></sc-if>
+      </div>
+      <div style="flex:none;padding:14px 20px 2px;display:flex;flex-direction:column;gap:10px">
+        <sc-if value="{{ ubiError }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bad-soft);color:var(--bad-ink);font-weight:600;font-size:var(--t-sm);line-height:1.3"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">location_off</span>No encontramos tu ubicación. Tocá el mapa donde está el problema.</div></sc-if>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i-lg);color:var(--pri-ink);font-variation-settings:'FILL' 1">location_on</span>
+          <div><div style="font-weight:700;font-size:var(--t-lg);line-height:1.2">{{ addr }}</div><div style="color:var(--mfg);font-size:var(--t-sm)">{{ addrSub }}</div></div>
+        </div>
+      </div>
+      <div style="flex:none;padding:12px 20px calc(12px + var(--sab))">
+        <button onClick="{{ confirmUbi }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer;opacity:{{ ubiBtnOp }}" style-active="transform:scale(.98)">Confirmar ubicación</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isCategoria }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="04 Categoría" style="position:absolute;inset:0;display:flex;flex-direction:column">
+      <div ref="{{ catScroll }}" style="flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding:12px 20px 10px">
+        <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">¿Qué problema es?</h1>
+        <sc-if value="{{ catLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--mfg);font-weight:600">{{ spin }}Mirando la foto…</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+            <sc-for list="{{ skel6 }}" as="k" hint-placeholder-count="6"><div style="height:92px;border-radius:16px;background:var(--muted)"></div></sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ catReady }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(150px*var(--fs)),1fr));gap:8px 10px;margin-top:20px">
+            <sc-for list="{{ cats }}" as="c" hint-placeholder-count="10">
+              <button onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" style="position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:92px;box-sizing:border-box;padding:12px 12px 10px;border:2px solid {{ c.bd }};border-radius:16px;background:{{ c.bg }};color:var(--fg);font-family:inherit;text-align:left;cursor:pointer">
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%">
+                  <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(28px*var(--fsh));color:{{ c.ic }}">{{ c.icon }}</span>
+                  <sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:3px;font-size:var(--t-xs);font-weight:700;color:var(--pri-ink)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh));font-variation-settings:'FILL' 1">check_circle</span>Elegido</span></sc-if>
+                </span>
+                <span style="font-size:calc(17px*var(--fs));font-weight:600;line-height:1.15">{{ c.name }}</span>
+                <sc-if value="{{ c.sug }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-14px;left:10px;display:flex;align-items:center;gap:4px;padding:2px 10px 2px 6px;border-radius:99px;background:var(--pri);color:var(--pri-fg);font-size:var(--t-xs);font-weight:700;line-height:1.35"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(16px*var(--fsh));font-variation-settings:'FILL' 1">auto_awesome</span>Sugerido</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ isOtro }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+              <label style="font-weight:700">Contanos qué problema es <span style="font-weight:400;color:var(--mfg)">(obligatorio)</span></label>
+              <input value="{{ otro }}" onChange="{{ setOtro }}" placeholder="Por ejemplo: cartel caído" style="box-sizing:border-box;width:100%;min-height:56px;padding:12px 14px;border:2px solid {{ otroBd }};border-radius:14px;background:var(--card);color:var(--fg);font-family:inherit;font-size:var(--t-body);outline:none">
+              <sc-if value="{{ otroErr }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:flex-start;color:var(--bad-ink);font-weight:600;font-size:var(--t-sm)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">error</span>Escribí qué problema es para poder seguir.</div></sc-if>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+      <div style="flex:none;padding:12px 20px calc(12px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+        <button onClick="{{ nextCat }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer;opacity:{{ catBtnOp }}" style-active="transform:scale(.98)">Continuar<span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">arrow_forward</span></button>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isDuplicados }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="05 ¿Ya lo reportaron?" style="position:absolute;inset:0;display:flex;flex-direction:column">
+      <div style="flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding:16px 20px 18px;display:flex;flex-direction:column;gap:12px">
+        <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">¿Ya lo reportaron?</h1>
+        <sc-if value="{{ dupLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;color:var(--mfg);font-weight:600">{{ spin }}Buscando reportes cerca…</div>
+          <sc-for list="{{ skel2 }}" as="k" hint-placeholder-count="2"><div style="height:124px;border-radius:18px;background:var(--muted)"></div></sc-for>
+        </sc-if>
+        <sc-if value="{{ dupReady }}" hint-placeholder-val="{{ true }}">
+          <p style="margin:0 0 2px;color:var(--mfg);text-wrap:pretty">Hay 3 reportes cerca. Si es el mismo, sumate: cuantos más vecinos, más peso tiene.</p>
+          <sc-for list="{{ dups }}" as="d" hint-placeholder-count="3">
+            <button onClick="{{ d.pick }}" aria-pressed="{{ d.on }}" style="display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px;border:2px solid {{ d.bd }};border-radius:18px;background:{{ d.bg }};color:var(--fg);font-family:inherit;text-align:left;cursor:pointer">
+              <span style="flex:none;width:100px;height:100px;border-radius:12px;background:repeating-linear-gradient(135deg,var(--ph1) 0 8px,var(--ph2) 8px 16px);display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:var(--i-lg);color:var(--mfg)">{{ d.icon }}</span></span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                <span style="font-weight:700;font-size:var(--t-body);line-height:1.2">{{ d.short }}</span>
+                <span style="font-size:var(--t-sm);color:var(--mfg);line-height:1.25">{{ d.addr }}</span>
+                <span style="display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:3px;font-size:var(--t-xs);font-weight:700">
+                  <span style="display:flex;align-items:center;gap:4px"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">near_me</span>{{ d.distTxt }}</span>
+                  <span style="display:flex;align-items:center;gap:4px"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">group</span>{{ d.vecTxt }}</span>
+                </span>
+              </span>
+              <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i-lg);color:{{ d.rc }}">{{ d.radio }}</span>
+            </button>
+          </sc-for>
+        </sc-if>
+      </div>
+      <sc-if value="{{ dupReady }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:none;display:flex;flex-direction:column;gap:10px;padding:12px 20px calc(12px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+        <button onClick="{{ joinDup }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">group_add</span>Es este, me sumo</button>
+        <button onClick="{{ newReport }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:12px 20px;border:2px solid var(--pri);border-radius:16px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="background:var(--pri-soft)">Es otro, crear nuevo</button>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isDetalles }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="06 Detalles y envío" style="position:absolute;inset:0;display:flex;flex-direction:column">
+      <div style="flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding:16px 20px 18px;display:flex;flex-direction:column;gap:14px">
+        <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">Revisá y enviá</h1>
+        <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--warn-soft);color:var(--warn-ink);font-weight:600;line-height:1.3"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">wifi_off</span>Sin señal, lo enviamos apenas vuelva.</div></sc-if>
+        <sc-if value="{{ sendErr }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bad-soft);color:var(--bad-ink);font-weight:600;line-height:1.3"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">error</span>No pudimos enviarlo. Tu reporte está guardado: probá de nuevo.</div></sc-if>
+        <div style="display:flex;flex-direction:column;border-radius:18px;background:var(--card);border:1px solid var(--border)">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 6px 10px 12px;border-bottom:1px solid var(--border)">
+            <span style="flex:none;width:60px;height:60px;border-radius:10px;background:repeating-linear-gradient(135deg,var(--ph1) 0 8px,var(--ph2) 8px 16px)"></span>
+            <span style="flex:1 1 120px"><span style="display:block;font-size:var(--t-sm);color:var(--mfg)">Foto</span><span style="display:block;font-weight:700;line-height:1.2">1 foto lista</span></span>
+            <button onClick="{{ editFoto }}" style="display:flex;align-items:center;gap:5px;min-height:48px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-sm);text-decoration:underline;cursor:pointer" style-active="background:var(--pri-soft)">Cambiar</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 6px 10px 12px;border-bottom:1px solid var(--border)">
+            <span style="flex:none;width:60px;display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:var(--i-lg);color:var(--pri-ink)">location_on</span></span>
+            <span style="flex:1 1 120px"><span style="display:block;font-size:var(--t-sm);color:var(--mfg)">Lugar</span><span style="display:block;font-weight:700;line-height:1.2">{{ addr }}, La Calera</span></span>
+            <button onClick="{{ editUbi }}" style="display:flex;align-items:center;gap:5px;min-height:48px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-sm);text-decoration:underline;cursor:pointer" style-active="background:var(--pri-soft)">Cambiar</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 6px 10px 12px">
+            <span style="flex:none;width:60px;display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:var(--i-lg);color:var(--pri-ink)">{{ catIcon }}</span></span>
+            <span style="flex:1 1 120px"><span style="display:block;font-size:var(--t-sm);color:var(--mfg)">Problema</span><span style="display:block;font-weight:700;line-height:1.2">{{ catName }}</span></span>
+            <button onClick="{{ editCat }}" style="display:flex;align-items:center;gap:5px;min-height:48px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-sm);text-decoration:underline;cursor:pointer" style-active="background:var(--pri-soft)">Cambiar</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="font-weight:700">¿Querés agregar algo? <span style="font-weight:400;color:var(--mfg)">(opcional)</span></label>
+          <textarea value="{{ desc }}" onChange="{{ setDesc }}" rows="3" placeholder="Por ejemplo: está frente a la escuela" style="box-sizing:border-box;width:100%;min-height:96px;padding:12px 14px;border:2px solid var(--border);border-radius:14px;background:var(--card);color:var(--fg);font-family:inherit;font-size:var(--t-body);line-height:1.35;resize:none;outline:none" style-focus="border-color:var(--pri)"></textarea>
+        </div>
+      </div>
+      <div style="flex:none;padding:12px 20px calc(12px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+        <button onClick="{{ send }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)">
+          <sc-if value="{{ sending }}" hint-placeholder-val="{{ false }}">{{ spin }}Enviando…</sc-if>
+          <sc-if value="{{ notSending }}" hint-placeholder-val="{{ true }}"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">send</span>{{ sendLabel }}</sc-if>
+        </button>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isConfirmacion }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="07 Confirmación" style="position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat)">
+  <div style="flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding:20px 20px 18px;display:flex;flex-direction:column;gap:16px">
+    <sc-if value="{{ confOk }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(56px*var(--fsh));color:var(--ok);font-variation-settings:'FILL' 1">check_circle</span>
+        <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">¡Listo! Ya está en el mapa</h1>
+      </div>
+      <div style="padding:14px 18px;border-radius:18px;background:var(--card);border:1px solid var(--border)">
+        <div style="font-size:var(--t-sm);color:var(--mfg)">Tu número de reporte</div>
+        <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:var(--t-3xl);line-height:1.1;letter-spacing:.02em">LC-0482</div>
+      </div>
+      <sc-if value="{{ waDone }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--ok-soft);color:var(--ok-ink);font-weight:600;line-height:1.3"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">done_all</span>Se abrió WhatsApp con el mensaje listo.</div></sc-if>
+      <p style="margin:0;text-wrap:pretty">Falta un paso: <b>mandáselo a la Muni</b> para que quede registrado.</p>
+      <div style="padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;gap:10px">
+        <div style="font-weight:700;line-height:1.25">¿Te avisamos cuando lo arreglen?</div>
+        <sc-if value="{{ notifOff }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toggleNotif }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;min-height:52px;padding:10px 16px;border:2px solid var(--pri);border-radius:14px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-body);line-height:1.2;cursor:pointer" style-active="background:var(--pri-soft)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">notifications</span>Sí, avisame</button></sc-if>
+        <sc-if value="{{ notif }}" hint-placeholder-val="{{ false }}"><button onClick="{{ toggleNotif }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;min-height:52px;padding:10px 16px;border:2px solid var(--ok);border-radius:14px;background:var(--ok-soft);color:var(--ok-ink);font-family:inherit;font-weight:700;font-size:var(--t-body);line-height:1.2;cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">notifications_active</span>Listo, te vamos a avisar</button></sc-if>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:var(--t-sm);color:var(--mfg);text-wrap:pretty">Opcional: entrá con tu cuenta para no perder tus reportes si cambiás de teléfono.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button style="flex:1 1 calc(150px*var(--fs));min-height:48px;padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-sm);cursor:pointer" style-active="background:var(--muted)">Entrar con Apple</button>
+          <button style="flex:1 1 calc(150px*var(--fs));min-height:48px;padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-sm);cursor:pointer" style-active="background:var(--muted)">Entrar con Google</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ confOff }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(56px*var(--fsh));color:var(--warn-ink)">schedule_send</span>
+        <h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em;text-wrap:balance">Guardado en tu teléfono</h1>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--warn-soft);color:var(--warn-ink);font-weight:600;line-height:1.3"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">wifi_off</span>Sin señal, lo enviamos apenas vuelva.</div>
+      <p style="margin:0;text-wrap:pretty">No hace falta que hagas nada. Cuando se envíe, te avisamos para que se lo mandes a la Muni por WhatsApp.</p>
+    </sc-if>
+  </div>
+  <div style="flex:none;display:flex;flex-direction:column;gap:4px;padding:12px 20px calc(8px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+    <sc-if value="{{ confOk }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ openWa }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--ok);color:var(--ok-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">chat</span>Enviar a la Muni por WhatsApp</button>
+      <button onClick="{{ home }}" style="align-self:center;min-height:48px;padding:0 14px;border:0;border-radius:12px;background:transparent;color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-sm);text-decoration:underline;cursor:pointer">Ahora no, volver a la cámara</button>
+    </sc-if>
+    <sc-if value="{{ confOff }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ home }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;margin-bottom:8px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">photo_camera</span>Volver a la cámara</button>
+    </sc-if>
+  </div>
+  <sc-if value="{{ wa }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:var(--scrim);display:flex;flex-direction:column;justify-content:flex-end">
+    <div style="max-height:90%;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(16px + var(--sab));display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--mfg)">simulación · en el teléfono se abre WhatsApp</div>
+      <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.15">Este mensaje le llega a la Muni</div>
+      <div style="align-self:flex-end;max-width:92%;padding:12px 14px;border-radius:18px 18px 4px 18px;background:var(--ok-soft);line-height:1.35">{{ waMsg }} <span style="color:var(--ok-ink);font-weight:700;text-decoration:underline;word-break:break-all">arreglemoslacalle.ar/r/LC-0482</span></div>
+      <div style="font-size:var(--t-sm);color:var(--mfg);text-wrap:pretty">Ya viene escrito, con el link a la foto y al mapa. Solo hay que tocar enviar.</div>
+      <button onClick="{{ closeWa }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--ok);color:var(--ok-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">check</span>Listo, volver a Arreglemos</button>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMapa }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="08 Mapa público" style="position:absolute;inset:0;overflow:hidden">
+  <div style="position:absolute;left:0;right:0;top:0;bottom:calc(25% - 24px);background:var(--muted)">
+    <sc-if value="{{ mapOn }}" hint-placeholder-val="{{ false }}"><iframe title="Mapa de reportes" src="map.html" ref="{{ mapRef }}" style="position:absolute;inset:0;display:block;width:100%;height:100%;border:0"></iframe></sc-if>
+    <sc-if value="{{ mapLoading }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-top:120px;color:var(--mfg);font-weight:600">{{ spinLg }}Cargando el mapa…</div></sc-if>
+    <sc-if value="{{ mapError }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-top:120px;color:var(--mfg);font-weight:600"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:calc(48px*var(--fsh))">cloud_off</span>No pudimos cargar el mapa</div></sc-if>
+  </div>
+  <div style="position:absolute;left:12px;right:12px;top:calc(var(--sat) + 8px);display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button onClick="{{ back }}" style="display:flex;align-items:center;gap:6px;min-height:48px;padding:0 14px 0 10px;border:0;border-radius:14px;background:var(--card);box-shadow:var(--shadow);color:var(--fg);font-family:inherit;font-weight:700;font-size:var(--t-sm);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">arrow_back</span>Volver</button>
+      <button onClick="{{ openCatPanel }}" style="flex:1 1 calc(170px*var(--fs));display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:6px 10px 6px 12px;border:0;border-radius:14px;background:var(--card);box-shadow:var(--shadow);color:var(--fg);font-family:inherit;font-size:var(--t-sm);text-align:left;cursor:pointer"><span style="display:flex;align-items:center;gap:8px"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">filter_list</span><span>Problema: <b>{{ fCatLabel }}</b></span></span><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">expand_more</span></button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;box-sizing:border-box;padding:4px;border-radius:14px;background:var(--card);box-shadow:var(--shadow)">
+      <sc-for list="{{ stOpts }}" as="o" hint-placeholder-count="3">
+        <button onClick="{{ o.pick }}" style="flex:1 1 0;min-width:min-content;display:flex;align-items:center;justify-content:center;gap:5px;min-height:48px;padding:0 6px;border:0;border-radius:10px;background:{{ o.bg }};color:{{ o.fg }};font-family:inherit;font-weight:700;font-size:var(--t-xs);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">{{ o.icon }}</span>{{ o.label }}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ mapOffline }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:14px;background:var(--warn-soft);color:var(--warn-ink);font-weight:600;font-size:var(--t-sm);line-height:1.3;box-shadow:var(--shadow)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">wifi_off</span>Sin señal. Te mostramos lo último que cargamos.</div></sc-if>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:{{ sheetH }};transition:height .32s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;background:var(--card);border-radius:24px 24px 0 0;box-shadow:0 -4px 24px hsl(224 40% 10% / .2)">
+    <div style="flex:none;padding-top:8px;display:grid;place-items:center"><div style="width:40px;height:5px;border-radius:3px;background:var(--border)"></div></div>
+    <div style="flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;padding:4px 12px 8px 20px">
+      <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.1">{{ listTitle }}</div>
+      <button onClick="{{ toggleSheet }}" style="display:flex;align-items:center;gap:4px;min-height:48px;padding:0 14px 0 10px;border:0;border-radius:12px;background:var(--muted);color:var(--fg);font-family:inherit;font-weight:700;font-size:var(--t-sm);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">{{ sheetBtnIcon }}</span>{{ sheetBtnLabel }}</button>
+    </div>
+    <div style="flex:1;min-height:0;overflow:hidden auto;scrollbar-width:none;padding:2px 16px calc(14px + var(--sab));display:flex;flex-direction:column;gap:10px">
+      <sc-if value="{{ listReady }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ list }}" as="r" hint-placeholder-count="3">
+          <button onClick="{{ r.onOpen }}" style="flex:none;display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--border);border-radius:18px;background:var(--bg);color:var(--fg);font-family:inherit;text-align:left;cursor:pointer" style-active="background:var(--muted)">
+            <span style="flex:none;width:92px;height:92px;border-radius:12px;background:repeating-linear-gradient(135deg,var(--ph1) 0 8px,var(--ph2) 8px 16px);display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:var(--i-lg);color:var(--mfg)">{{ r.icon }}</span></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+              <span style="font-weight:700;font-size:var(--t-body);line-height:1.2">{{ r.short }}</span>
+              <span style="font-size:var(--t-sm);color:var(--mfg);line-height:1.25">{{ r.addr }}</span>
+              <span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:3px">
+                <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px 3px 6px;border-radius:99px;background:{{ r.stBg }};color:{{ r.stFg }};font-size:var(--t-xs);font-weight:700"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">{{ r.stIcon }}</span>{{ r.stLabel }}</span>
+                <span style="font-size:var(--t-xs);color:var(--mfg);font-weight:600">{{ r.meta }}</span>
+              </span>
+            </span>
+            <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);color:var(--mfg)">chevron_right</span>
+          </button>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ listLoading }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ skel3 }}" as="k" hint-placeholder-count="3"><div style="flex:none;height:114px;border-radius:18px;background:var(--muted)"></div></sc-for>
+      </sc-if>
+      <sc-if value="{{ listEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:10px;align-items:flex-start;font-weight:600"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">search_off</span>No hay reportes con este filtro.</div>
+        <button onClick="{{ clearFilters }}" style="flex:none;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;min-height:52px;padding:10px 16px;border:2px solid var(--pri);border-radius:14px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-body);cursor:pointer" style-active="background:var(--pri-soft)">Quitar filtros</button>
+      </sc-if>
+      <sc-if value="{{ listError }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:10px;align-items:flex-start;font-weight:600;color:var(--bad-ink)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">error</span>No pudimos cargar los reportes.</div>
+        <button onClick="{{ retry }}" style="flex:none;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;min-height:52px;padding:10px 16px;border:0;border-radius:14px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-body);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">refresh</span>Probar de nuevo</button>
+      </sc-if>
+    </div>
+  </div>
+  <sc-if value="{{ catPanel }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:var(--scrim);display:flex;flex-direction:column;justify-content:flex-end">
+    <div style="max-height:88%;box-sizing:border-box;background:var(--card);border-radius:24px 24px 0 0;padding:16px 16px calc(14px + var(--sab));display:flex;flex-direction:column;gap:12px">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-left:4px">
+        <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.15">¿Qué problema querés ver?</div>
+        <button onClick="{{ closeCatPanel }}" style="flex:none;display:flex;align-items:center;gap:4px;min-height:48px;padding:0 12px 0 8px;border:0;border-radius:12px;background:var(--muted);color:var(--fg);font-family:inherit;font-weight:700;font-size:var(--t-sm);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">close</span>Cerrar</button>
+      </div>
+      <div style="flex:1;min-height:0;overflow:hidden auto;scrollbar-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(150px*var(--fs)),1fr));gap:8px">
+        <sc-for list="{{ fOpts }}" as="o" hint-placeholder-count="11">
+          <button onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:8px;min-height:54px;box-sizing:border-box;padding:8px 10px;border:2px solid {{ o.bd }};border-radius:14px;background:{{ o.bg }};color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-sm);line-height:1.15;text-align:left;cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">{{ o.icon }}</span><span style="flex:1">{{ o.short }}</span><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(20px*var(--fsh))">{{ o.radio }}</span></button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetalle }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="09 Detalle del reporte" style="position:absolute;inset:0;display:flex;flex-direction:column">
+  <sc-if value="{{ dReady }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;min-height:0;overflow:auto;scrollbar-width:none">
+    <div style="position:relative;height:310px;background:repeating-linear-gradient(135deg,var(--ph1) 0 14px,var(--ph2) 14px 28px);display:grid;place-items:center">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--fg)">foto del problema</span>
+      <span style="position:absolute;left:16px;bottom:14px;display:inline-flex;align-items:center;gap:6px;padding:6px 14px 6px 9px;border-radius:99px;background:{{ dStBg }};color:{{ dStFg }};font-weight:700;font-size:var(--t-sm);box-shadow:var(--shadow)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">{{ dStIcon }}</span>{{ dStLabel }}</span>
+    </div>
+    <div style="padding:18px 20px 22px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i-lg);color:var(--pri-ink)">{{ dIcon }}</span><h1 style="margin:0;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em">{{ dName }}</h1></div>
+        <div style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;color:var(--mfg)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">location_on</span><span>{{ dAddr }}, La Calera · Reporte {{ dId }}</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(calc(140px*var(--fs)),1fr));gap:10px">
+        <div style="padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:var(--t-3xl);line-height:1.05">{{ dayN }}</div><div style="font-size:var(--t-sm);font-weight:600;color:var(--mfg);line-height:1.2">{{ dayL }}</div></div>
+        <div style="padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:var(--t-3xl);line-height:1.05">{{ vecN }}</div><div style="font-size:var(--t-sm);font-weight:600;color:var(--mfg);line-height:1.2">{{ vecL }}</div></div>
+      </div>
+      <sc-if value="{{ hasDesc }}" hint-placeholder-val="{{ true }}"><p style="margin:0;text-wrap:pretty">{{ dDesc }}</p></sc-if>
+      <div>
+        <h2 style="margin:0 0 12px;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.15">Qué pasó hasta ahora</h2>
+        <sc-for list="{{ events }}" as="ev" hint-placeholder-count="3">
+          <div style="display:flex;gap:12px">
+            <div style="flex:none;display:flex;flex-direction:column;align-items:center">
+              <span style="font-family:'Material Symbols Rounded';line-height:1;font-size:22px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:{{ ev.bg }};color:{{ ev.fg }}">{{ ev.icon }}</span>
+              <div style="flex:1;width:2px;min-height:12px;background:{{ ev.line }}"></div>
+            </div>
+            <div style="padding:6px 0 14px"><div style="font-weight:600;line-height:1.3">{{ ev.txt }}</div><div style="font-size:var(--t-sm);color:var(--mfg)">{{ ev.date }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ dOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ openFix }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:12px 20px;border:2px solid var(--pri);border-radius:16px;background:transparent;color:var(--pri-ink);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="background:var(--pri-soft)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">check_circle</span>Ya está arreglado</button></sc-if>
+      <div role="note" style="display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:var(--warn-soft);color:var(--warn-ink);font-size:var(--t-sm);line-height:1.25"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">emergency</span><span>¿Hay riesgo para personas? <b>Llamá al 911 o al 103</b></span></div>
+      <sc-if value="{{ notFlagged }}" hint-placeholder-val="{{ true }}"><button onClick="{{ flag }}" style="align-self:center;display:flex;align-items:center;gap:6px;min-height:48px;padding:0 14px;border:0;border-radius:12px;background:transparent;color:var(--mfg);font-family:inherit;font-weight:600;font-size:var(--t-sm);text-decoration:underline;cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">flag</span>Denunciar este reporte</button></sc-if>
+      <sc-if value="{{ flagged }}" hint-placeholder-val="{{ false }}"><div style="align-self:center;display:flex;align-items:center;gap:6px;min-height:48px;color:var(--mfg);font-weight:600;font-size:var(--t-sm)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">check</span>Gracias. Vamos a revisar este reporte.</div></sc-if>
+    </div>
+  </div>
+  <div style="flex:none;padding:12px 20px calc(12px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+    <sc-if value="{{ canJoin }}" hint-placeholder-val="{{ true }}"><button onClick="{{ join }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">group_add</span>Me sumo</button></sc-if>
+    <sc-if value="{{ isJoined }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;box-sizing:border-box;padding:12px 20px;border-radius:16px;background:var(--ok-soft);color:var(--ok-ink);font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">check_circle</span>{{ joinedTxt }}</div></sc-if>
+    <sc-if value="{{ dDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ reopen }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">report</span>Sigue roto</button></sc-if>
+  </div>
+  </sc-if>
+  <sc-if value="{{ dLoading }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column">
+    <div style="flex:none;height:310px;background:var(--muted)"></div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div style="height:34px;width:55%;border-radius:8px;background:var(--muted)"></div>
+      <div style="height:20px;width:80%;border-radius:8px;background:var(--muted)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="height:84px;border-radius:16px;background:var(--muted)"></div><div style="height:84px;border-radius:16px;background:var(--muted)"></div></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;color:var(--mfg);font-weight:600">{{ spin }}Cargando el reporte…</div>
+    </div>
+  </div>
+  </sc-if>
+  <sc-if value="{{ dError }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat)">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center">
+      <span style="font-family:'Material Symbols Rounded';line-height:1;font-size:calc(56px*var(--fsh));color:var(--bad-ink)">cloud_off</span>
+      <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.15;text-wrap:balance">No pudimos abrir este reporte</div>
+      <div style="color:var(--mfg)">Revisá tu conexión y probá de nuevo.</div>
+    </div>
+    <div style="flex:none;padding:12px 20px calc(12px + var(--sab))"><button onClick="{{ retry }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">refresh</span>Probar de nuevo</button></div>
+  </div>
+  </sc-if>
+  <button onClick="{{ back }}" style="position:absolute;left:12px;top:calc(var(--sat) + 8px);display:flex;align-items:center;gap:6px;min-height:48px;padding:0 14px 0 10px;border:0;border-radius:14px;background:var(--card);box-shadow:var(--shadow);color:var(--fg);font-family:inherit;font-weight:700;font-size:var(--t-sm);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">arrow_back</span>Volver</button>
+  <sc-if value="{{ fixSheet }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:var(--scrim);display:flex;flex-direction:column;justify-content:flex-end">
+    <div style="max-height:90%;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(10px + var(--sab));display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.15">¿Ya lo arreglaron?</div>
+      <div style="color:var(--mfg);text-wrap:pretty">Si querés, sumá una foto de cómo quedó. Es opcional.</div>
+      <sc-if value="{{ noFixPhoto }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toggleFixPhoto }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:12px 20px;border:2px dashed var(--border);border-radius:16px;background:transparent;color:var(--fg);font-family:inherit;font-weight:700;font-size:var(--t-body);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">add_a_photo</span>Agregar foto</button></sc-if>
+      <sc-if value="{{ fixPhoto }}" hint-placeholder-val="{{ false }}"><button onClick="{{ toggleFixPhoto }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:12px 20px;border:2px solid var(--ok);border-radius:16px;background:var(--ok-soft);color:var(--ok-ink);font-family:inherit;font-weight:700;font-size:var(--t-body);cursor:pointer"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);font-variation-settings:'FILL' 1">check_circle</span>Foto agregada · Quitar</button></sc-if>
+      <button onClick="{{ confirmFix }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--ok);color:var(--ok-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">check</span>Sí, está arreglado</button>
+      <button onClick="{{ closeFix }}" style="align-self:center;min-height:48px;padding:0 16px;border:0;border-radius:12px;background:transparent;color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-body);text-decoration:underline;cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMis }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="10 Mis reportes" style="position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--sat)">
+  <div style="flex:none;display:flex;padding:4px 20px 0 10px"><button onClick="{{ back }}" style="display:flex;align-items:center;gap:6px;min-height:48px;padding:0 12px 0 8px;border:0;border-radius:12px;background:transparent;color:var(--fg);font-family:inherit;font-weight:600;font-size:var(--t-body);cursor:pointer" style-active="background:var(--muted)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">arrow_back</span>Volver</button></div>
+  <div style="flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding:8px 20px 18px;display:flex;flex-direction:column;gap:12px">
+    <h1 style="margin:0 0 2px;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-2xl);line-height:1.1;letter-spacing:-.015em">Mis reportes</h1>
+    <sc-if value="{{ misOffline }}" hint-placeholder-val="{{ false }}"><div style="flex:none;display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--warn-soft);color:var(--warn-ink);font-weight:600;line-height:1.3"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">wifi_off</span>Sin señal, lo enviamos apenas vuelva.</div></sc-if>
+    <sc-if value="{{ misLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:10px;color:var(--mfg);font-weight:600">{{ spin }}Cargando tus reportes…</div>
+      <sc-for list="{{ skel3 }}" as="k" hint-placeholder-count="3"><div style="flex:none;height:114px;border-radius:18px;background:var(--muted)"></div></sc-for>
+    </sc-if>
+    <sc-if value="{{ misReady }}" hint-placeholder-val="{{ true }}">
+      <sc-for list="{{ mine }}" as="r" hint-placeholder-count="3">
+        <button onClick="{{ r.onOpen }}" style="flex:none;display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--border);border-radius:18px;background:var(--card);color:var(--fg);font-family:inherit;text-align:left;cursor:pointer" style-active="background:var(--muted)">
+          <span style="flex:none;width:92px;height:92px;border-radius:12px;background:repeating-linear-gradient(135deg,var(--ph1) 0 8px,var(--ph2) 8px 16px);display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:var(--i-lg);color:var(--mfg)">{{ r.icon }}</span></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+            <span style="font-weight:700;font-size:var(--t-body);line-height:1.2">{{ r.short }}</span>
+            <span style="font-size:var(--t-sm);color:var(--mfg);line-height:1.25">{{ r.addr }}</span>
+            <span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:3px">
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px 3px 6px;border-radius:99px;background:{{ r.stBg }};color:{{ r.stFg }};font-size:var(--t-xs);font-weight:700"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:calc(18px*var(--fsh))">{{ r.stIcon }}</span>{{ r.stLabel }}</span>
+              <span style="font-size:var(--t-xs);color:var(--mfg);font-weight:600">{{ r.meta }}</span>
+            </span>
+          </span>
+          <span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i);color:var(--mfg)">chevron_right</span>
+        </button>
+      </sc-for>
+    </sc-if>
+    <sc-if value="{{ misEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px 10px;text-align:center">
+        <span style="width:96px;height:96px;border-radius:50%;background:var(--pri-soft);color:var(--pri-ink);display:grid;place-items:center"><span style="font-family:'Material Symbols Rounded';line-height:1;font-size:44px">photo_camera</span></span>
+        <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:var(--t-xl);line-height:1.15;text-wrap:balance">Todavía no reportaste nada.</div>
+        <div style="color:var(--mfg)">¡Sacá la primera foto!</div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="flex:none;padding:12px 20px calc(12px + var(--sab));background:var(--bg);border-top:1px solid var(--border)">
+    <button onClick="{{ home }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:var(--t-lg);line-height:1.2;text-align:center;cursor:pointer" style-active="transform:scale(.98)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:var(--i)">photo_camera</span>{{ misCta }}</button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+
+<sc-if value="{{ isWeb }}" hint-placeholder-val="{{ false }}">
+<div data-alc="1" data-theme="{{ theme }}" data-fs="1" data-plat="web" style="background:var(--bg);color:var(--fg);font-family:'Rubik',system-ui,sans-serif;font-size:var(--t-body);line-height:1.4;-webkit-font-smoothing:antialiased">
+  <header style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="position:relative;width:34px;height:34px;flex:none;border-radius:24%;background:hsl(226 72% 42%);overflow:hidden">
+        <div style="position:absolute;left:27%;top:69%;width:46%;height:14%;border-radius:50%;background:hsl(228 60% 20%)"></div>
+        <div style="position:absolute;left:30%;top:22%;width:40%;height:40%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:hsl(0 0% 100%)"></div>
+        <div style="position:absolute;left:42%;top:34%;width:16%;height:16%;border-radius:50%;background:hsl(45 100% 51%)"></div>
+      </div>
+      <div style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:18px;line-height:1.1">Arreglemos la Calle</div>
+    </div>
+    <div style="font-size:15px;color:var(--mfg)">App vecinal independiente</div>
+  </header>
+
+  <sc-if value="{{ isWebReporte }}" hint-placeholder-val="{{ false }}">
+  <main data-screen-label="12 Web · Página del reporte" style="max-width:560px;margin:0 auto;padding-bottom:28px">
+    <div style="position:relative;aspect-ratio:4/3;background:repeating-linear-gradient(135deg,var(--ph1) 0 14px,var(--ph2) 14px 28px);display:grid;place-items:center">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">foto del problema</span>
+      <span style="position:absolute;left:16px;bottom:14px;display:inline-flex;align-items:center;gap:6px;padding:6px 14px 6px 9px;border-radius:99px;background:var(--warn-soft);color:var(--warn-ink);font-weight:700;font-size:16px;box-shadow:var(--shadow)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:24px;font-variation-settings:'FILL' 1">schedule</span>Abierto</span>
+    </div>
+    <div style="padding:18px 20px 0;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;color:var(--pri-ink);font-weight:700"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:24px">{{ wIcon }}</span>{{ wName }}</div>
+        <h1 style="margin:6px 0 4px;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:30px;line-height:1.1;letter-spacing:-.015em;text-wrap:balance">{{ wName }} en {{ wAddr }}</h1>
+        <div style="color:var(--mfg)">La Calera, Córdoba · Reporte {{ wId }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05">{{ wVec }}</div><div style="font-size:16px;font-weight:600;color:var(--mfg);line-height:1.2">vecinos sumados</div></div>
+        <div style="padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05">{{ wDays }}</div><div style="font-size:16px;font-weight:600;color:var(--mfg);line-height:1.2">días abierto</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;min-height:58px;padding:14px 20px;border:0;border-radius:16px;background:var(--pri);color:var(--pri-fg);font-family:inherit;font-weight:700;font-size:20px;line-height:1.2;cursor:pointer" style-hover="filter:brightness(1.08)"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:24px">download</span>Descargá la app y sumate</button>
+        <div style="text-align:center;font-size:16px;color:var(--mfg)">Gratis y sin crear cuenta. Para iPhone y Android.</div>
+      </div>
+      <div style="position:relative;height:230px;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--muted)">
+        <iframe title="Mapa del reporte" src="map.html" ref="{{ mapRef }}" style="position:absolute;inset:0;display:block;width:100%;height:100%;border:0"></iframe>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:24px;color:var(--pri-ink);font-variation-settings:'FILL' 1">location_on</span><span><b>{{ wAddr }}</b>, La Calera, Córdoba</span></div>
+      <div style="padding-top:14px;border-top:1px solid var(--border);font-size:16px;color:var(--mfg);text-wrap:pretty">Arreglemos la Calle es una app hecha por vecinos. No pertenece a la Municipalidad ni a ningún gobierno.</div>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isWebRanking }}" hint-placeholder-val="{{ false }}">
+  <main data-screen-label="13 Web · Ranking semanal" style="max-width:960px;margin:0 auto;padding:26px 20px 32px;display:flex;flex-direction:column;gap:24px">
+    <div>
+      <div style="font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--pri-ink)">Ranking semanal</div>
+      <h1 style="margin:6px 0 6px;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:32px;line-height:1.1;letter-spacing:-.015em;text-wrap:balance">Reportes vecinales de La Calera</h1>
+      <div style="color:var(--mfg)">Municipio de La Calera, Córdoba · Semana del 9 al 15 de noviembre de 2026</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div style="padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05;font-variant-numeric:tabular-nums">64</div><div style="font-size:16px;font-weight:600;color:var(--mfg);line-height:1.25">reportes abiertos</div></div>
+      <div style="padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05;font-variant-numeric:tabular-nums">9</div><div style="font-size:16px;font-weight:600;color:var(--mfg);line-height:1.25">resueltos esta semana</div></div>
+      <div style="padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--border)"><div style="font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05;font-variant-numeric:tabular-nums">312</div><div style="font-size:16px;font-weight:600;color:var(--mfg);line-height:1.25">vecinos sumados</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px">
+      <section>
+        <h2 style="margin:0 0 4px;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:24px;line-height:1.15">Con más vecinos sumados</h2>
+        <div style="font-size:16px;color:var(--mfg);margin-bottom:10px">Los cinco reportes abiertos que más vecinos acompañan.</div>
+        <div style="border-radius:16px;background:var(--card);border:1px solid var(--border);overflow:hidden">
+          <sc-for list="{{ rankVec }}" as="x" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
+              <span style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:20px;color:var(--mfg);font-variant-numeric:tabular-nums">{{ x.n }}</span>
+              <span><span style="display:flex;align-items:center;gap:6px;font-weight:700;line-height:1.2"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:22px">{{ x.icon }}</span>{{ x.short }}</span><span style="display:block;font-size:16px;color:var(--mfg);line-height:1.3">{{ x.addr }} · {{ x.small }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:28px;line-height:1;font-variant-numeric:tabular-nums">{{ x.big }}</span><span style="display:block;font-size:15px;color:var(--mfg)">{{ x.bigL }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+      <section>
+        <h2 style="margin:0 0 4px;font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:24px;line-height:1.15">Con más días abiertos</h2>
+        <div style="font-size:16px;color:var(--mfg);margin-bottom:10px">Los cinco reportes que llevan más tiempo sin resolverse.</div>
+        <div style="border-radius:16px;background:var(--card);border:1px solid var(--border);overflow:hidden">
+          <sc-for list="{{ rankDays }}" as="x" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
+              <span style="font-family:'Rubik',system-ui,sans-serif;font-weight:700;font-size:20px;color:var(--mfg);font-variant-numeric:tabular-nums">{{ x.n }}</span>
+              <span><span style="display:flex;align-items:center;gap:6px;font-weight:700;line-height:1.2"><span style="font-family:'Material Symbols Rounded';line-height:1;flex:none;font-size:22px">{{ x.icon }}</span>{{ x.short }}</span><span style="display:block;font-size:16px;color:var(--mfg);line-height:1.3">{{ x.addr }} · {{ x.small }}</span></span>
+              <span style="text-align:right"><span style="display:block;font-family:'Rubik',system-ui,sans-serif;font-weight:800;font-size:28px;line-height:1;font-variant-numeric:tabular-nums">{{ x.big }}</span><span style="display:block;font-size:15px;color:var(--mfg)">{{ x.bigL }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+    <div style="padding-top:16px;border-top:1px solid var(--border);font-size:16px;color:var(--mfg);text-wrap:pretty;max-width:68ch">Cómo se arma: los reportes los cargan vecinos desde la app, con foto y ubicación. Cada vecino se puede sumar una sola vez por reporte. Arreglemos la Calle es una iniciativa vecinal independiente; no pertenece a la Municipalidad ni a ningún gobierno.</div>
+  </main>
+  </sc-if>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;camara&quot;,&quot;options&quot;:[&quot;permisos&quot;,&quot;camara&quot;,&quot;ubicacion&quot;,&quot;categoria&quot;,&quot;duplicados&quot;,&quot;detalles&quot;,&quot;confirmacion&quot;,&quot;mapa&quot;,&quot;detalle&quot;,&quot;mis&quot;,&quot;web-reporte&quot;,&quot;web-ranking&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pantalla&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;default&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;denegado&quot;,&quot;cargando&quot;,&quot;error&quot;,&quot;vacio&quot;,&quot;sin-conexion&quot;,&quot;otro&quot;,&quot;otro-error&quot;,&quot;enviando&quot;,&quot;whatsapp&quot;,&quot;lista&quot;,&quot;filtro&quot;,&quot;resuelto&quot;,&quot;arreglado&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pantalla&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;light&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;tsType&quot;:&quot;'light'|'dark'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;fontScale&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;1&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;1.5&quot;,&quot;2&quot;],&quot;tsType&quot;:&quot;'1'|'1.5'|'2'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ios&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;tsType&quot;:&quot;'ios'|'android'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;offline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;locked&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;onScreen&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(screen: string) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  static CATS = [
+    { id: 'bache', name: 'Bache', short: 'Bache', icon: 'remove_road' },
+    { id: 'tierra', name: 'Calle de tierra en mal estado', short: 'Calle de tierra', icon: 'landslide' },
+    { id: 'agua', name: 'Anegamiento / desagüe tapado', short: 'Anegamiento', icon: 'flood' },
+    { id: 'luz', name: 'Luminaria apagada', short: 'Luminaria apagada', icon: 'light_off' },
+    { id: 'basura', name: 'Basural / residuos', short: 'Basural', icon: 'delete' },
+    { id: 'arbol', name: 'Árbol o rama caída', short: 'Árbol caído', icon: 'park' },
+    { id: 'semaforo', name: 'Semáforo / señal rota', short: 'Semáforo roto', icon: 'traffic' },
+    { id: 'vereda', name: 'Vereda rota', short: 'Vereda rota', icon: 'directions_walk' },
+    { id: 'cloaca', name: 'Cloaca desbordada', short: 'Cloaca desbordada', icon: 'water_damage' },
+    { id: 'otro', name: 'Otro', short: 'Otro', icon: 'more_horiz' },
+  ];
+  static REPORTS = [
+    { id: 'LC-0431', cat: 'bache', addr: 'Av. San Martín 431', days: 23, vec: 12, st: 'abierto', block: 'sm400', lat: -31.34391, lng: -64.33546, dist: '20 m', desc: 'Bache grande sobre la mano que va al centro. Ya rompió dos cubiertas.' },
+    { id: 'LC-0471', cat: 'bache', addr: 'Av. San Martín 468', days: 4, vec: 2, st: 'abierto', block: 'sm400', lat: -31.34425, lng: -64.33525, dist: '60 m' },
+    { id: 'LC-0467', cat: 'vereda', addr: 'Av. San Martín 452', days: 6, vec: 2, st: 'abierto', block: 'sm400', lat: -31.34384, lng: -64.33473, dist: '90 m' },
+    { id: 'LC-0455', cat: 'luz', addr: 'Av. San Martín 455', days: 9, vec: 3, st: 'abierto', block: 'sm400', lat: -31.34405, lng: -64.33499 },
+    { id: 'LC-0402', cat: 'basura', addr: 'Vélez Sarsfield 210', days: 41, vec: 31, st: 'abierto', block: 'vs200', lat: -31.34166, lng: -64.33646 },
+    { id: 'LC-0460', cat: 'agua', addr: 'Vélez Sarsfield 236', days: 12, vec: 8, st: 'abierto', block: 'vs200', lat: -31.34143, lng: -64.3362, desc: 'Cada vez que llueve se junta agua y no se puede cruzar.' },
+    { id: 'LC-0388', cat: 'tierra', addr: 'Belgrano 148', days: 58, vec: 17, st: 'abierto', block: 'bg100', lat: -31.34283, lng: -64.33257 },
+    { id: 'LC-0419', cat: 'semaforo', addr: 'Rivadavia 602', days: 44, vec: 9, st: 'resuelto', fixedAgo: 14, block: 'rv600', lat: -31.34607, lng: -64.33457, desc: 'El semáforo de la esquina quedó en amarillo intermitente.' },
+    { id: 'LC-0444', cat: 'arbol', addr: 'Rivadavia 640', days: 18, vec: 5, st: 'resuelto', fixedAgo: 7, block: 'rv600', lat: -31.34625, lng: -64.3342 },
+    { id: 'LC-0476', cat: 'cloaca', addr: 'Los Aromos 77', days: 3, vec: 14, st: 'abierto', block: 'la000', lat: -31.3449, lng: -64.33804 },
+  ];
+  static CENTER = [-31.344, -64.3352];
+
+  state = { screen: null, hist: [], vOff: false, cat: null, otro: '', otroErr: null, dup: 0, desc: '', sending: false, notif: false, wa: null, waDone: false, sheet: null, fCat: null, fSt: null, catPanel: null, rid: null, joined: {}, st: {}, reopened: {}, fixSheet: null, fixPhoto: false, flagged: {}, pin: null, flash: false, sent: false, rankTab: 'vec' };
+
+  mapRef = el => { this.mapEl = el; };
+  catScroll = el => { this.catEl = el; };
+
+  componentDidMount() {
+    this.onMsg = e => {
+      const d = e.data;
+      if (!d || d.alc !== 1 || !this.mapEl || e.source !== this.mapEl.contentWindow) return;
+      if (d.ev === 'ready') { this.mapOk = this.mapEl; this.mapSig = null; this.sendMap(); }
+      else if (d.ev === 'pin') this.setState({ pin: [d.lat, d.lng] });
+      else if (d.ev === 'open') this.open(d.id);
+    };
+    window.addEventListener('message', this.onMsg);
+    if (this.props.onScreen) this.props.onScreen(this.cur());
+  }
+  componentWillUnmount() { window.removeEventListener('message', this.onMsg); clearTimeout(this.t1); clearTimeout(this.t2); }
+  componentDidUpdate(pp) {
+    if (pp.screen !== this.props.screen || pp.variant !== this.props.variant) {
+      this.setState({ screen: null, hist: [], vOff: false, sheet: null, rid: null, cat: null, catPanel: null, fixSheet: null, wa: null, fCat: null, fSt: null, otroErr: null });
+      if (this.props.onScreen) this.props.onScreen(this.props.screen || 'camara');
+    }
+    this.sendMap();
+  }
+
+  cur() { return this.state.screen || this.props.screen || 'camara'; }
+  v() { return this.state.vOff ? 'default' : (this.props.variant || 'default'); }
+  notify(s) { if (this.props.onScreen) this.props.onScreen(s); }
+  go(s, extra) {
+    if (this.props.locked) return;
+    const from = this.cur();
+    this.setState(p => ({ ...(extra || {}), screen: s, hist: [...p.hist, from], vOff: true }), () => this.notify(s));
+  }
+  back() {
+    if (this.props.locked) return;
+    const h = this.state.hist.slice(), s = h.pop() || 'camara';
+    this.setState({ screen: s, hist: h, vOff: true }, () => this.notify(s));
+  }
+  home() {
+    if (this.props.locked) return;
+    this.setState({ screen: 'camara', hist: [], vOff: true, cat: null, otro: '', dup: 0, desc: '', pin: null, wa: null, waDone: false }, () => this.notify('camara'));
+  }
+  open(id) { this.go('detalle', { rid: id }); }
+
+  filters() {
+    const vacio = this.cur() === 'mapa' && this.v() === 'vacio';
+    return { cat: this.state.fCat || (vacio ? 'cloaca' : 'todas'), st: this.state.fSt || (vacio ? 'resuelto' : 'todos') };
+  }
+  fmt(n) {
+    if (n <= 0) return 'Hoy';
+    const M = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const d = new Date(2026, 10, 15 - n);
+    return d.getDate() + ' de ' + M[d.getMonth()];
+  }
+  catOf(id) { return Component.CATS.find(c => c.id === id) || Component.CATS[0]; }
+  curCat() { const v = this.v(); return this.state.cat || (v === 'otro' || v === 'otro-error' ? 'otro' : 'bache'); }
+  addr() {
+    const p = this.state.pin;
+    if (!p) return 'Av. San Martín 425';
+    const n = Math.max(2, 425 + Math.round((p[1] + 64.3352) * 90000)), dl = p[0] + 31.344;
+    return (Math.abs(dl) < 0.0006 ? 'Av. San Martín ' : dl > 0 ? 'Vélez Sarsfield ' : 'Rivadavia ') + n;
+  }
+  reports() {
+    const st = this.state;
+    const base = Component.REPORTS.slice();
+    if (st.sent) base.unshift({ id: 'LC-0482', cat: this.curCat(), addr: this.addr(), days: 0, vec: 1, st: 'abierto', block: 'sm400', lat: Component.CENTER[0], lng: Component.CENTER[1], desc: st.desc, mine: true });
+    return base.map(r => {
+      const c = this.catOf(r.cat), stt = st.st[r.id] || r.st, open = stt === 'abierto', joined = !!st.joined[r.id], vec = r.vec + (joined ? 1 : 0);
+      const short = r.cat === 'otro' && r.mine && st.otro ? st.otro : c.short;
+      return {
+        ...r, st: stt, open, joined, vec, icon: c.icon, short,
+        stLabel: open ? 'Abierto' : 'Resuelto', stIcon: open ? 'schedule' : 'check_circle',
+        stBg: open ? 'var(--warn-soft)' : 'var(--ok-soft)', stFg: open ? 'var(--warn-ink)' : 'var(--ok-ink)',
+        vecTxt: vec === 1 ? '1 vecino' : vec + ' vecinos', distTxt: 'a ' + r.dist,
+        meta: (vec === 1 ? '1 vecino' : vec + ' vecinos') + ' · ' + (open ? (r.days === 0 ? 'hoy' : r.days === 1 ? '1 día' : r.days + ' días') : 'arreglado'),
+        onOpen: () => this.open(r.id),
+      };
+    });
+  }
+  mapCfg() {
+    const s = this.cur(), theme = this.props.theme === 'dark' ? 'dark' : 'light', C = Component.CENTER;
+    if (s === 'ubicacion') return { mode: 'pick', theme, center: C, zoom: 17.5, located: this.v() !== 'error' };
+    if (s === 'mapa') {
+      const f = this.filters();
+      return { mode: 'public', theme, center: C, zoom: 16, cat: f.cat, st: f.st, reports: this.reports().map(r => ({ id: r.id, cat: r.cat, st: r.st, vec: r.vec, block: r.block, lat: r.lat, lng: r.lng, icon: r.icon, label: r.short + ', ' + r.addr })) };
+    }
+    if (s === 'web-reporte') { const r = Component.REPORTS[0]; return { mode: 'static', theme, center: [r.lat, r.lng], zoom: 17 }; }
+    return null;
+  }
+  sendMap() {
+    const c = this.mapCfg();
+    if (!c || !this.mapEl || this.mapOk !== this.mapEl) return;
+    const sig = JSON.stringify(c);
+    if (sig === this.mapSig) return;
+    this.mapSig = sig;
+    this.mapEl.contentWindow.postMessage({ alc: 'init', ...c }, '*');
+  }
+  spinner(size) {
+    return React.createElement('span', { style: { fontFamily: "'Material Symbols Rounded'", fontSize: size, lineHeight: 1, flex: 'none', display: 'inline-block', animation: 'alcSpin 1s linear infinite' } }, 'progress_activity');
+  }
+
+  renderVals() {
+    const K = Component, st = this.state, p = this.props, s = this.cur(), v = this.v();
+    const web = s === 'web-reporte' || s === 'web-ranking';
+    const offline = v === 'sin-conexion' || !!p.offline;
+    const catId = this.curCat(), catObj = this.catOf(catId);
+    const R = this.reports(), byId = id => R.find(r => r.id === id);
+    const stepN = { ubicacion: 1, categoria: 2, duplicados: 3, detalles: 4 }[s] || 0;
+    const on = { bd: 'var(--pri)', bg: 'var(--pri-soft)' }, off = { bd: 'var(--border)', bg: 'var(--card)' };
+    this._spin = this._spin || this.spinner('var(--i)');
+    this._spinLg = this._spinLg || this.spinner('calc(40px*var(--fsh))');
+
+    // categoría
+    const otroErr = st.otroErr ?? (s === 'categoria' && v === 'otro-error');
+    const cats = K.CATS.map(c => {
+      const sel = c.id === catId;
+      return { ...c, on: sel, sug: c.id === 'bache', ...(sel ? on : off), ic: sel ? 'var(--pri-ink)' : 'var(--fg)', pick: () => this.setState({ cat: c.id, otroErr: false }, () => { if (c.id === 'otro' && this.catEl) this.catEl.scrollTop = this.catEl.scrollHeight; }) };
+    });
+    const dups = ['LC-0431', 'LC-0471', 'LC-0467'].map((id, i) => {
+      const sel = st.dup === i;
+      return { ...byId(id), on: sel, ...(sel ? on : off), radio: sel ? 'radio_button_checked' : 'radio_button_unchecked', rc: sel ? 'var(--pri)' : 'var(--mfg)', pick: () => this.setState({ dup: i }) };
+    });
+
+    // mapa
+    const mapV = s === 'mapa' ? v : '';
+    const f = this.filters();
+    const sheet = st.sheet || (mapV === 'lista' ? 'high' : 'low');
+    const list = R.filter(r => (f.cat === 'todas' || r.cat === f.cat) && (f.st === 'todos' || r.st === f.st)).sort((a, b) => b.vec - a.vec);
+    const listBusy = mapV === 'cargando', listFail = mapV === 'error';
+    const catPanel = st.catPanel ?? (mapV === 'filtro');
+    const stOpts = [['todos', 'Todos'], ['abierto', 'Abiertos'], ['resuelto', 'Resueltos']].map(([id, label]) => {
+      const sel = f.st === id;
+      return { label, icon: sel ? 'radio_button_checked' : 'radio_button_unchecked', bg: sel ? 'var(--fg)' : 'transparent', fg: sel ? 'var(--bg)' : 'var(--fg)', pick: () => this.setState({ fSt: id }) };
+    });
+    const fOpts = [{ id: 'todas', short: 'Todos', icon: 'apps' }, ...K.CATS].map(c => {
+      const sel = f.cat === c.id;
+      return { short: c.short, icon: c.icon, ...(sel ? on : off), radio: sel ? 'radio_button_checked' : 'radio_button_unchecked', pick: () => this.setState({ fCat: c.id, catPanel: false }) };
+    });
+
+    // detalle
+    const dV = s === 'detalle' ? v : '';
+    const r = byId(st.rid || (dV === 'resuelto' ? 'LC-0419' : 'LC-0431')) || R[0];
+    const ev = (icon, txt, date, ok) => ({ icon, txt, date, bg: ok ? 'var(--ok-soft)' : 'var(--muted)', fg: ok ? 'var(--ok-ink)' : 'var(--fg)' });
+    const events = [];
+    if (st.reopened[r.id]) events.push(ev('report', 'Un vecino avisó que sigue roto', 'Hoy'));
+    if (!r.open || st.reopened[r.id]) events.push(ev('check_circle', 'Un vecino avisó que está arreglado', this.fmt(st.st[r.id] ? 0 : r.fixedAgo), true));
+    if (r.joined) events.push(ev('group_add', 'Te sumaste vos', 'Hoy'));
+    if (r.vec - (r.joined ? 1 : 0) > 1) events.push(ev('group', 'Se sumaron ' + (r.vec - (r.joined ? 1 : 0) - 1) + ' vecinos', this.fmt(Math.max(0, Math.round(r.days / 2)))));
+    if (!r.mine || st.waDone) events.push(ev('chat', 'Se lo mandaron a la Muni por WhatsApp', this.fmt(Math.max(0, r.days - 1))));
+    events.push(ev('campaign', r.mine ? 'Lo reportaste vos' : 'Un vecino lo reportó', this.fmt(r.days)));
+    events.forEach((e, i) => { e.line = i === events.length - 1 ? 'transparent' : 'var(--border)'; });
+    const openDays = r.open ? r.days : r.days - (r.fixedAgo || 0);
+    const fixSheet = st.fixSheet ?? (dV === 'arreglado');
+
+    // mis reportes
+    const misV = s === 'mis' ? v : '';
+    let mine = R.filter(x => x.mine || ['LC-0460', 'LC-0419', 'LC-0388'].includes(x.id));
+    if (s === 'mis' && offline) mine = [{ id: 'pend', icon: 'remove_road', short: 'Bache', addr: 'Av. San Martín 425', stLabel: 'Sin enviar', stIcon: 'cloud_off', stBg: 'var(--muted)', stFg: 'var(--fg)', meta: 'Se envía cuando vuelva la señal', onOpen: () => {} }, ...mine];
+    if (misV === 'vacio') mine = [];
+    const misBusy = misV === 'cargando';
+
+    // ranking web
+    const openR = R.filter(x => x.open);
+    const rank = (key) => openR.slice().sort((a, b) => b[key] - a[key]).slice(0, 5).map((x, i) => ({
+      n: i + 1, icon: x.icon, short: x.short, addr: x.addr, id: x.id,
+      big: key === 'vec' ? x.vec : x.days, bigL: key === 'vec' ? 'vecinos' : 'días',
+      small: key === 'vec' ? x.days + ' días abierto' : x.vecTxt + (x.vec === 1 ? ' sumado' : ' sumados'),
+    }));
+    const w = Component.REPORTS[0];
+
+    return {
+      isApp: !web, isWeb: web, theme: p.theme === 'dark' ? 'dark' : 'light', fs: String(p.fontScale || '1'),
+      plat: web ? 'web' : p.platform === 'android' ? 'android' : 'ios',
+      spin: this._spin, spinLg: this._spinLg, offline,
+      skel2: [1, 2], skel3: [1, 2, 3], skel6: [1, 2, 3, 4, 5, 6],
+      back: () => this.back(), home: () => this.home(), retry: () => this.setState({ vOff: true }),
+
+      isPermisos: s === 'permisos', permOk: v !== 'denegado', permDenied: v === 'denegado',
+      start: () => this.go('camara'), retryPerm: () => this.setState({ vOff: true }), toGallery: () => this.go('ubicacion'),
+
+      isCamara: s === 'camara', flashOp: st.flash ? 0.9 : 0,
+      shoot: () => { if (p.locked) return; this.setState({ flash: true }); this.t2 = setTimeout(() => { this.setState({ flash: false }); this.go('ubicacion'); }, 220); },
+      toMapa: () => this.go('mapa'), toMis: () => this.go('mis'),
+
+      isStep: stepN > 0, stepN, segs: [1, 2, 3, 4].map(i => ({ bg: i <= stepN ? 'var(--pri)' : 'var(--border)' })),
+
+      isUbicacion: s === 'ubicacion', ubiMap: v !== 'cargando', ubiLoading: v === 'cargando', ubiError: v === 'error' && !st.pin,
+      addr: v === 'cargando' ? 'Buscando la dirección…' : v === 'error' && !st.pin ? 'Sin dirección todavía' : this.addr(),
+      addrSub: v === 'cargando' ? 'Esperá un momento' : 'La Calera, Córdoba', ubiBtnOp: v === 'cargando' ? 0.45 : 1,
+      confirmUbi: () => { if (v !== 'cargando') this.go('categoria'); },
+
+      isCategoria: s === 'categoria', catReady: v !== 'cargando', catLoading: v === 'cargando', catBtnOp: v === 'cargando' ? 0.45 : 1,
+      cats, isOtro: catId === 'otro', otro: st.otro, otroErr, otroBd: otroErr ? 'var(--bad)' : 'var(--border)',
+      setOtro: e => this.setState({ otro: e.target.value, otroErr: false }),
+      nextCat: () => { if (v === 'cargando') return; if (catId === 'otro' && !st.otro.trim()) { this.setState({ otroErr: true }); return; } this.go('duplicados'); },
+
+      isDuplicados: s === 'duplicados', dupReady: v !== 'cargando', dupLoading: v === 'cargando', dups,
+      joinDup: () => { const id = dups[st.dup].id; this.go('detalle', { rid: id, joined: { ...st.joined, [id]: true } }); },
+      newReport: () => this.go('detalles'),
+
+      isDetalles: s === 'detalles', sendErr: s === 'detalles' && v === 'error',
+      catName: catId === 'otro' && st.otro ? st.otro : catObj.name, catIcon: catObj.icon,
+      editFoto: () => this.go('camara'), editUbi: () => this.go('ubicacion'), editCat: () => this.go('categoria'),
+      desc: st.desc, setDesc: e => this.setState({ desc: e.target.value }),
+      sending: st.sending || v === 'enviando', notSending: !(st.sending || v === 'enviando'),
+      sendLabel: v === 'error' && s === 'detalles' ? 'Probar de nuevo' : 'Enviar reporte',
+      send: () => { if (st.sending || p.locked) return; this.setState({ sending: true }); this.t1 = setTimeout(() => { this.setState({ sending: false, sent: !offline }); this.go('confirmacion'); }, 1100); },
+
+      isConfirmacion: s === 'confirmacion', confOk: !offline, confOff: offline,
+      waDone: st.waDone, notif: st.notif, notifOff: !st.notif, toggleNotif: () => this.setState({ notif: !st.notif }),
+      wa: st.wa ?? (s === 'confirmacion' && v === 'whatsapp'), openWa: () => this.setState({ wa: true }), closeWa: () => this.setState({ wa: false, waDone: true }),
+      waMsg: 'Hola, soy vecino de La Calera. Quiero avisar de un problema: ' + (catId === 'otro' && st.otro ? st.otro : catObj.name).toLowerCase() + ' en ' + this.addr() + '. Reporte LC-0482.',
+      toMis: () => this.go('mis'), toMiReporte: () => this.open('LC-0482'),
+
+      isMapa: s === 'mapa', mapOn: !listBusy && !listFail, mapLoading: listBusy, mapError: listFail, mapRef: this.mapRef,
+      mapOffline: s === 'mapa' && offline, fCatLabel: f.cat === 'todas' ? 'Todos' : this.catOf(f.cat).short,
+      openCatPanel: () => this.setState({ catPanel: true }), closeCatPanel: () => this.setState({ catPanel: false }), catPanel,
+      stOpts, fOpts, sheetH: sheet === 'high' ? '85%' : '25%',
+      toggleSheet: () => this.setState({ sheet: sheet === 'high' ? 'low' : 'high' }),
+      sheetBtnLabel: sheet === 'high' ? 'Ver mapa' : 'Ver lista', sheetBtnIcon: sheet === 'high' ? 'expand_more' : 'expand_less',
+      listTitle: listBusy ? 'Cargando reportes…' : listFail ? 'Sin reportes' : list.length === 1 ? '1 reporte' : list.length + ' reportes',
+      list, listReady: !listBusy && !listFail && list.length > 0, listEmpty: !listBusy && !listFail && list.length === 0, listLoading: listBusy, listError: listFail,
+      clearFilters: () => this.setState({ fCat: 'todas', fSt: 'todos', vOff: true }),
+
+      isDetalle: s === 'detalle', dReady: dV !== 'cargando' && dV !== 'error', dLoading: dV === 'cargando', dError: dV === 'error',
+      dName: r.short, dIcon: r.icon, dAddr: r.addr, dId: r.id, dStLabel: r.stLabel, dStIcon: r.stIcon, dStBg: r.stBg, dStFg: r.stFg,
+      dayN: r.open && r.days === 0 ? 'Hoy' : openDays, dayL: r.open ? (r.days === 0 ? 'lo reportaron' : openDays === 1 ? 'día abierto' : 'días abierto') : 'días hasta el arreglo',
+      vecN: r.vec, vecL: r.vec === 1 ? 'vecino sumado' : 'vecinos sumados',
+      dDesc: r.desc, hasDesc: !!r.desc, events, dOpen: r.open, dDone: !r.open,
+      canJoin: r.open && !r.joined && !r.mine, isJoined: r.open && (r.joined || !!r.mine),
+      joinedTxt: r.mine ? 'Es tu reporte' : 'Ya te sumaste',
+      join: () => this.setState({ joined: { ...st.joined, [r.id]: true } }),
+      reopen: () => this.setState({ st: { ...st.st, [r.id]: 'abierto' }, reopened: { ...st.reopened, [r.id]: true } }),
+      flagged: !!st.flagged[r.id], notFlagged: !st.flagged[r.id], flag: () => this.setState({ flagged: { ...st.flagged, [r.id]: true } }),
+      fixSheet, openFix: () => this.setState({ fixSheet: true }), closeFix: () => this.setState({ fixSheet: false }),
+      fixPhoto: st.fixPhoto, noFixPhoto: !st.fixPhoto, toggleFixPhoto: () => this.setState({ fixPhoto: !st.fixPhoto }),
+      confirmFix: () => this.setState({ fixSheet: false, st: { ...st.st, [r.id]: 'resuelto' }, reopened: { ...st.reopened, [r.id]: false } }),
+
+      isMis: s === 'mis', mine, misReady: !misBusy && mine.length > 0, misEmpty: !misBusy && mine.length === 0, misLoading: misBusy,
+      misOffline: s === 'mis' && offline, misCta: mine.length === 0 && !misBusy ? 'Sacar la primera foto' : 'Sacar otra foto',
+
+      isWebReporte: s === 'web-reporte', isWebRanking: s === 'web-ranking',
+      wName: this.catOf(w.cat).short, wIcon: this.catOf(w.cat).icon, wAddr: w.addr, wId: w.id, wVec: w.vec, wDays: w.days,
+      rankVec: rank('vec'), rankDays: rank('days'),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

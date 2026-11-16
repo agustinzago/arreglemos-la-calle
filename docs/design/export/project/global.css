@@ -1,0 +1,77 @@
+/* Arreglemos la Calle — tokens (NativeWind v4 / React Native Reusables)
+   Paleta "los colores de la calle": azul señal (acción), amarillo vial (abierto),
+   verde (resuelto), grises de hormigón y asfalto.
+   Los colores van como tripletes HSL para usarlos con hsl(var(--token)). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 96%;
+    --foreground: 224 32% 12%;
+    --card: 0 0% 100%;
+    --muted: 220 18% 91%;
+    --muted-foreground: 222 12% 34%;
+    --border: 220 14% 80%;
+    --primary: 226 72% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 224 90% 94%;
+    --primary-ink: 226 75% 32%;
+    --success: 152 60% 24%;
+    --success-foreground: 0 0% 100%;
+    --success-soft: 146 45% 90%;
+    --success-ink: 152 60% 18%;
+    --warning: 45 100% 51%;
+    --warning-foreground: 224 32% 12%;
+    --warning-soft: 48 100% 86%;
+    --warning-ink: 36 90% 22%;
+    --destructive: 356 72% 42%;
+    --destructive-soft: 356 80% 94%;
+    --destructive-ink: 356 75% 34%;
+    --card-foreground: 224 32% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 32% 12%;
+    --input: 220 14% 80%;
+    --ring: 226 72% 40%;
+    --secondary: 220 18% 91%;
+    --secondary-foreground: 224 32% 12%;
+    --accent: 224 90% 94%;
+    --accent-foreground: 226 75% 32%;
+    --destructive-foreground: 0 0% 100%;
+  }
+
+  .dark:root {
+    --background: 224 24% 8%;
+    --foreground: 220 25% 94%;
+    --card: 224 20% 13%;
+    --muted: 224 16% 18%;
+    --muted-foreground: 220 14% 72%;
+    --border: 224 12% 30%;
+    --primary: 224 95% 74%;
+    --primary-foreground: 224 40% 10%;
+    --primary-soft: 226 45% 20%;
+    --primary-ink: 224 100% 80%;
+    --success: 146 50% 60%;
+    --success-foreground: 150 40% 8%;
+    --success-soft: 150 30% 15%;
+    --success-ink: 146 52% 72%;
+    --warning: 46 100% 58%;
+    --warning-foreground: 224 32% 10%;
+    --warning-soft: 44 50% 16%;
+    --warning-ink: 46 95% 68%;
+    --destructive: 356 90% 72%;
+    --destructive-soft: 356 40% 17%;
+    --destructive-ink: 356 92% 78%;
+    --card-foreground: 220 25% 94%;
+    --popover: 224 20% 13%;
+    --popover-foreground: 220 25% 94%;
+    --input: 224 12% 30%;
+    --ring: 224 95% 74%;
+    --secondary: 224 16% 18%;
+    --secondary-foreground: 220 25% 94%;
+    --accent: 226 45% 20%;
+    --accent-foreground: 224 100% 80%;
+    --destructive-foreground: 356 40% 10%;
+  }
+}
