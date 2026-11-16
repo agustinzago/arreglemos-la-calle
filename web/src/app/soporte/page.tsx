@@ -24,7 +24,16 @@ export default function Soporte() {
         </dd>
 
         <dt>¿Cómo borro un reporte que hice?</dt>
-        <dd>Escribinos a {mail} con el número del reporte y lo sacamos.</dd>
+        <dd>
+          Si vinculaste tu cuenta, en Mis reportes está «Borrar mi cuenta», que borra todos tus reportes. Para uno
+          solo, o si no vinculaste, escribinos a {mail} con el número del reporte y lo sacamos.
+        </dd>
+        <dt>Cambié de teléfono, ¿pierdo mis reportes?</dt>
+        <dd>
+          No, si antes los vinculaste: en Mis reportes tocá «Continuar con Apple» o «Continuar con Google». En el
+          teléfono nuevo, tocá lo mismo con la misma cuenta y aparecen tus reportes. Sin vincular, quedan en el teléfono
+          viejo.
+        </dd>
 
         <dt>Vi un reporte falso u ofensivo</dt>
         <dd>Abrilo en la app y tocá «Denunciar». Con varias denuncias se oculta del mapa; también podés escribirnos.</dd>
@@ -40,7 +49,7 @@ export default function Soporte() {
 
         <dt>¿Qué datos guardan?</dt>
         <dd>
-          Lo contamos en la <a href="/privacidad">política de privacidad</a>. No pedimos nombre, email ni teléfono.
+          Lo contamos en la <a href="/privacidad">política de privacidad</a>. No pedimos nombre, email ni teléfono (el email solo si vinculás Apple o Google).
         </dd>
       </dl>
     </main>

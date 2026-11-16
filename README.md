@@ -141,13 +141,18 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
 
 ### Dominio y web (Vercel)
 
-- [ ] Comprar el dominio.
+- [x] Comprar el dominio: `arreglemoslacalle.app` (ya es el default de la web y de la app).
 - [ ] Vercel → Add New Project → importar el repo, Root Directory `web` (Next.js, pnpm y Node 24 los detecta solo).
 - [ ] Variables del proyecto (Production): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` de producción,
-      `SITE_URL=https://<dominio>` (og:url y links absolutos) y `CONTACT_EMAIL` (la casilla de /privacidad y /soporte).
+      `SITE_URL=https://arreglemoslacalle.app` (og:url y links absolutos) y `CONTACT_EMAIL` (la casilla de /privacidad y /soporte).
 - [ ] Settings → Domains: agregar el dominio y cargar los registros DNS que pide Vercel.
-- [ ] Crear la casilla de `CONTACT_EMAIL` (un reenvío del dominio alcanza) y probar que llegue.
-- [ ] Abrir `https://<dominio>/privacidad`, `/soporte`, `/r/<id>` y `/ranking/la-calera`.
+- [ ] Crear la casilla `hola@arreglemoslacalle.app` (el default de `CONTACT_EMAIL`; un reenvío del dominio alcanza) y
+      probar que llegue.
+- [ ] Verificar el dominio en Google Search Console (la misma cuenta de Google que Play y Google Cloud): lo pide la
+      pantalla de consentimiento de OAuth de Google Sign-In para ponerlo como dominio autorizado.
+- [ ] Revisar `/privacidad` (`web/src/app/privacidad/page.tsx`): es un borrador; al aprobarlo, sacar el aviso
+      "Borrador" y el comentario `ponytail:`.
+- [ ] Abrir `https://arreglemoslacalle.app/privacidad`, `/soporte`, `/r/<id>` y `/ranking/la-calera`.
 
 ### EAS (app)
 
@@ -161,7 +166,7 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
   ENVS="--environment production --environment preview --environment development"
   npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_SUPABASE_URL --value https://<ref>.supabase.co --visibility plaintext
   npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY --value sb_publishable_… --visibility plaintext
-  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_WEB_URL --value https://<dominio> --visibility plaintext
+  npx eas-cli@latest env:set $ENVS --name EXPO_PUBLIC_WEB_URL --value https://arreglemoslacalle.app --visibility plaintext
   npx eas-cli@latest env:set $ENVS --name GOOGLE_MAPS_API_KEY --value AIza… --visibility sensitive
   npx eas-cli@latest env:set $ENVS --name GOOGLE_SERVICES_JSON --type file --value ./google-services.json --visibility secret
   ```
@@ -213,7 +218,7 @@ Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (
 - [ ] App Store Connect → Apps → nueva app con el bundle `ar.arreglemoslacalle.app`, idioma principal Español (México).
 - [ ] `npx eas-cli@latest submit --profile production --platform ios` y probar por TestFlight.
 - [ ] Ficha: nombre, subtítulo, descripción, palabras clave, capturas, categoría, URL de soporte
-      `https://<dominio>/soporte` y URL de privacidad `https://<dominio>/privacidad`.
+      `https://arreglemoslacalle.app/soporte` y URL de privacidad `https://arreglemoslacalle.app/privacidad`.
 - [ ] Privacidad de la app (las respuestas siguen `/privacidad`): sin rastreo (tracking: no). Datos recopilados,
       todos para "Funcionalidad de la app" y vinculados al usuario (por la cuenta anónima):
       Ubicación precisa; Fotos o videos; Otro contenido del usuario (descripción); ID de usuario (cuenta anónima);
@@ -229,9 +234,9 @@ Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (
 - [ ] Crear la app, `npx eas-cli@latest build --profile production --platform android` y subir el primer AAB a mano
       (Play no acepta el primero por API). Después, `eas submit` con una cuenta de servicio de Google Play.
 - [ ] Ficha: descripción, capturas, ícono, gráfico destacado, mail de contacto y política de privacidad
-      `https://<dominio>/privacidad`.
+      `https://arreglemoslacalle.app/privacidad`.
 - [ ] Seguridad de los datos: recopila datos: sí; comparte con terceros: no (Supabase, Expo y Anthropic son
-      proveedores de servicio); cifrados en tránsito: sí; se puede pedir el borrado: sí ("Borrar mi cuenta" en la app y `https://<dominio>/soporte`).
+      proveedores de servicio); cifrados en tránsito: sí; se puede pedir el borrado: sí ("Borrar mi cuenta" en la app y `https://arreglemoslacalle.app/soporte`).
       Tipos, todos para "Funcionalidad de la app": Ubicación precisa; Fotos; Otro contenido generado por el usuario
       (descripción); ID del dispositivo u otros IDs (cuenta anónima y token de avisos, opcional); Dirección de correo
       (solo si vincula Apple o Google, opcional).

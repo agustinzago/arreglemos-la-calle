@@ -1,5 +1,6 @@
 // Política de privacidad: la piden App Store y Google Play (URL en la ficha de cada tienda).
 // Si la app empieza a juntar algo nuevo, actualizar esta página, la fecha y las respuestas de las tiendas (README).
+// ponytail: borrador escrito por un agente, falta la revisión de una persona (README, Lanzamiento).
 import type { Metadata } from "next";
 import { CONTACT_EMAIL } from "@/lib/site";
 
@@ -12,12 +13,13 @@ export default function Privacidad() {
   return (
     <main className="doc">
       <h1>Política de privacidad</h1>
-      <p className="muted">Última actualización: 16 de noviembre de 2026</p>
+      <p className="muted">Última actualización: 17 de noviembre de 2026</p>
+      <p className="draft">Borrador: este texto todavía no fue revisado.</p>
 
       <p>
         Arreglemos la Calle es una app vecinal independiente para reportar problemas de la calle con una foto. No es
-        del gobierno ni de ningún municipio. No pedimos tu nombre, tu email ni tu teléfono, no mostramos publicidad y
-        no vendemos datos.
+        del gobierno ni de ningún municipio. Para usarla no pedimos tu nombre, tu email ni tu teléfono, no mostramos
+        publicidad y no vendemos datos.
       </p>
 
       <h2>Qué datos juntamos y para qué</h2>
@@ -40,7 +42,16 @@ export default function Privacidad() {
         <dd>
           La primera vez que abrís la app se crea una cuenta anónima, sin nombre, email ni teléfono. Sirve para saber
           qué reportes hiciste y a cuáles te sumaste, para que cada vecino se sume una sola vez y para frenar abusos.
-          Nunca se muestra en público.
+          Nunca se muestra en público. Si desinstalás la app sin vincular una cuenta, el teléfono la pierde y ya no
+          podemos asociarte a tus reportes.
+        </dd>
+
+        <dt>Cuenta de Apple o Google (opcional)</dt>
+        <dd>
+          Si vinculás tu cuenta desde Mis reportes, para no perder tus reportes al cambiar de teléfono, recibimos el
+          email de esa cuenta (con Apple puede ser un email privado que Apple reenvía) y un identificador de Apple o
+          Google. No recibimos tu contraseña ni tus contactos, y no usamos el email para mandarte mensajes: sirve solo
+          para que entres con la misma cuenta en otro teléfono.
         </dd>
 
         <dt>Token de avisos</dt>
@@ -56,7 +67,8 @@ export default function Privacidad() {
 
       <h2>Qué es público y qué no</h2>
       <p>
-        Cualquiera puede ver, en la app y en este sitio, la foto, la categoría, la descripción, la dirección y el
+        Cualquiera puede ver, en la app, en este sitio, en el ranking semanal de cada municipio y en una interfaz
+        pública para que municipios y otros sistemas lean los reportes, la foto, la categoría, la descripción, la dirección y el
         lugar del problema, su estado, la fecha y cuántos vecinos se sumaron. Nunca se muestra quién hizo un reporte,
         quién se sumó ni tu token de avisos. Por eso no pongas datos personales ni caras en la foto o la descripción.
       </p>
@@ -67,10 +79,12 @@ export default function Privacidad() {
           <b>Supabase</b>, donde se guardan los reportes, las fotos y la cuenta anónima.
         </li>
         <li>
-          <b>Expo, Apple y Google</b>, que entregan los avisos a tu teléfono si los aceptaste.
+          <b>Expo, Apple y Google</b>, que entregan los avisos a tu teléfono si los aceptaste y, si vinculás tu
+          cuenta, se encargan del inicio de sesión.
         </li>
         <li>
-          <b>Anthropic</b>, que recibe la foto para sugerir la categoría del problema. La sugerencia la confirmás o
+          <b>Anthropic</b>, que recibe una copia chica de la foto apenas la elegís (aunque después no termines el
+          reporte) para sugerir la categoría del problema. No guardamos esa copia. La sugerencia la confirmás o
           cambiás vos.
         </li>
         <li>
@@ -81,7 +95,10 @@ export default function Privacidad() {
           y sos vos quien decide mandarlo, desde tu cuenta de WhatsApp.
         </li>
       </ul>
-      <p>Cada uno de estos servicios usa los datos solo para lo que hace en la app.</p>
+      <p>
+        Cada uno de estos servicios usa los datos solo para lo que hace en la app, y pueden guardarlos en servidores
+        fuera de la Argentina.
+      </p>
 
       <h2>Permisos del teléfono</h2>
       <p>
@@ -91,8 +108,20 @@ export default function Privacidad() {
 
       <h2>Cuánto tiempo los guardamos</h2>
       <p>
-        Los reportes quedan publicados mientras la app funcione, salvo que se oculten por denuncias de los vecinos o
+        Los reportes quedan publicados mientras la app funcione, salvo que borres tu cuenta o se oculten por denuncias de los vecinos o
         por el operador. El token de avisos se guarda hasta que lo apagues o desinstales la app.
+      </p>
+
+      <h2>Cómo borrar tu cuenta y tus datos</h2>
+      <p>
+        Si vinculaste tu cuenta, entrá a Mis reportes y tocá «Borrar mi cuenta». Se borran en el momento los reportes
+        que creaste, sus fotos, tu cuenta y tu token de avisos. Donde te sumaste o avisaste algo en reportes de otros
+        vecinos, el movimiento sigue contando pero queda desvinculado de vos, y se borra la foto que hayas agregado. No
+        se puede deshacer.
+      </p>
+      <p>
+        Si no vinculaste tu cuenta, o querés borrar un reporte puntual, escribinos a{" "}
+        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> con el número o el link de los reportes.
       </p>
 
       <h2>Tus derechos</h2>

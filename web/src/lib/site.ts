@@ -1,2 +1,2 @@
-// ponytail: casilla sin decidir hasta tener el dominio; CONTACT_EMAIL (ver .env.example) la pisa.
-export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "contacto@arreglemoslacalle.example";
+// Casilla de /privacidad y /soporte. CONTACT_EMAIL (ver .env.example) la pisa.
+export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "hola@arreglemoslacalle.app";

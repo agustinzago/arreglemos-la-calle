@@ -4,8 +4,8 @@ import "./globals.css";
 
 const rubik = Rubik({ subsets: ["latin"], weight: ["400", "600", "700", "800"] });
 
-// ponytail: dominio sin decidir; SITE_URL (ver .env.example) lo pisa. Arma los links absolutos de og:url.
-const SITE_URL = process.env.SITE_URL ?? "https://arreglemoslacalle.example";
+// Arma los links absolutos de og:url. SITE_URL (ver .env.example) lo pisa, por ejemplo en un preview.
+const SITE_URL = process.env.SITE_URL ?? "https://arreglemoslacalle.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
