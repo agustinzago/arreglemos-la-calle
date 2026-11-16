@@ -146,7 +146,8 @@ function List(props: {
               <li key={x.id}>
                 <a className="rank-row" href={`/r/${x.id}`}>
                   <span className="rank">{i + 1}</span>
-                  <img src={props.photo(x)} alt="" loading="lazy" />
+                  {/* Sin loading="lazy": al imprimir, las fotos que no se cargaron salen en blanco. */}
+                  <img src={props.photo(x)} alt="" />
                   <span>
                     <b>{categoryShortLabel(x.category)}</b>
                     <span className="muted">

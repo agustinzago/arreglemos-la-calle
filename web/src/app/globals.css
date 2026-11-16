@@ -114,3 +114,33 @@ h1 { margin: 6px 0 4px; font-weight: 700; font-size: 1.875rem; line-height: 1.1;
 .big { text-align: right; }
 .big b { font-weight: 800; font-size: 1.75rem; line-height: 1; }
 .ranking .note { max-width: 68ch; }
+
+/* Impresión: "Imprimir → Guardar como PDF" del ranking da el documento que el operador le manda a la Muni. */
+@page { size: A4; margin: 14mm 14mm 16mm; }
+@media print {
+  /* Siempre claro en papel, aunque el sistema esté en modo oscuro. */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 32% 12%;
+    --card: 0 0% 100%;
+    --muted: 220 18% 91%;
+    --muted-foreground: 222 12% 34%;
+    --border: 220 14% 80%;
+    --primary-ink: 226 75% 32%;
+  }
+  html { color-scheme: light; font-size: 13px; }
+  body { background: none; }
+  .top { padding: 0 0 10px; }
+  .top > .muted { display: none; }
+  .logo { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .ranking { max-width: none; padding: 14px 0 0; gap: 18px; }
+  .stat { padding: 8px 12px; }
+  .stat b { font-size: 2rem; }
+  /* Una columna: más lugar para la dirección y la página se lee de arriba abajo. */
+  .lists { grid-template-columns: 1fr; gap: 18px; }
+  .lists h2, .lists .intro { break-after: avoid; }
+  .rank-list { overflow: visible; }
+  .lists section, .rank-list li, .stats, .note { break-inside: avoid; }
+  .rank-row img { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .rank-row:hover { background: none; }
+}
