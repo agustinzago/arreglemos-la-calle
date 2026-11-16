@@ -41,11 +41,9 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getMunicipality, getReport, joinReport, listEvents, photoUrl } from '@/lib/reports';
+import { getMunicipality, getReport, joinReport, listEvents, photoUrl, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
-// ponytail: dominio provisorio hasta que #5 publique la web; configurable con EXPO_PUBLIC_WEB_URL.
-const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://arreglemoslacalle.com.ar';
 const DAY = 86_400_000;
 
 type Data = { report: PublicReport; events: PublicReportEvent[]; municipality: PublicMunicipality | null };

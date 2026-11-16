@@ -105,3 +105,6 @@ export async function myReports(): Promise<MyReport[]> {
   if (error) throw error;
   return data as MyReport[];
 }
+
+// ponytail: dominio sin decidir; EXPO_PUBLIC_WEB_URL (mobile/.env) lo pisa. Base del link a /r/[id].
+export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://arreglemoslacalle.example';

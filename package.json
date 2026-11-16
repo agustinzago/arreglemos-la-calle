@@ -4,6 +4,6 @@
   "packageManager": "pnpm@11.22.0",
   "scripts": {
     "test": "pnpm --filter @arreglemos/tests test",
-    "typecheck": "pnpm --filter mobile typecheck"
+    "typecheck": "pnpm --filter mobile --filter web typecheck"
   }
 }
