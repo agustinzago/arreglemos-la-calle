@@ -47,6 +47,7 @@ const zoomOf = (lngDelta: number, width: number) => Math.log2((360 * width) / (2
 const lngDeltaOf = (zoom: number, width: number) => (360 * width) / (256 * 2 ** zoom);
 
 const openReport = (id: number) => router.push(`/reporte/${id}`);
+const clusterSize = (count: number) => (count < 10 ? 34 : count < 100 ? 40 : 48);
 
 export default function MapScreen() {
   const params = useLocalSearchParams<{ id?: string; lat?: string; lng?: string }>();
@@ -153,14 +154,14 @@ export default function MapScreen() {
                 onPress={() => zoomInto(cluster_id, f.geometry.coordinates)}
                 accessibilityLabel={`Grupo de ${point_count} reportes y ${vecinos} vecinos. Tocá para acercar.`}
               >
-                <View className="flex-row items-center gap-2 rounded-full border-2 border-card bg-foreground py-1 pl-1 pr-3.5">
-                  <View className="min-h-[30px] min-w-[30px] items-center justify-center rounded-full bg-warning px-1">
-                    <Text maxFontSizeMultiplier={1.5} className="text-base font-sans-bold text-warning-foreground">
-                      {point_count}
-                    </Text>
-                  </View>
-                  <Text maxFontSizeMultiplier={1.5} className="text-[15px] font-sans-bold text-background">
-                    reportes · {vecinos} vecinos
+                {/* Como en Apple o Google Maps: un círculo con la cantidad, que crece un poco con el grupo. El
+                    detalle (vecinos, dirección) está en la lista de abajo y en el lector de pantalla. */}
+                <View
+                  style={{ width: clusterSize(point_count), height: clusterSize(point_count) }}
+                  className="items-center justify-center rounded-full border-2 border-card bg-warning shadow"
+                >
+                  <Text maxFontSizeMultiplier={1.3} className="text-sm font-sans-bold text-warning-foreground">
+                    {point_count}
                   </Text>
                 </View>
               </Marker>
