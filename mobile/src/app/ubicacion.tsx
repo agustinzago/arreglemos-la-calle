@@ -3,17 +3,27 @@
 // Se mueve tocando el mapa o arrastrándolo, y debajo se ve la dirección leída del pin.
 import { formatAddress } from '@arreglemos/shared';
 import * as Location from 'expo-location';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { MapPin, MapPinOff, Minus, Plus, Pointer, Settings } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, Image, Linking, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import {
+  ActivityIndicator,
+  AppState,
+  Image,
+  Linking,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import MapView, { type LatLng, Marker, type Region } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { whereAmI } from '@/lib/location';
+import { startSuggestion } from '@/lib/suggestion';
 import { THEME } from '@/lib/theme';
 
 const LA_CALERA = { latitude: -31.344, longitude: -64.3355 };
@@ -72,6 +82,19 @@ export default function LocationScreen() {
   useEffect(() => {
     if (params.source === 'camera') locate();
   }, []);
+
+  // La sugerencia (#11) corre mientras el vecino pone el pin. Arranca cuando termina de entrar la pantalla:
+  // si la pregunta por la IA sale mientras se cierra la galería o anima el cambio de pantalla, iOS no la muestra.
+  const navigation = useNavigation();
+  useEffect(() => {
+    let started = false;
+    // 'transitionEnd' es del stack nativo; el tipo genérico de useNavigation no lo conoce.
+    return navigation.addListener('transitionEnd' as never, (e: { data?: { closing?: boolean } }) => {
+      if (started || e.data?.closing) return;
+      started = true;
+      startSuggestion(params.photoUri);
+    });
+  }, [navigation]);
 
   // Si negó la ubicación y vuelve de Ajustes, probamos de nuevo.
   useEffect(() => {
