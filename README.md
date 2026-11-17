@@ -145,7 +145,7 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
 - [ ] Vercel → Add New Project → importar el repo, Root Directory `web` (Next.js, pnpm y Node 24 los detecta solo).
 - [ ] Variables del proyecto (Production): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` de producción,
       `SITE_URL=https://arreglemoslacalle.app` (og:url y links absolutos) y `CONTACT_EMAIL` (la casilla de /privacidad y /soporte).
-- [ ] Settings → Domains: agregar el dominio y cargar los registros DNS que pide Vercel.
+- [x] Settings → Domains: agregar el dominio y cargar los registros DNS que pide Vercel.
 - [ ] Crear la casilla `hola@arreglemoslacalle.app` (el default de `CONTACT_EMAIL`; un reenvío del dominio alcanza) y
       probar que llegue.
 - [ ] Verificar el dominio en Google Search Console (la misma cuenta de Google que Play y Google Cloud): lo pide la
@@ -203,9 +203,7 @@ Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (
 
 ### Arte
 
-- [ ] Ícono y splash: siguen siendo los del template de Expo. Reemplazar `mobile/assets/expo.icon` (iOS),
-      `mobile/assets/images/icon.png`, `android-icon-foreground.png`, `android-icon-background.png`,
-      `android-icon-monochrome.png` y `splash-icon.png`.
+- [x] Ícono, splash y logo propios (`mobile/assets/images/`, `web/src/app/icon.png`).
 - [ ] Capturas para las tiendas (iPhone 6.9" y teléfono Android), ícono de Play de 512×512 y gráfico destacado de
       1024×500.
 
@@ -223,7 +221,9 @@ Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (
       ID del dispositivo (token de avisos); Dirección de correo (solo si vincula Apple o Google, opcional).
 - [ ] Cifrado: no hace falta responder, `ios.config.usesNonExemptEncryption: false` ya está en `app.json` (solo HTTPS).
 - [ ] Notas para la revisión: contar que la cuenta es anónima, que los reportes son públicos y que vincular Apple o
-      Google es opcional (en Mis reportes); "Borrar mi cuenta" aparece ahí una vez vinculada.
+      Google es opcional (en Mis reportes); "Borrar mi cuenta" aparece ahí una vez vinculada. Por la guía 1.2
+      (contenido de usuarios): en cada reporte hay "Denunciar este reporte" (con varias denuncias se oculta) y
+      "Bloquear a quien lo publicó" (deja de ver sus reportes), y el contacto está en `/soporte`.
 
 ### Google Play
 

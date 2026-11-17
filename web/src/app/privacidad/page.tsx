@@ -59,6 +59,12 @@ export default function Privacidad() {
           vuelve a estar roto. Podés apagar los avisos cuando quieras desde los ajustes del teléfono.
         </dd>
 
+        <dt>Bloqueos</dt>
+        <dd>
+          Si bloqueás a quien publicó un reporte, guardamos ese bloqueo junto a tu cuenta anónima para no mostrarte más
+          sus reportes. La otra persona no se entera y nadie más lo ve.
+        </dd>
+
         <dt>Lo que escribís</dt>
         <dd>La categoría, la dirección y la descripción opcional del reporte. Son públicas.</dd>
       </dl>

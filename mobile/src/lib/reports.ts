@@ -123,6 +123,13 @@ export async function registerEvent(
   return data as PublicReport;
 }
 
+/** Bloquear a quien publicó el reporte (guía 1.2 de Apple): este vecino deja de ver sus reportes y movimientos. */
+export async function blockReportAuthor(reportId: number) {
+  await ensureSession();
+  const { error } = await supabase.rpc('block_report_author', { p_report_id: reportId });
+  if (error) throw error;
+}
+
 export const photoUrl = (path: string) => supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
 
 /** Un reporte de "Mis reportes": `created` = lo creó este vecino; si no, se sumó. */
