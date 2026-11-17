@@ -123,14 +123,15 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
 
 - [ ] Crear el proyecto de producción (el de test queda para los tests) y aplicar todas las migraciones en orden
       con su `SUPABASE_DB_URL` (ver Migraciones).
-- [ ] Auth → Sign In / Providers: activar "Allow anonymous sign-ins" y "Allow manual linking" (vincular cuenta, ver
+      Hecho (`nrcttobgzrimqklktftk`, sa-east-1) salvo `20261117130000_block_users.sql`: aplicarla (SQL Editor).
+- [x] Auth → Sign In / Providers: activar "Allow anonymous sign-ins" y "Allow manual linking" (vincular cuenta, ver
       Cuentas).
-- [ ] Auth → Rate Limits: dejar el límite de inicios de sesión anónimos por IP en el default (30 por hora). Si
+- [x] Auth → Rate Limits: dejar el límite de inicios de sesión anónimos por IP en el default (30 por hora). Si
       vecinos de una misma red móvil (comparten IP) reciben error al abrir la app por primera vez, subirlo.
-- [ ] Auth → Attack Protection: **no** activar el CAPTCHA todavía. Con CAPTCHA, `signInAnonymously` tiene que
+- [x] Auth → Attack Protection: **no** activar el CAPTCHA todavía. Con CAPTCHA, `signInAnonymously` tiene que
       mandar un `captchaToken` y la app no lo hace: nadie podría entrar. Activarlo requiere sumar Turnstile o
       hCaptcha a la app primero.
-- [ ] Desplegar `suggest-category` en producción (ver Edge Functions).
+- [x] Desplegar `suggest-category` en producción (ver Edge Functions).
 - [ ] Cargar el WhatsApp de cada municipio activo. Número con código de país, como lo pide wa.me (549 + característica
       sin 0 + número sin 15). Sin número la app no muestra "Enviar a la Muni":
 
@@ -142,23 +143,23 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
 ### Dominio y web (Vercel)
 
 - [x] Comprar el dominio: `arreglemoslacalle.app` (ya es el default de la web y de la app).
-- [ ] Vercel → Add New Project → importar el repo, Root Directory `web` (Next.js, pnpm y Node 24 los detecta solo).
-- [ ] Variables del proyecto (Production): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` de producción,
+- [x] Vercel → Add New Project → importar el repo, Root Directory `web` (Next.js, pnpm y Node 24 los detecta solo).
+- [x] Variables del proyecto (Production): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` de producción,
       `SITE_URL=https://arreglemoslacalle.app` (og:url y links absolutos) y `CONTACT_EMAIL` (la casilla de /privacidad y /soporte).
 - [x] Settings → Domains: agregar el dominio y cargar los registros DNS que pide Vercel.
-- [ ] Crear la casilla `hola@arreglemoslacalle.app` (el default de `CONTACT_EMAIL`; un reenvío del dominio alcanza) y
+- [x] Crear la casilla `hola@arreglemoslacalle.app` (el default de `CONTACT_EMAIL`; un reenvío del dominio alcanza) y
       probar que llegue.
-- [ ] Verificar el dominio en Google Search Console (la misma cuenta de Google que Play y Google Cloud): lo pide la
+- [x] Verificar el dominio en Google Search Console (la misma cuenta de Google que Play y Google Cloud): lo pide la
       pantalla de consentimiento de OAuth de Google Sign-In para ponerlo como dominio autorizado.
 - [ ] Abrir `https://arreglemoslacalle.app/privacidad`, `/soporte`, `/r/<id>` y `/ranking/la-calera`.
 
 ### EAS (app)
 
 - [ ] `bash scripts/push-setup.sh`: cuenta de Expo, `eas init` (projectId), Firebase/FCM y APNs.
-- [ ] Google Maps para Android: Google Cloud Console → habilitar "Maps SDK for Android" → Credenciales → crear una
+- [x] Google Maps para Android: Google Cloud Console → habilitar "Maps SDK for Android" → Credenciales → crear una
       API key restringida a apps de Android con el paquete `ar.arreglemoslacalle.app` y los SHA-1 del certificado de
       EAS (`npx eas-cli@latest credentials --platform android`) y de Play (Play Console → Integridad de la app).
-- [ ] Variables de EAS (desde `mobile/`). `EXPO_PUBLIC_*` van en el bundle, así que no son secretas:
+- [x] Variables de EAS (desde `mobile/`). `EXPO_PUBLIC_*` van en el bundle, así que no son secretas:
 
   ```sh
   ENVS="--environment production --environment preview --environment development"
@@ -177,20 +178,25 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
 
 Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (o no vincula). Ver Cuentas.
 
-- [ ] Apple: el primer `eas build` de iOS crea el App ID `ar.arreglemoslacalle.app` con la capability **Sign in with
+- [x] Apple: el primer `eas build` de iOS crea el App ID `ar.arreglemoslacalle.app` con la capability **Sign in with
       Apple** (por el plugin `expo-apple-authentication`). Solo app nativa: no hacen falta Services ID, clave .p8 ni
       secreto.
-- [ ] Supabase → Providers → Apple: activar, y en **Client IDs** poner `ar.arreglemoslacalle.app` (más
+- [x] Supabase → Providers → Apple: activar, y en **Client IDs** poner `ar.arreglemoslacalle.app` (más
       `host.exp.Exponent` para probar en Expo Go).
-- [ ] Google Cloud Console (la misma cuenta que Play y Firebase) → APIs & Services: pantalla de consentimiento (OAuth
+- [x] Google Cloud Console (la misma cuenta que Play y Firebase) → APIs & Services: pantalla de consentimiento (OAuth
       consent screen) con el dominio autorizado (verificarlo antes en Google Search Console) y la URL de
       `/privacidad`. Crear tres OAuth client IDs: **Web** (es el `webClientId`), **iOS** (bundle
       `ar.arreglemoslacalle.app`) y **Android** (paquete `ar.arreglemoslacalle.app` y SHA-1: uno con el certificado de
       EAS, `npx eas-cli@latest credentials --platform android`, y otro con el de Play → Integridad de la app).
-- [ ] Supabase → Providers → Google: activar, en **Client IDs** el web primero y después el de iOS y los de Android,
+- [ ] Pantalla de consentimiento de OAuth → **Publish app** (pasar de Testing a In production). En Testing solo
+      entran los usuarios de prueba: el revisor de Apple no podría vincular con Google. Con `openid`, `email` y
+      `profile` y sin logo no hace falta la verificación de Google.
+- [ ] Cuando Play firme la app: sumar el SHA-1 de Play (Play Console → Integridad de la app) a un cliente OAuth
+      Android y a la key "Maps Android". Hoy solo está el del certificado de EAS.
+- [x] Supabase → Providers → Google: activar, en **Client IDs** el web primero y después el de iOS y los de Android,
       separados por coma, y activar **Skip nonce checks** (el SDK de Google en iOS manda un nonce que la app no ve).
       El client secret no hace falta para el flujo nativo.
-- [ ] Variables de EAS (y `mobile/.env` para desarrollo local). `app.config.ts` arma con la de iOS el `iosUrlScheme`
+- [x] Variables de EAS (y `mobile/.env` para desarrollo local). `app.config.ts` arma con la de iOS el `iosUrlScheme`
       del plugin de Google:
 
   ```sh
@@ -209,17 +215,18 @@ Hasta hacerlo, la tarjeta "No pierdas tus reportes" de Mis reportes no aparece (
 
 ### App Store
 
-- [ ] Apple Developer Program (USD 99/año).
+- [x] Apple Developer Program (USD 99/año).
 - [ ] `npx eas-cli@latest build --profile production --platform ios`: EAS crea el App ID y los certificados.
-- [ ] App Store Connect → Apps → nueva app con el bundle `ar.arreglemoslacalle.app`, idioma principal Español (México).
+- [x] App Store Connect → Apps → nueva app con el bundle `ar.arreglemoslacalle.app`, idioma principal Español (México).
 - [ ] `npx eas-cli@latest submit --profile production --platform ios` y probar por TestFlight.
 - [ ] Ficha: nombre, subtítulo, descripción, palabras clave, capturas, categoría, URL de soporte
       `https://arreglemoslacalle.app/soporte` y URL de privacidad `https://arreglemoslacalle.app/privacidad`.
+- [ ] Datos de contacto para la revisión (nombre, teléfono y email).
 - [ ] Privacidad de la app (las respuestas siguen `/privacidad`): sin rastreo (tracking: no). Datos recopilados,
       todos para "Funcionalidad de la app" y vinculados al usuario (por la cuenta anónima):
       Ubicación precisa; Fotos o videos; Otro contenido del usuario (descripción); ID de usuario (cuenta anónima);
       ID del dispositivo (token de avisos); Dirección de correo (solo si vincula Apple o Google, opcional).
-- [ ] Cifrado: no hace falta responder, `ios.config.usesNonExemptEncryption: false` ya está en `app.json` (solo HTTPS).
+- [x] Cifrado: no hace falta responder, `ios.config.usesNonExemptEncryption: false` ya está en `app.json` (solo HTTPS).
 - [ ] Notas para la revisión: contar que la cuenta es anónima, que los reportes son públicos y que vincular Apple o
       Google es opcional (en Mis reportes); "Borrar mi cuenta" aparece ahí una vez vinculada. Por la guía 1.2
       (contenido de usuarios): en cada reporte hay "Denunciar este reporte" (con varias denuncias se oculta) y
