@@ -83,7 +83,8 @@ export function AccountCard({ onChange }: { onChange: () => void }) {
           <ShieldCheck color={theme.successInk} size={24} />
           <View className="shrink">
             <Text className="font-sans-bold">Cuenta vinculada con {linked.map((p) => NAME[p]).join(' y ')}</Text>
-            {user.email && <Text variant="muted">{user.email}</Text>}
+            {/* Con "Ocultar mi email" Apple manda un alias (…@privaterelay.appleid.com): no sirve mostrarlo. */}
+            {user.email && !user.email.endsWith('@privaterelay.appleid.com') && <Text variant="muted">{user.email}</Text>}
           </View>
         </View>
         <Button variant="ghost" size="sm" className="min-h-[52px] rounded-md" disabled={busy} onPress={remove}>

@@ -36,7 +36,7 @@ export function startSuggestion(photoUri: string) {
   if (consent === '0') return;
   Alert.alert(
     '¿Usamos IA para sugerirte la categoría?',
-    'La foto se manda a Anthropic (Claude) y no se guarda. Lo podés cambiar en Mis reportes.',
+    'La foto es analizada mediante IA y no la guardamos. Lo podés cambiar en Mis reportes.',
     [
       { text: 'No', style: 'cancel', onPress: () => setAiSuggestions(false) },
       {

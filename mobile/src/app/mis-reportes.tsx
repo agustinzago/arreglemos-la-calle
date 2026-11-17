@@ -208,7 +208,7 @@ function AiToggle() {
     <View className="mt-4 flex-row items-center gap-3 rounded-xl border border-border bg-card p-4">
       <View className="shrink grow">
         <Text className="font-sans-bold">Sugerir la categoría con IA</Text>
-        <Text variant="muted">La foto se manda a Anthropic (Claude) y no se guarda.</Text>
+        <Text variant="muted">La foto es analizada mediante IA y no la guardamos.</Text>
       </View>
       <Switch
         accessibilityLabel="Sugerir la categoría con IA"
