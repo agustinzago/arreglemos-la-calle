@@ -7,7 +7,7 @@ import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { Camera, CircleAlert, CloudOff, RotateCcw, Trash2 } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, SectionList, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, SectionList, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AccountCard } from '@/components/account-card';
@@ -16,6 +16,7 @@ import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { myReports, WEB_URL, type MyReport } from '@/lib/reports';
+import { aiSuggestionsOn, setAiSuggestions } from '@/lib/suggestion';
 import { discardUnsent, onUnsentChange, retryUnsent, unsentReports, type UnsentReport } from '@/lib/unsent';
 
 export default function MyReportsScreen() {
@@ -82,6 +83,7 @@ export default function MyReportsScreen() {
         ListFooterComponent={
           <>
             <AccountCard onChange={load} />
+            <AiToggle />
             <View className="flex-row justify-center gap-6 pt-4">
               <Text className="text-muted-foreground underline" role="link" onPress={() => Linking.openURL(`${WEB_URL}/privacidad`)}>
                 Privacidad
@@ -194,6 +196,29 @@ function UnsentRow({ item }: { item: UnsentReport }) {
           </Button>
         </View>
       )}
+    </View>
+  );
+}
+
+/** Sugerir la categoría con IA (la foto va a Anthropic). La primera foto lo pregunta; acá se cambia. */
+function AiToggle() {
+  const theme = useTheme();
+  const [on, setOn] = useState(aiSuggestionsOn);
+  return (
+    <View className="mt-4 flex-row items-center gap-3 rounded-xl border border-border bg-card p-4">
+      <View className="shrink grow">
+        <Text className="font-sans-bold">Sugerir la categoría con IA</Text>
+        <Text variant="muted">La foto se manda a Anthropic (Claude) y no se guarda.</Text>
+      </View>
+      <Switch
+        accessibilityLabel="Sugerir la categoría con IA"
+        value={on}
+        trackColor={{ true: theme.primary }}
+        onValueChange={(value) => {
+          setAiSuggestions(value);
+          setOn(value);
+        }}
+      />
     </View>
   );
 }
