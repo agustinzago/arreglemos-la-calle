@@ -121,9 +121,9 @@ Lo que es código ya está. Esto es lo que hace una persona, más o menos en est
 
 ### Supabase de producción
 
-- [ ] Crear el proyecto de producción (el de test queda para los tests) y aplicar todas las migraciones en orden
-      con su `SUPABASE_DB_URL` (ver Migraciones).
-      Hecho (`nrcttobgzrimqklktftk`, sa-east-1) salvo `20261117130000_block_users.sql`: aplicarla (SQL Editor).
+- [x] Crear el proyecto de producción (el de test queda para los tests) y aplicar todas las migraciones en orden
+      con su `SUPABASE_DB_URL` (ver Migraciones). Es `nrcttobgzrimqklktftk` (sa-east-1). Cada migración nueva se
+      aplica en test y en producción.
 - [x] Auth → Sign In / Providers: activar "Allow anonymous sign-ins" y "Allow manual linking" (vincular cuenta, ver
       Cuentas).
 - [x] Auth → Rate Limits: dejar el límite de inicios de sesión anónimos por IP en el default (30 por hora). Si
