@@ -87,7 +87,7 @@ export default function Privacidad() {
           cuenta, se encargan del inicio de sesión.
         </li>
         <li>
-          <b>Anthropic</b>, solo si aceptás la sugerencia de categoría (la app te pregunta la primera vez): recibe una
+          <b>Anthropic</b>, solo si aceptás la sugerencia de categoría (la app te pregunta la primera vez y lo podés cambiar en Mis reportes): recibe una
           copia chica de cada foto apenas la elegís (aunque después no termines el reporte) para sugerir la categoría
           del problema. No guardamos esa copia. La sugerencia la confirmás o cambiás vos.
         </li>

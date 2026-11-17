@@ -1,7 +1,7 @@
 // Categoría sugerida por IA (#11). El pedido sale apenas hay foto y corre mientras el vecino ubica el
 // pin. Si no llega en 2 s (o la Edge Function falla o no está desplegada) es "sin sugerencia": nunca se espera.
 // La foto va a Anthropic (IA de terceros): la primera vez se pide permiso (App Store, guía 5.1.2(i)).
-// ponytail: la respuesta queda para siempre; si alguien quiere cambiarla, reinstala. Sumar un ajuste si lo piden.
+// Después se cambia con el interruptor de Mis reportes.
 import 'expo-sqlite/localStorage/install';
 import { CATEGORIES, type CategoryCode } from '@arreglemos/shared';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
@@ -23,7 +23,10 @@ async function requestSuggestion(photoUri: string, signal: AbortSignal): Promise
   return CATEGORIES.find((c) => c.code === data?.category)?.code ?? null;
 }
 
-const CONSENT = 'ai-suggestion'; // '1' aceptó, '0' no
+const CONSENT = 'ai-suggestion'; // '1' aceptó, '0' no, sin valor: todavía no le preguntamos
+
+export const aiSuggestionsOn = () => localStorage.getItem(CONSENT) === '1';
+export const setAiSuggestions = (on: boolean) => localStorage.setItem(CONSENT, on ? '1' : '0');
 
 /** Arranca el pedido para esta foto (en segundo plano), si el vecino aceptó. La primera vez, pregunta. */
 export function startSuggestion(photoUri: string) {
@@ -32,14 +35,14 @@ export function startSuggestion(photoUri: string) {
   if (consent === '1') return request(photoUri);
   if (consent === '0') return;
   Alert.alert(
-    '¿Te sugerimos la categoría?',
-    'Para sugerirla, mandamos una copia chica de la foto a Anthropic, una empresa de inteligencia artificial. No la guardamos. Si no, la elegís vos.',
+    '¿Usamos IA para sugerirte la categoría?',
+    'La foto se manda a Anthropic (Claude) y no se guarda. Lo podés cambiar en Mis reportes.',
     [
-      { text: 'No, gracias', style: 'cancel', onPress: () => localStorage.setItem(CONSENT, '0') },
+      { text: 'No', style: 'cancel', onPress: () => setAiSuggestions(false) },
       {
-        text: 'Sí, sugerir',
+        text: 'Sí',
         onPress: () => {
-          localStorage.setItem(CONSENT, '1');
+          setAiSuggestions(true);
           request(photoUri);
         },
       },
