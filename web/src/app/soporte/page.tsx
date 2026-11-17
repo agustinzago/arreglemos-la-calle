@@ -36,7 +36,10 @@ export default function Soporte() {
         </dd>
 
         <dt>Vi un reporte falso u ofensivo</dt>
-        <dd>Abrilo en la app y tocá «Denunciar». Con varias denuncias se oculta del mapa; también podés escribirnos.</dd>
+        <dd>
+          Abrilo en la app y tocá «Denunciar». Con varias denuncias se oculta del mapa; también podés escribirnos. Si no
+          querés ver más lo que publica esa persona, tocá «Bloquear a quien lo publicó».
+        </dd>
 
         <dt>No me llegan los avisos</dt>
         <dd>

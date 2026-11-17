@@ -1,5 +1,6 @@
 // Detalle del reporte: foto, datos, historia, "Me sumo", "Enviar a la Muni" y "Compartir".
 // Estados (#8): "Ya está arreglado" (con foto opcional), "Sigue roto" (si está resuelto) y "Denunciar".
+// "Bloquear a quien lo publicó" (guía 1.2 de Apple): deja de ver sus reportes y vuelve atrás.
 import {
   categoryLabel,
   municipalityMessage,
@@ -14,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeft,
+  Ban,
   Check,
   CircleCheck,
   CloudOff,
@@ -46,7 +48,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StatusBadge } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';
+import { blockReportAuthor, getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
 const DAY = 86_400_000;
@@ -161,6 +163,25 @@ export default function ReportScreen() {
         },
       },
     ]);
+  }
+
+  function block() {
+    Alert.alert(
+      '¿Bloquear a quien lo publicó?',
+      'No vas a ver más sus reportes ni lo que haga en otros. No se entera de que lo bloqueaste.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Bloquear',
+          style: 'destructive',
+          onPress: () =>
+            blockReportAuthor(report.id).then(
+              () => (router.canGoBack() ? router.back() : router.replace('/')),
+              () => Alert.alert('No pudimos bloquear', 'Revisá tu conexión y probá de nuevo.'),
+            ),
+        },
+      ],
+    );
   }
 
   function sendToMuni() {
@@ -281,6 +302,16 @@ export default function ReportScreen() {
             >
               <Flag color={theme.mutedForeground} size={icon * 0.8} />
               <Text className="font-sans-semibold text-muted-foreground underline">Denunciar este reporte</Text>
+            </Pressable>
+          )}
+          {!isMine && (
+            <Pressable
+              role="button"
+              onPress={block}
+              className="min-h-touch flex-row items-center justify-center gap-2 self-center px-3"
+            >
+              <Ban color={theme.mutedForeground} size={icon * 0.8} />
+              <Text className="font-sans-semibold text-muted-foreground underline">Bloquear a quien lo publicó</Text>
             </Pressable>
           )}
         </View>

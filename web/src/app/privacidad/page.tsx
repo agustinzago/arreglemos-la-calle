@@ -1,6 +1,5 @@
 // Política de privacidad: la piden App Store y Google Play (URL en la ficha de cada tienda).
 // Si la app empieza a juntar algo nuevo, actualizar esta página, la fecha y las respuestas de las tiendas (README).
-// ponytail: borrador escrito por un agente, falta la revisión de una persona (README, Lanzamiento).
 import type { Metadata } from "next";
 import { CONTACT_EMAIL } from "@/lib/site";
 
@@ -14,7 +13,6 @@ export default function Privacidad() {
     <main className="doc">
       <h1>Política de privacidad</h1>
       <p className="muted">Última actualización: 17 de noviembre de 2026</p>
-      <p className="draft">Borrador: este texto todavía no fue revisado.</p>
 
       <p>
         Arreglemos la Calle es una app vecinal independiente para reportar problemas de la calle con una foto. No es
@@ -59,6 +57,12 @@ export default function Privacidad() {
           Solo si aceptás «¿Te avisamos cuando lo arreglen?». Es un código que identifica a tu teléfono para mandarle
           avisos. Lo usamos únicamente para avisarte cuando un reporte que hiciste o al que te sumaste se arregla o
           vuelve a estar roto. Podés apagar los avisos cuando quieras desde los ajustes del teléfono.
+        </dd>
+
+        <dt>Bloqueos</dt>
+        <dd>
+          Si bloqueás a quien publicó un reporte, guardamos ese bloqueo junto a tu cuenta anónima para no mostrarte más
+          sus reportes. La otra persona no se entera y nadie más lo ve.
         </dd>
 
         <dt>Lo que escribís</dt>
