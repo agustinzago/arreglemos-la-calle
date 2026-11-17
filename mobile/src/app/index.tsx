@@ -10,6 +10,7 @@ import { Camera, Images, List, Map } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, View } from 'react-native';
+import { GestureDetector, usePinchGesture } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmergencyNotice } from '@/components/emergency-notice';
@@ -32,6 +33,22 @@ export default function CameraScreen() {
   const [cameraPermission, requestCamera, getCamera] = useCameraPermissions();
   const [locationPermission, requestLocation, getLocation] = Location.useForegroundPermissions();
   const [busy, setBusy] = useState(false);
+  // `zoom` de expo-camera: 0 es 1x (el lente normal) y 1 el máximo, en escala exponencial.
+  const [zoom, setZoom] = useState(0);
+  // En refs y no en el estado: el gesto puede quedarse con callbacks de un render viejo.
+  const zoomNow = useRef(0);
+  const pinchStart = useRef(0);
+  const pinch = usePinchGesture({
+    runOnJS: true,
+    onActivate: () => {
+      pinchStart.current = zoomNow.current;
+    },
+    // ponytail: 0.25 por cada "e" de escala del pellizco, a ojo; ajustar si se siente lento o rápido.
+    onUpdate: (e) => {
+      zoomNow.current = Math.min(1, Math.max(0, pinchStart.current + Math.log(e.scale) * 0.25));
+      setZoom(zoomNow.current);
+    },
+  });
   const onPrimary = THEME[useColorScheme().colorScheme ?? 'light'].primaryForeground;
 
   // Al volver de Ajustes, releer los permisos.
@@ -78,7 +95,19 @@ export default function CameraScreen() {
       <View className="px-screen pb-2">
         <EmergencyNotice tone="solid" />
       </View>
-      <CameraView ref={camera} facing="back" style={{ flex: 1 }} />
+      <GestureDetector gesture={pinch}>
+        <View style={{ flex: 1 }}>
+          <CameraView
+            ref={camera}
+            facing="back"
+            style={{ flex: 1 }}
+            zoom={zoom}
+            // expo-camera aplica el zoom inicial antes de configurar la sesión, iOS lo resetea y en
+            // iPhones con ultra gran angular arranca en 0.5x. Un zoom apenas distinto lo vuelve a aplicar.
+            onCameraReady={() => setZoom((z) => (z === 0 ? 0.0001 : z))}
+          />
+        </View>
+      </GestureDetector>
       <View className="gap-3 px-screen py-4">
         <Button onPress={shoot} disabled={busy} accessibilityLabel="Sacar foto">
           {busy ? <ActivityIndicator color={onPrimary} /> : <Camera color={onPrimary} size={28} />}
