@@ -7,7 +7,7 @@ import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { Camera, CircleAlert, CloudOff, RotateCcw, Trash2 } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, SectionList, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, SectionList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AccountCard } from '@/components/account-card';
@@ -15,7 +15,7 @@ import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { myReports, type MyReport } from '@/lib/reports';
+import { myReports, WEB_URL, type MyReport } from '@/lib/reports';
 import { discardUnsent, onUnsentChange, retryUnsent, unsentReports, type UnsentReport } from '@/lib/unsent';
 
 export default function MyReportsScreen() {
@@ -79,7 +79,19 @@ export default function MyReportsScreen() {
             {section.title}
           </Text>
         )}
-        ListFooterComponent={<AccountCard onChange={load} />}
+        ListFooterComponent={
+          <>
+            <AccountCard onChange={load} />
+            <View className="flex-row justify-center gap-6 pt-4">
+              <Text className="text-muted-foreground underline" role="link" onPress={() => Linking.openURL(`${WEB_URL}/privacidad`)}>
+                Privacidad
+              </Text>
+              <Text className="text-muted-foreground underline" role="link" onPress={() => Linking.openURL(`${WEB_URL}/soporte`)}>
+                Soporte
+              </Text>
+            </View>
+          </>
+        }
         contentContainerClassName="flex-grow gap-2 px-screen pb-5"
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center gap-3 py-10">

@@ -87,9 +87,9 @@ export default function Privacidad() {
           cuenta, se encargan del inicio de sesión.
         </li>
         <li>
-          <b>Anthropic</b>, que recibe una copia chica de la foto apenas la elegís (aunque después no termines el
-          reporte) para sugerir la categoría del problema. No guardamos esa copia. La sugerencia la confirmás o
-          cambiás vos.
+          <b>Anthropic</b>, solo si aceptás la sugerencia de categoría (la app te pregunta la primera vez): recibe una
+          copia chica de cada foto apenas la elegís (aunque después no termines el reporte) para sugerir la categoría
+          del problema. No guardamos esa copia. La sugerencia la confirmás o cambiás vos.
         </li>
         <li>
           <b>Google Maps y Apple Maps</b>, que dibujan el mapa de la app.
