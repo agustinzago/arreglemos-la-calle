@@ -5,6 +5,7 @@ export const instant = false;
 import { categoryLabel, STATUS_LABEL, type PublicMunicipality, type PublicReport } from "@arreglemos/shared";
 import type { Metadata } from "next";
 import { cache } from "react";
+import { Icon } from "@/lib/icon";
 import { db, photoUrl } from "@/lib/supabase";
 import ReportNotFound from "../../not-found";
 
@@ -70,7 +71,7 @@ export default async function ReportPage({ params }: PageProps<"/r/[id]">) {
       <div className="photo">
         <img src={photo} alt={`Foto: ${title(r, m)}`} />
         <span className={`badge ${resolved ? "resolved" : "open"}`}>
-          {resolved ? <Icon d={CHECK} /> : <Icon d={CLOCK} />}
+          {resolved ? <Icon name="check" /> : <Icon name="clock" />}
           {STATUS_LABEL[r.status]}
         </span>
       </div>
@@ -96,7 +97,7 @@ export default async function ReportPage({ params }: PageProps<"/r/[id]">) {
         </div>
         <div className="cta">
           <a className="button" href={APP_URL}>
-            <Icon d={DOWNLOAD} />
+            <Icon name="download" />
             Descargá la app y sumate
           </a>
           <span className="muted">Gratis y sin crear cuenta. Para iPhone y Android.</span>
@@ -110,7 +111,7 @@ export default async function ReportPage({ params }: PageProps<"/r/[id]">) {
           />
         </div>
         <div className="row">
-          <Icon d={PIN} />
+          <Icon name="pin" />
           <span>
             {r.address && <b>{r.address}</b>}
             {r.address && place && ", "}
@@ -123,19 +124,5 @@ export default async function ReportPage({ params }: PageProps<"/r/[id]">) {
         </div>
       </div>
     </main>
-  );
-}
-
-// Íconos de Lucide (los mismos que la app), inline para no sumar una dependencia por cuatro dibujos.
-const CLOCK = "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20M12 6v6l4 2";
-const CHECK = "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m-3 10 2 2 4-4";
-const DOWNLOAD = "M12 15V3M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5";
-const PIN = "M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6";
-
-function Icon({ d }: { d: string }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d={d} />
-    </svg>
   );
 }
