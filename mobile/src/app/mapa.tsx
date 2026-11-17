@@ -26,6 +26,7 @@ import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
+import { whereAmI } from '@/lib/location';
 import { mapReports, type Area, type MapFilters } from '@/lib/reports';
 
 const LA_CALERA = { latitude: -31.344, longitude: -64.3355 };
@@ -129,6 +130,12 @@ export default function MapScreen() {
         ref={mapRef}
         style={{ flex: 1 }}
         initialRegion={region}
+        // Sin un reporte para mostrar, arranca donde está el vecino (La Calera si no sabemos). En onMapReady
+        // porque iOS ignora los movimientos de antes.
+        onMapReady={() =>
+          !params.lat &&
+          whereAmI().then((here) => here && mapRef.current?.animateToRegion({ ...here, latitudeDelta: 0.02, longitudeDelta: 0.02 }))
+        }
         onRegionChangeComplete={setRegion}
         userInterfaceStyle={colorScheme === 'dark' ? 'dark' : 'light'}
         showsUserLocation

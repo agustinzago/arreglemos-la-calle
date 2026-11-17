@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { whereAmI } from '@/lib/location';
 import { THEME } from '@/lib/theme';
 
 const LA_CALERA = { latitude: -31.344, longitude: -64.3355 };
@@ -150,7 +151,10 @@ export default function LocationScreen() {
             ref={map}
             style={{ flex: 1 }}
             initialRegion={region.current}
-            onMapReady={() => pinRef.current && center(pinRef.current)}
+            // Foto de galería sin ubicación: sin pin, pero el mapa arranca cerca del vecino y no en La Calera.
+            onMapReady={() =>
+              pinRef.current ? center(pinRef.current) : whereAmI().then((here) => here && !pinRef.current && center(here))
+            }
             onRegionChangeComplete={(r) => (region.current = r)}
             onPress={(e) => e.nativeEvent.action !== 'marker-press' && movePin(e.nativeEvent.coordinate)}
             showsUserLocation={params.source === 'camera' && gps === 'ok'}
