@@ -9,6 +9,9 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "ar.arreglemoslacalle.app",
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "es"
+      },
       "config": {
         "usesNonExemptEncryption": false
       }

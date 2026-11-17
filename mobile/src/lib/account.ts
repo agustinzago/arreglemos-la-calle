@@ -79,6 +79,9 @@ export async function linkAccount(provider: Provider): Promise<LinkResult> {
     };
   }
   if (error) throw error;
+  // La sesión que devuelve el vínculo trae el usuario sin la identidad nueva (identities vacío), y la
+  // tarjeta seguía mostrando "No pierdas tus reportes". Refrescarla trae el usuario completo.
+  await supabase.auth.refreshSession();
   return { status: 'linked' };
 }
 
