@@ -1,6 +1,6 @@
 # 004 — Keep the camera pinch-zoom re-render to the camera view only
 
-- **Status**: TODO
+- **Status**: DONE without step 0 (no device was available; applied because it only moves code). Pinch feel still needs a device check.
 - **Commit**: 2579875
 - **Severity**: LOW
 - **Category**: Performance

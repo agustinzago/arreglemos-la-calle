@@ -5,9 +5,9 @@ Written by an `improve-animations` audit of `mobile/` at commit 24ba49e. Plan 00
 | # | Plan | Severity | Status |
 | --- | --- | --- | --- |
 | 001 | [Give every tap target an eased 0.97 press scale](001-press-feedback-scale.md) | MEDIUM | DONE (device check pending) |
-| 002 | [Fade the modal backdrops, slide only the sheet](002-modal-sheet-backdrop-fade.md) | MEDIUM | TODO |
-| 003 | [Flip the map sheet's toggle label when the sheet starts moving](003-sheet-toggle-label-timing.md) | LOW | TODO |
-| 004 | [Keep the camera pinch-zoom re-render to the camera view only](004-camera-pinch-isolate-rerender.md) | LOW | TODO (measure first) |
+| 002 | [Fade the modal backdrops, slide only the sheet](002-modal-sheet-backdrop-fade.md) | MEDIUM | DONE (device check pending) |
+| 003 | [Flip the map sheet's toggle label when the sheet starts moving](003-sheet-toggle-label-timing.md) | LOW | DONE (device check pending) |
+| 004 | [Keep the camera pinch-zoom re-render to the camera view only](004-camera-pinch-isolate-rerender.md) | LOW | DONE, step 0 skipped (device check pending) |
 
 ## Order and dependencies
 
