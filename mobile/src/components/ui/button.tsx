@@ -3,6 +3,7 @@
 import { TextClassContext } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as Haptics from 'expo-haptics';
 import { Pressable } from 'react-native';
 
 const buttonVariants = cva('flex-row items-center justify-center gap-2.5 rounded-lg px-5 py-3.5', {
@@ -38,12 +39,19 @@ type ButtonProps = React.ComponentProps<typeof Pressable> &
   React.RefAttributes<typeof Pressable> &
   VariantProps<typeof buttonVariants>;
 
-function Button({ className, variant, size, ...props }: ButtonProps) {
+function Button({ className, variant, size, onPress, ...props }: ButtonProps) {
   return (
     <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>
       <Pressable
         className={cn(props.disabled && 'opacity-45', buttonVariants({ variant, size }), className)}
         role="button"
+        onPress={
+          onPress &&
+          ((e) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+            onPress(e);
+          })
+        }
         {...props}
       />
     </TextClassContext.Provider>
