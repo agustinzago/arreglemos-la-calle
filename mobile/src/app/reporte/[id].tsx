@@ -393,7 +393,7 @@ function FixSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 justify-end">
-        <Pressable accessibilityLabel="Cancelar" onPress={onClose} className="absolute inset-0 bg-black/40" />
+        <Pressable accessibilityLabel="Cancelar" onPress={onClose} scaleOnPress={false} className="absolute inset-0 bg-black/40" />
         <View className="max-h-[90%] rounded-t-2xl bg-card">
           <ScrollView contentContainerClassName="gap-4 px-screen pb-10 pt-5">
             <Text variant="h2">¿Ya lo arreglaron?</Text>

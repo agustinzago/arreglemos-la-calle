@@ -8,8 +8,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 const buttonVariants = cva('flex-row items-center justify-center gap-2.5 rounded-lg px-5 py-3.5', {
   variants: {
     variant: {
-      default: 'bg-primary active:scale-[0.98]',
-      success: 'bg-success active:scale-[0.98]',
+      default: 'bg-primary',
+      success: 'bg-success',
       outline: 'border-2 border-primary bg-transparent active:bg-primary-soft',
       ghost: 'active:bg-accent',
     },

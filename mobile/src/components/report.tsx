@@ -47,7 +47,7 @@ export function ReportRow({ report, onPress, className }: { report: PublicReport
       onPress={onPress}
       role="button"
       accessibilityLabel={`${title}, ${STATUS_LABEL[report.status]}, ${report.address ?? 'sin dirección'}, ${reportMeta(report)}`}
-      className={`flex-row items-center gap-3 rounded-xl border border-border p-2.5 active:opacity-80 ${className ?? 'bg-background'}`}
+      className={`flex-row items-center gap-3 rounded-xl border border-border p-2.5 ${className ?? 'bg-background'}`}
     >
       <View className="h-[92px] w-[92px] items-center justify-center overflow-hidden rounded-[12px] bg-muted">
         <Icon size={32} color={theme.mutedForeground} />

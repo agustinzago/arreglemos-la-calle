@@ -210,7 +210,7 @@ export default function MapScreen() {
             <Pressable
               role="button"
               onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-              className="min-h-touch flex-row items-center gap-2 rounded-md bg-card px-3 shadow active:opacity-80"
+              className="min-h-touch flex-row items-center gap-2 rounded-md bg-card px-3 shadow"
             >
               <ArrowLeft size={22} color={theme.foreground} />
               <Text className="text-sm font-sans-bold">Volver</Text>
@@ -219,7 +219,7 @@ export default function MapScreen() {
               role="button"
               accessibilityHint="Abre la lista de problemas para filtrar el mapa"
               onPress={() => setFilterOpen(true)}
-              className="min-h-touch shrink flex-row items-center gap-2 rounded-md bg-card px-3 shadow active:opacity-80"
+              className="min-h-touch shrink flex-row items-center gap-2 rounded-md bg-card px-3 shadow"
             >
               <ListFilter size={22} color={theme.foreground} />
               <Text className="shrink text-sm">
@@ -266,7 +266,7 @@ export default function MapScreen() {
           <Pressable
             role="button"
             onPress={toggleSheet}
-            className="min-h-touch flex-row items-center gap-1.5 rounded-[12px] bg-muted px-3 active:opacity-80"
+            className="min-h-touch flex-row items-center gap-1.5 rounded-[12px] bg-muted px-3"
           >
             {sheetOpen ? <ChevronDown size={22} color={theme.foreground} /> : <ChevronUp size={22} color={theme.foreground} />}
             <Text className="text-sm font-sans-bold">{sheetOpen ? 'Ver mapa' : 'Ver lista'}</Text>
@@ -358,7 +358,7 @@ function CategoryFilter({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 justify-end">
-        <Pressable accessibilityLabel="Cerrar" onPress={onClose} className="absolute inset-0 bg-black/40" />
+        <Pressable accessibilityLabel="Cerrar" onPress={onClose} scaleOnPress={false} className="absolute inset-0 bg-black/40" />
         <View className="max-h-[88%] gap-4 rounded-t-2xl bg-card px-screen pb-10 pt-5">
           <View className="flex-row flex-wrap items-center justify-between gap-2">
             <Text variant="h2" className="shrink">
