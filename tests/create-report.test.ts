@@ -59,7 +59,14 @@ describe('crear reporte', () => {
     expect(data.municipality_id).toBe(municipalityIds[name]);
   });
 
-  test('un reporte fuera de todo polígono queda sin municipio', async () => {
+  test('un reporte apenas afuera del radio urbano queda con el municipio más cercano', async () => {
+    // Reporte real, a ~200 m al sur del radio urbano de La Calera en IDECOR.
+    const { data, error } = await createReport(v, { lat: -31.362944, lng: -64.345474 });
+    expect(error).toBeNull();
+    expect(data.municipality_id).toBe(municipalityIds['La Calera']);
+  });
+
+  test('un reporte lejos de todo polígono queda sin municipio', async () => {
     const { data, error } = await createReport(v, PLACES.sierras);
     expect(error).toBeNull();
     expect(data.municipality_id).toBeNull();
