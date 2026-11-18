@@ -11,6 +11,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
+import { hapticTap } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { currentUser, deleteAccount, linkAccount, linkProviders, type Provider } from '@/lib/account';
 
@@ -116,7 +117,10 @@ export function AccountCard({ onChange }: { onChange: () => void }) {
               }
               cornerRadius={14}
               style={{ width: '100%', height: 52 }}
-              onPress={() => link(p)}
+              onPress={() => {
+                hapticTap();
+                link(p);
+              }}
             />
           ) : (
             <Button key={p} variant="outline" size="sm" className="min-h-[52px] rounded-md" onPress={() => link(p)}>

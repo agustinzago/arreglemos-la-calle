@@ -12,7 +12,6 @@ import {
   AppState,
   Image,
   Linking,
-  Pressable,
   ScrollView,
   useWindowDimensions,
   View,
@@ -21,6 +20,7 @@ import MapView, { type LatLng, Marker, type Region } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { reverseGeocode, whereAmI } from '@/lib/location';
 import { startSuggestion } from '@/lib/suggestion';

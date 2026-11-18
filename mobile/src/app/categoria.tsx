@@ -6,12 +6,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowRight, CircleAlert, CircleCheck, Sparkles } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
-import { ActivityIndicator, Keyboard, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Keyboard, ScrollView, TextInput, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
 import { useOffline } from '@/components/offline-banner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS } from '@/lib/categories';
 import { nearbyReports } from '@/lib/reports';

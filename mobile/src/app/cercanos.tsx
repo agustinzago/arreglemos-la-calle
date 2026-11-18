@@ -6,11 +6,12 @@ import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Circle, CircleDot, Navigation, UserPlus, Users } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Alert, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
 import { useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { categoryIcon } from '@/lib/categories';
 import { joinReport, photoUrl } from '@/lib/reports';

@@ -4,8 +4,9 @@ import { categoryShortLabel, reportTitle, STATUS_LABEL, type PublicReport } from
 import { Image } from 'expo-image';
 import { ChevronRight, CircleCheck, Clock } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { categoryIcon } from '@/lib/categories';
 import { photoUrl } from '@/lib/reports';

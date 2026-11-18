@@ -37,7 +37,6 @@ import {
   Alert,
   Linking,
   Modal,
-  Pressable,
   ScrollView,
   Share,
   useWindowDimensions,
@@ -47,6 +46,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { StatusBadge } from '@/components/report';
 import { Button } from '@/components/ui/button';
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { categoryIcon } from '@/lib/categories';
 import { blockReportAuthor, getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';

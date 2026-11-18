@@ -3,8 +3,10 @@
 // reemplaza la pantalla actual por una nueva, que vuelve a pedir sus datos.
 import { router, useGlobalSearchParams, usePathname } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { Pressable } from '@/components/ui/pressable';
 
 import { DATA_MODE_LABEL, DATA_MODES, setDataMode, useDataMode, type DataMode } from './data-mode';
 

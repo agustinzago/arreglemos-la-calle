@@ -17,13 +17,14 @@ import {
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Modal, ScrollView, useWindowDimensions, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Supercluster from 'supercluster';
 
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS, categoryIcon } from '@/lib/categories';
 import { whereAmI } from '@/lib/location';
