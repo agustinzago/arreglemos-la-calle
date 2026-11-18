@@ -2,8 +2,8 @@
 // Estados (#8): "Ya está arreglado" (con foto opcional), "Sigue roto" (si está resuelto) y "Denunciar".
 // "Bloquear a quien lo publicó" (guía 1.2 de Apple): deja de ver sus reportes y vuelve atrás.
 import {
-  categoryLabel,
   municipalityMessage,
+  reportTitle,
   reportUrl,
   whatsappLink,
   type PublicMunicipality,
@@ -48,6 +48,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StatusBadge } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { categoryIcon } from '@/lib/categories';
 import { blockReportAuthor, getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -118,9 +119,13 @@ export default function ReportScreen() {
 
   const { report, events, municipality } = data;
   const resolved = report.status === 'resolved';
-  const days = Math.floor(
-    ((resolved && report.resolved_at ? Date.parse(report.resolved_at) : Date.now()) - Date.parse(report.created_at)) /
-      DAY,
+  // max(0): si el reloj del teléfono va atrasado, un reporte recién creado parece del futuro ("-1 días").
+  const days = Math.max(
+    0,
+    Math.floor(
+      ((resolved && report.resolved_at ? Date.parse(report.resolved_at) : Date.now()) - Date.parse(report.created_at)) /
+        DAY,
+    ),
   );
   const isMine = events[0]?.mine ?? false; // el primer evento es el sumate del creador
   const joined = events.some((e) => e.type === 'sumate' && e.mine);
@@ -128,7 +133,8 @@ export default function ReportScreen() {
   const reopenedAt = events.map((e) => e.type).lastIndexOf('sigue_roto');
   const markedFixed = !resolved && events.slice(reopenedAt + 1).some((e) => e.type === 'resuelto' && e.mine);
   const url = reportUrl(WEB_URL, report.id);
-  const title = categoryLabel(report.category);
+  const title = reportTitle(report);
+  const CategoryIcon = categoryIcon(report.category);
 
   async function act(run: () => Promise<unknown>, failTitle: string) {
     setBusy(true);
@@ -198,10 +204,12 @@ export default function ReportScreen() {
   return (
     <View className="flex-1 bg-background">
       <ScrollView contentContainerClassName="pb-6">
-        <View>
+        {/* El ícono queda detrás de la foto: se ve mientras carga o si no carga. */}
+        <View className="h-[310px] items-center justify-center bg-muted">
+          <CategoryIcon color={theme.mutedForeground} size={56} />
           <Image
             source={photoUrl(report.photo_path)}
-            style={{ height: 310 }}
+            style={{ position: 'absolute', width: '100%', height: '100%' }}
             contentFit="cover"
             accessibilityLabel={`Foto: ${title}`}
           />
@@ -224,10 +232,12 @@ export default function ReportScreen() {
 
           <View className="flex-row flex-wrap gap-3">
             <Stat
-              value={!resolved && days === 0 ? 'Hoy' : String(days)}
+              value={days === 0 ? (resolved ? '<1' : 'Hoy') : days.toLocaleString('es-AR')}
               label={
                 resolved
-                  ? 'días hasta el arreglo'
+                  ? days <= 1
+                    ? 'día hasta el arreglo'
+                    : 'días hasta el arreglo'
                   : days === 0
                     ? 'lo reportaron'
                     : days === 1
@@ -236,7 +246,7 @@ export default function ReportScreen() {
               }
             />
             <Stat
-              value={String(report.vecinos_count)}
+              value={report.vecinos_count.toLocaleString('es-AR')}
               label={report.vecinos_count === 1 ? 'vecino sumado' : 'vecinos sumados'}
             />
           </View>
@@ -301,7 +311,7 @@ export default function ReportScreen() {
               className="min-h-touch flex-row items-center justify-center gap-2 self-center px-3"
             >
               <Flag color={theme.mutedForeground} size={icon * 0.8} />
-              <Text className="font-sans-semibold text-muted-foreground underline">Denunciar este reporte</Text>
+              <Text className="shrink text-center font-sans-semibold text-muted-foreground underline">Denunciar este reporte</Text>
             </Pressable>
           )}
           {!isMine && (
@@ -311,7 +321,9 @@ export default function ReportScreen() {
               className="min-h-touch flex-row items-center justify-center gap-2 self-center px-3"
             >
               <Ban color={theme.mutedForeground} size={icon * 0.8} />
-              <Text className="font-sans-semibold text-muted-foreground underline">Bloquear a quien lo publicó</Text>
+              <Text className="shrink text-center font-sans-semibold text-muted-foreground underline">
+                Bloquear a quien lo publicó
+              </Text>
             </Pressable>
           )}
         </View>
@@ -333,7 +345,7 @@ export default function ReportScreen() {
         ) : isMine || joined ? (
           <View className="min-h-button flex-row items-center justify-center gap-2.5 rounded-lg bg-success-soft px-5 py-3.5">
             <Check color={theme.successInk} size={icon} />
-            <Text className="font-sans-bold text-lg text-success-ink">
+            <Text className="shrink text-center font-sans-bold text-lg text-success-ink">
               {isMine ? 'Es tu reporte' : 'Ya te sumaste'}
             </Text>
           </View>
@@ -442,7 +454,8 @@ function BackButton() {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <View className="min-w-[140px] flex-1 rounded-lg border border-border bg-card px-3.5 py-3">
-      <Text className="font-display text-3xl" maxFontSizeMultiplier={1.5}>
+      {/* Una línea siempre: con letra grande, "1.284" partido en dos se lee como otro número. */}
+      <Text className="font-display text-3xl" maxFontSizeMultiplier={1.5} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
       <Text className="font-sans-semibold text-sm text-muted-foreground">{label}</Text>
@@ -480,7 +493,7 @@ function timeline(events: PublicReportEvent[]) {
       });
     else if (e.type === 'sumate' && !e.mine && last.others > 0) {
       last.others += 1;
-      last.text = `Se sumaron ${last.others} vecinos`;
+      last.text = `Se sumaron ${last.others.toLocaleString('es-AR')} vecinos`;
       last.at = e.created_at;
     } else {
       const others = e.type === 'sumate' && !e.mine ? 1 : 0;
@@ -503,7 +516,9 @@ function when(iso: string) {
   const days = Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(iso).setHours(0, 0, 0, 0)) / DAY);
   if (days <= 0) return 'Hoy';
   if (days === 1) return 'Ayer';
-  return new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
+  // Sin el año, algo de hace 3 años parece de esta semana.
+  const year = new Date(iso).getFullYear() === new Date().getFullYear() ? undefined : 'numeric';
+  return new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year });
 }
 
 function Timeline({ events }: { events: PublicReportEvent[] }) {
@@ -528,12 +543,14 @@ function Timeline({ events }: { events: PublicReportEvent[] }) {
               <Text className="font-sans-semibold">{item.text}</Text>
               <Text variant="muted">{when(item.at)}</Text>
               {item.photo ? (
-                <Image
-                  source={photoUrl(item.photo)}
-                  style={{ width: 160, height: 120, borderRadius: 12, marginTop: 8 }}
-                  contentFit="cover"
-                  accessibilityLabel="Foto de cómo quedó"
-                />
+                <View className="mt-2 h-[120px] w-[160px] overflow-hidden rounded-[12px] bg-muted">
+                  <Image
+                    source={photoUrl(item.photo)}
+                    style={{ width: 160, height: 120 }}
+                    contentFit="cover"
+                    accessibilityLabel="Foto de cómo quedó"
+                  />
+                </View>
               ) : null}
             </View>
           </View>

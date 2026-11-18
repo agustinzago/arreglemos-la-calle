@@ -2,7 +2,7 @@
 // Se abre desde la cámara; el pie vuelve a ella. Arriba, los reportes sin enviar (#12), guardados en el
 // teléfono: "No se pudieron enviar" (rechazados) y "Esperando señal"; se ven aunque no haya red, y al
 // enviarse pasan a "Los que creaste". Al pie, vincular la cuenta (o borrarla, si ya está vinculada).
-import { categoryShortLabel } from '@arreglemos/shared';
+import { categoryShortLabel, reportTitle } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { Camera, CircleAlert, CloudOff, RotateCcw, Trash2 } from 'lucide-react-native';
@@ -15,6 +15,7 @@ import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { categoryIcon } from '@/lib/categories';
 import { myReports, WEB_URL, type MyReport } from '@/lib/reports';
 import { aiSuggestionsOn, setAiSuggestions } from '@/lib/suggestion';
 import { discardUnsent, onUnsentChange, retryUnsent, unsentReports, type UnsentReport } from '@/lib/unsent';
@@ -53,6 +54,19 @@ export default function MyReportsScreen() {
     { title: 'A los que te sumaste', data: failed ? [] : (items?.filter((i) => !i.created) ?? []) },
   ].filter((s) => s.data.length > 0);
   const empty = items !== null && items.length === 0 && unsent.length === 0;
+  // Si no cargaron se dice siempre: con reportes sin enviar la lista no queda vacía y ListEmpty no se ve.
+  const loadError = (
+    <>
+      <CloudOff size={56} color={theme.destructiveInk} />
+      <Text variant="h2" className="text-center">
+        No pudimos cargar tus reportes
+      </Text>
+      <Text className="text-center text-muted-foreground">Revisá tu conexión y probá de nuevo.</Text>
+      <Button variant="outline" onPress={load}>
+        <Text>Probar de nuevo</Text>
+      </Button>
+    </>
+  );
 
   return (
     <View className="flex-1 bg-background">
@@ -82,6 +96,7 @@ export default function MyReportsScreen() {
         )}
         ListFooterComponent={
           <>
+            {failed && sections.length > 0 && <View className="items-center gap-3 py-6">{loadError}</View>}
             <AccountCard onChange={load} />
             <AiToggle />
             <View className="flex-row justify-center gap-6 pt-4">
@@ -98,16 +113,7 @@ export default function MyReportsScreen() {
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center gap-3 py-10">
             {failed ? (
-              <>
-                <CloudOff size={56} color={theme.destructiveInk} />
-                <Text variant="h2" className="text-center">
-                  No pudimos cargar tus reportes
-                </Text>
-                <Text className="text-center text-muted-foreground">Revisá tu conexión y probá de nuevo.</Text>
-                <Button variant="outline" onPress={load}>
-                  <Text>Probar de nuevo</Text>
-                </Button>
-              </>
+              loadError
             ) : empty ? (
               <>
                 <View className="h-24 w-24 items-center justify-center rounded-full bg-primary-soft">
@@ -146,7 +152,8 @@ export default function MyReportsScreen() {
  */
 function UnsentRow({ item }: { item: UnsentReport }) {
   const theme = useTheme();
-  const title = categoryShortLabel(item.category);
+  const title = reportTitle({ category: item.category, description: item.description ?? null }, categoryShortLabel);
+  const Icon = categoryIcon(item.category);
   const meta = item.failed ? 'No lo pudimos enviar. Probá de nuevo o descartalo.' : 'Se envía cuando vuelva la señal';
 
   function discard() {
@@ -161,11 +168,18 @@ function UnsentRow({ item }: { item: UnsentReport }) {
       <View
         accessible
         accessibilityLabel={`${title}, ${item.failed ? 'no se envió' : 'sin enviar'}, ${item.address ?? 'sin dirección'}. ${meta}`}
-        className="flex-row items-center gap-3"
+        className="flex-row items-start gap-3"
       >
-        <Image source={item.photoUri} style={{ width: 92, height: 92, borderRadius: 12 }} contentFit="cover" />
+        {/* Si la foto no está (o no carga) queda el ícono de la categoría, como en ReportRow. */}
+        <View className="h-[92px] w-[92px] items-center justify-center overflow-hidden rounded-[12px] bg-muted">
+          <Icon size={32} color={theme.mutedForeground} />
+          <Image source={item.photoUri} style={{ position: 'absolute', width: 92, height: 92 }} contentFit="cover" />
+        </View>
         <View className="flex-1 gap-1">
-          <Text className="font-sans-bold">{title}</Text>
+          {/* Con "Otro" el título es lo que escribió el vecino: dos líneas alcanzan para reconocerlo. */}
+          <Text numberOfLines={2} className="font-sans-bold">
+            {title}
+          </Text>
           <Text variant="muted">{item.address ?? 'Sin dirección'}</Text>
           <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
             <View
@@ -186,11 +200,11 @@ function UnsentRow({ item }: { item: UnsentReport }) {
       </View>
       {item.failed && (
         <View className="flex-row flex-wrap gap-2">
-          <Button variant="outline" size="sm" className="flex-1" onPress={() => retryUnsent(item.id)}>
+          <Button variant="outline" size="sm" className="grow" onPress={() => retryUnsent(item.id)}>
             <RotateCcw size={20} color={theme.primaryInk} />
             <Text>Probar de nuevo</Text>
           </Button>
-          <Button variant="ghost" size="sm" className="flex-1" onPress={discard}>
+          <Button variant="ghost" size="sm" className="grow" onPress={discard}>
             <Trash2 size={20} color={theme.foreground} />
             <Text>Descartar</Text>
           </Button>

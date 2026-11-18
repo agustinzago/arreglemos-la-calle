@@ -21,7 +21,7 @@ const buttonVariants = cva('flex-row items-center justify-center gap-2.5 rounded
   defaultVariants: { variant: 'default', size: 'default' },
 });
 
-const buttonTextVariants = cva('text-lg font-sans-bold', {
+const buttonTextVariants = cva('shrink text-center text-lg font-sans-bold', {
   variants: {
     variant: {
       default: 'text-primary-foreground',

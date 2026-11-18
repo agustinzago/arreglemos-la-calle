@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
+import { DataToggle } from "@/dev/DataToggle";
 
 const rubik = Rubik({ subsets: ["latin"], weight: ["400", "600", "700", "800"] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <a href="/privacidad">Privacidad</a>
           <a href="/soporte">Soporte</a>
         </footer>
+        {process.env.NODE_ENV === "development" && <DataToggle />}
       </body>
     </html>
   );

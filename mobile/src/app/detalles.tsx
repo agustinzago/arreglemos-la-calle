@@ -1,6 +1,6 @@
 // Paso "Revisá y enviá": resumen de foto, lugar y problema (cada uno con "Cambiar"), una
 // descripción opcional y "Enviar reporte". Al enviar, la confirmación queda sobre la cámara.
-import { categoryLabel, isRejection, type CategoryCode } from '@arreglemos/shared';
+import { categoryLabel, DETAILS_MAX, isRejection, type CategoryCode } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { MapPin, Send } from 'lucide-react-native';
@@ -13,7 +13,7 @@ import { OfflineBanner, useOffline } from '@/components/offline-banner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { CATEGORY_ICONS } from '@/lib/categories';
+import { categoryIcon } from '@/lib/categories';
 import { saveUnsent } from '@/lib/unsent';
 import { createReport } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
@@ -28,7 +28,7 @@ export default function DetailsScreen() {
   const [sending, setSending] = useState(false);
   const offline = useOffline();
   const iconSize = 30 * Math.min(fontScale, 1.5);
-  const CategoryIcon = CATEGORY_ICONS[params.category];
+  const CategoryIcon = categoryIcon(params.category);
 
   const rows = [
     {
@@ -83,6 +83,8 @@ export default function DetailsScreen() {
           lng: report.lng,
           category: report.category,
           address: report.address ?? '',
+          // Para "Otro", el mensaje a la Muni dice qué es (la primera línea de la descripción).
+          description: report.description ?? '',
           municipalityId: report.municipality_id ?? '',
         },
       });
@@ -111,7 +113,7 @@ export default function DetailsScreen() {
         {rows.map((row, i) => (
           <View
             key={row.label}
-            className={`flex-row flex-wrap items-center gap-3 p-3.5 ${i > 0 ? 'border-t border-border' : ''}`}
+            className={`flex-row flex-wrap items-start gap-3 p-3.5 ${i > 0 ? 'border-t border-border' : ''}`}
           >
             <View className="min-w-[60px] items-center">{row.icon}</View>
             <View className="min-w-[140px] flex-1">
@@ -141,6 +143,7 @@ export default function DetailsScreen() {
           onChangeText={setExtra}
           placeholder="Por ejemplo: está frente a la escuela"
           multiline
+          maxLength={DETAILS_MAX}
           editable={!sending}
         />
       </View>

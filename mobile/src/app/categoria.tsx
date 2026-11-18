@@ -1,12 +1,12 @@
 // Paso "¿Qué problema es?": chips grandes con ícono y texto. "Otro" pide un texto obligatorio, que
 // pasa a ser la descripción del reporte (la base también lo exige). Si la sugerencia de IA (#11) llegó,
 // ese chip aparece marcado con "Sugerido"; el vecino igual tiene que tocar Continuar, así que lo ve.
-import { CATEGORIES, type CategoryCode } from '@arreglemos/shared';
+import { CATEGORIES, OTHER_MAX, type CategoryCode } from '@arreglemos/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowRight, CircleAlert, CircleCheck, Sparkles } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, useWindowDimensions, View } from 'react-native';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
+import { ActivityIndicator, Keyboard, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native';
 
 import { FormScreen } from '@/components/form-screen';
 import { useOffline } from '@/components/offline-banner';
@@ -31,6 +31,17 @@ export default function CategoryScreen() {
   const offline = useOffline();
   const [searching, setSearching] = useState(false);
   const iconSize = 28 * Math.min(fontScale, 1.5);
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const otherInput = useRef<ComponentRef<typeof TextInput>>(null);
+
+  // El campo de "Otro" (y su error) quedan abajo de todo, y iOS no baja solo hasta el campo con foco: se baja al
+  // final al elegir "Otro", al mostrar el error y cada vez que el teclado termina de abrir (achica la pantalla).
+  useEffect(() => {
+    if (category !== 'otro') return;
+    scroll.current?.scrollToEnd();
+    const sub = Keyboard.addListener('keyboardDidShow', () => scroll.current?.scrollToEnd());
+    return () => sub.remove();
+  }, [category, missingOther]);
 
   // Nunca se espera: los chips se muestran ya y la sugerencia se marca si llega (y si no eligió antes).
   useEffect(() => {
@@ -47,7 +58,11 @@ export default function CategoryScreen() {
 
   async function next() {
     if (!category || searching) return;
-    if (category === 'otro' && !other.trim()) return setMissingOther(true);
+    if (category === 'otro' && !other.trim()) {
+      setMissingOther(true);
+      otherInput.current?.focus();
+      return;
+    }
     const nextParams = { ...params, category, other: category === 'otro' ? other.trim() : '' };
     // Los cercanos se buscan acá: "¿Ya lo reportaron?" solo aparece si hay alguno. Sin señal no se
     // pueden buscar (#12), y si la búsqueda falla se sigue igual a la revisión.
@@ -60,6 +75,7 @@ export default function CategoryScreen() {
 
   return (
     <FormScreen
+      scrollRef={scroll}
       footer={
         <Button onPress={next} disabled={!category || searching}>
           <Text>{searching ? 'Buscando reportes cerca…' : 'Continuar'}</Text>
@@ -119,7 +135,9 @@ export default function CategoryScreen() {
             Contanos qué problema es <Text className="text-muted-foreground">(obligatorio)</Text>
           </Text>
           <Input
+            ref={otherInput}
             aria-labelledby="otro-label"
+            maxLength={OTHER_MAX}
             invalid={missingOther}
             value={other}
             onChangeText={(text) => {

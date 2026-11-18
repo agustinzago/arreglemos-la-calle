@@ -2,9 +2,11 @@
 // Bloqueante (instant = false) como /r/[id], para que las etiquetas OG estén completas en el <head>.
 export const instant = false;
 
-import { categoryShortLabel, type PublicMunicipality, type PublicReport } from "@arreglemos/shared";
+import { categoryShortLabel, reportTitle, type PublicMunicipality, type PublicReport } from "@arreglemos/shared";
 import type { Metadata } from "next";
 import { cache } from "react";
+import { dataMode, rankingFixture, type DataMode } from "@/dev/fixtures";
+import { Photo } from "@/lib/photo";
 import { db, photoUrl } from "@/lib/supabase";
 
 const DAY = 86_400_000;
@@ -17,7 +19,8 @@ const slug = (name: string) =>
   name.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 /** El municipio (por slug o id) y su ranking; null si no existe o no está activo. */
-const getRanking = cache(async (param: string) => {
+const getRanking = cache(async (param: string, mode: DataMode | null = null) => {
+  if (mode) return { ...rankingFixture(mode), photo: (r: PublicReport) => photoUrl(r.photo_path), week: weekLabel(new Date()) };
   const supabase = db();
   const { data, error } = await supabase.from("municipalities_public").select("*");
   if (error) throw error;
@@ -44,11 +47,13 @@ function weekLabel(today: Date) {
   return `Semana del ${from} al ${b.day} de ${b.month} de ${b.year}`;
 }
 
-const daysOpen = (r: PublicReport) => Math.floor((Date.now() - Date.parse(r.created_at)) / DAY);
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+// Nunca negativo: un reporte recién creado puede llegar "del futuro" si el reloj de la base va adelantado.
+const daysOpen = (r: PublicReport) => Math.max(0, Math.floor((Date.now() - Date.parse(r.created_at)) / DAY));
+const fmt = new Intl.NumberFormat("es-AR").format;
+const plural = (n: number, one: string, many: string) => `${fmt(n)} ${n === 1 ? one : many}`;
 
-export async function generateMetadata({ params }: PageProps<"/ranking/[municipio]">): Promise<Metadata> {
-  const data = await getRanking((await params).municipio);
+export async function generateMetadata({ params, searchParams }: PageProps<"/ranking/[municipio]">): Promise<Metadata> {
+  const data = await getRanking((await params).municipio, await dataMode(searchParams));
   if (!data) return { title: "Este ranking no está disponible", robots: { index: false } };
   const { municipality: m, ranking: r } = data;
   const title = `Ranking semanal de ${m.name}`;
@@ -63,8 +68,8 @@ export async function generateMetadata({ params }: PageProps<"/ranking/[municipi
   };
 }
 
-export default async function RankingPage({ params }: PageProps<"/ranking/[municipio]">) {
-  const data = await getRanking((await params).municipio);
+export default async function RankingPage({ params, searchParams }: PageProps<"/ranking/[municipio]">) {
+  const data = await getRanking((await params).municipio, await dataMode(searchParams));
   // Inline y no con notFound(): con Cache Components ese camino manda el HTML vacío (ver /r/[id]).
   if (!data) {
     return (
@@ -118,7 +123,7 @@ export default async function RankingPage({ params }: PageProps<"/ranking/[munic
 function Stat({ n, label }: { n: number; label: string }) {
   return (
     <div className="stat">
-      <b>{n}</b>
+      <b>{fmt(n)}</b>
       <span>{label}</span>
     </div>
   );
@@ -147,15 +152,15 @@ function List(props: {
                 <a className="rank-row" href={`/r/${x.id}`}>
                   <span className="rank">{i + 1}</span>
                   {/* Sin loading="lazy": al imprimir, las fotos que no se cargaron salen en blanco. */}
-                  <img src={props.photo(x)} alt="" />
+                  <Photo src={props.photo(x)} alt="" />
                   <span>
-                    <b>{categoryShortLabel(x.category)}</b>
+                    <b>{reportTitle(x, categoryShortLabel)}</b>
                     <span className="muted">
                       {x.address ?? "Sin dirección"} · {props.detail(x)}
                     </span>
                   </span>
                   <span className="big">
-                    <b>{n}</b>
+                    <b>{fmt(n)}</b>
                     <span className="muted">{unit}</span>
                   </span>
                 </a>

@@ -22,9 +22,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { whereAmI } from '@/lib/location';
+import { reverseGeocode, whereAmI } from '@/lib/location';
 import { startSuggestion } from '@/lib/suggestion';
 import { THEME } from '@/lib/theme';
+import { cn } from '@/lib/utils';
 
 const LA_CALERA = { latitude: -31.344, longitude: -64.3355 };
 const CLOSE = 0.004; // ~4 cuadras de alto
@@ -35,7 +36,10 @@ type Gps = 'loading' | 'ok' | 'error' | 'denied' | 'none';
 export default function LocationScreen() {
   const params = useLocalSearchParams<{ photoUri: string; source: 'camera' | 'gallery'; lat?: string; lng?: string }>();
   const theme = THEME[useColorScheme().colorScheme ?? 'light'];
-  const icon = 24 * Math.min(useWindowDimensions().fontScale, 1.5);
+  const { fontScale } = useWindowDimensions();
+  const icon = 24 * Math.min(fontScale, 1.5);
+  // Con la letra grande el aviso crece y tapaba el pin (el mapa lo centra): va arriba del mapa, no encima.
+  const hintAbove = fontScale >= 1.3;
   const map = useRef<MapView>(null);
 
   const fromExif = params.lat && params.lng ? { latitude: Number(params.lat), longitude: Number(params.lng) } : null;
@@ -109,7 +113,7 @@ export default function LocationScreen() {
     let stale = false;
     setAddress(undefined);
     const timer = setTimeout(() => {
-      Location.reverseGeocodeAsync(pin).then(
+      reverseGeocode(pin).then(
         (results) => !stale && setAddress(formatAddress(results[0])),
         () => !stale && setAddress(null),
       );
@@ -169,6 +173,8 @@ export default function LocationScreen() {
           </Banner>
         )}
 
+        {hintAbove && <Hint icon={icon} />}
+
         <View className="min-h-[260px] flex-1 overflow-hidden rounded-2xl border border-border">
           <MapView
             ref={map}
@@ -206,10 +212,7 @@ export default function LocationScreen() {
               accessibilityLabel="Tu foto"
               className="h-[76px] w-[76px] rounded-md border-[3px] border-card"
             />
-            <View className="flex-1 flex-row items-center gap-2 rounded-md bg-card px-3 py-2">
-              <Pointer color={theme.primaryInk} size={icon} />
-              <Text className="flex-1 text-sm font-sans-semibold">Tocá el mapa o arrastrá el pin</Text>
-            </View>
+            {!hintAbove && <Hint icon={icon} className="flex-1" />}
           </View>
 
           <View className="absolute bottom-2.5 right-2.5 gap-2">
@@ -222,7 +225,7 @@ export default function LocationScreen() {
           </View>
         </View>
 
-        <View className="flex-row items-center gap-3 pb-3" accessibilityLiveRegion="polite">
+        <View className="flex-row items-start gap-3 pb-3" accessibilityLiveRegion="polite">
           <MapPin color={theme.primaryInk} size={icon * 1.25} />
           <Text className={pin && address ? 'flex-1 text-lg font-sans-bold' : 'flex-1 text-muted-foreground'}>{addressText}</Text>
         </View>
@@ -244,6 +247,16 @@ function Banner({ tone, icon, children }: { tone: 'warning' | 'destructive'; ico
     <View role="note" className={`flex-row items-start gap-2.5 rounded-md px-3.5 py-3 ${box}`}>
       {icon}
       <Text className={`flex-1 text-sm font-sans-semibold ${ink}`}>{children}</Text>
+    </View>
+  );
+}
+
+function Hint({ icon, className }: { icon: number; className?: string }) {
+  const theme = THEME[useColorScheme().colorScheme ?? 'light'];
+  return (
+    <View className={cn('flex-row items-center gap-2 rounded-md bg-card px-3 py-2', className)}>
+      <Pointer color={theme.primaryInk} size={icon} />
+      <Text className="flex-1 text-sm font-sans-semibold">Tocá el mapa o arrastrá el pin</Text>
     </View>
   );
 }

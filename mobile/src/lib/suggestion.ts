@@ -8,6 +8,9 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { Alert } from 'react-native';
 import { ensureSession, supabase } from './supabase';
 
+// Solo desarrollo: fixtures de break-ui (src/dev). En release __DEV__ es false y Metro saca el require.
+const dev: typeof import('@/dev/fixtures') | null = __DEV__ ? require('@/dev/fixtures') : null;
+
 const TIMEOUT_MS = 2_000;
 let current: { photoUri: string; suggestion: Promise<CategoryCode | null> } | undefined;
 
@@ -65,5 +68,7 @@ function request(photoUri: string) {
 
 /** La sugerencia de esa foto: un código, o null si no hay (tardó, falló o es otra foto). */
 export function suggestionFor(photoUri: string): Promise<CategoryCode | null> {
+  const fx = dev?.suggestionFixture();
+  if (fx !== undefined) return Promise.resolve(fx);
   return current?.photoUri === photoUri ? current.suggestion : Promise.resolve(null);
 }

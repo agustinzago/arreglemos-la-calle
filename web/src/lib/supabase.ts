@@ -9,4 +9,6 @@ export const db = () =>
     auth: { persistSession: false, autoRefreshToken: false },
   }));
 
-export const photoUrl = (path: string) => db().storage.from("photos").getPublicUrl(path).data.publicUrl;
+// En desarrollo, un fixture (src/dev/fixtures.ts) puede poner una URL entera como photo_path.
+export const photoUrl = (path: string) =>
+  process.env.NODE_ENV === "development" && /^https?:\/\//.test(path) ? path : db().storage.from("photos").getPublicUrl(path).data.publicUrl;

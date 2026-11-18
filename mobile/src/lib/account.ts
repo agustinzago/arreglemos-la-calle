@@ -12,6 +12,9 @@ import { Platform } from 'react-native';
 import { forgetNotices, refreshNoticesToken } from './notices';
 import { ensureSession, supabase } from './supabase';
 
+// Solo desarrollo: fixtures de break-ui (src/dev). En release __DEV__ es false y Metro saca el require.
+const dev: typeof import('@/dev/fixtures') | null = __DEV__ ? require('@/dev/fixtures') : null;
+
 export type Provider = 'apple' | 'google';
 
 const googleWebClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
@@ -25,6 +28,8 @@ const googleAvailable =
 
 /** Con qué se puede vincular en este teléfono: Apple solo en iOS. */
 export async function linkProviders(): Promise<Provider[]> {
+  const fx = dev?.linkProvidersFixture();
+  if (fx !== undefined) return fx;
   const apple = Platform.OS === 'ios' && (await AppleAuthentication.isAvailableAsync());
   return [...(apple ? (['apple'] as const) : []), ...(googleAvailable ? (['google'] as const) : [])];
 }
@@ -57,6 +62,7 @@ export type LinkResult =
   | { status: 'exists'; signIn: () => Promise<void> };
 
 export async function linkAccount(provider: Provider): Promise<LinkResult> {
+  dev?.assertLiveData();
   await ensureSession();
   const token = await idToken(provider);
   if (!token) return { status: 'cancelled' };
@@ -87,12 +93,15 @@ export async function linkAccount(provider: Provider): Promise<LinkResult> {
 
 /** El vecino actual, para saber si ya vinculó (is_anonymous false) y con qué. */
 export async function currentUser(): Promise<User | null> {
+  const fx = dev?.currentUserFixture();
+  if (fx !== undefined) return fx;
   const { data } = await supabase.auth.getSession();
   return data.session?.user ?? null;
 }
 
 /** Borra la cuenta y todo lo suyo (exigido por Apple); el teléfono sigue como un vecino anónimo nuevo. */
 export async function deleteAccount() {
+  dev?.assertLiveData();
   const user = await currentUser();
   if (!user) return;
   await deleteAccountData(supabase, user.id);

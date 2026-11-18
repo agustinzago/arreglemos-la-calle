@@ -113,16 +113,18 @@ export default function CameraScreen() {
           {busy ? <ActivityIndicator color={onPrimary} /> : <Camera color={onPrimary} size={28} />}
           <Text>Sacar foto</Text>
         </Button>
+        {/* Ícono arriba del texto (como en el diseño) y ancho según el texto: al 100% entran los tres en una fila;
+            con la letra grande el que no entra baja a otra fila en vez de cortar la palabra. */}
         <View className="flex-row flex-wrap gap-3">
-          <Button variant="ghost" size="sm" className="flex-1" onPress={pickFromGallery}>
+          <Button variant="ghost" size="sm" className="grow flex-col gap-1" onPress={pickFromGallery}>
             <Images color="white" size={24} />
             <Text className="text-white">Galería</Text>
           </Button>
-          <Button variant="ghost" size="sm" className="flex-1" onPress={() => router.push('/mapa')}>
+          <Button variant="ghost" size="sm" className="grow flex-col gap-1" onPress={() => router.push('/mapa')}>
             <Map color="white" size={24} />
             <Text className="text-white">Mapa</Text>
           </Button>
-          <Button variant="ghost" size="sm" className="flex-1" onPress={() => router.push('/mis-reportes')}>
+          <Button variant="ghost" size="sm" className="grow flex-col gap-1" onPress={() => router.push('/mis-reportes')}>
             <List color="white" size={24} />
             <Text className="text-white">Mis reportes</Text>
           </Button>

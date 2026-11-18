@@ -11,6 +11,9 @@ import { AppState } from 'react-native';
 
 import { compressWithoutExif, sendReport, type NewReport } from './reports';
 
+// Solo desarrollo: fixtures de break-ui (src/dev). En release __DEV__ es false y Metro saca el require.
+const dev: typeof import('@/dev/fixtures') | null = __DEV__ ? require('@/dev/fixtures') : null;
+
 /** `id` es también el nombre de la foto en Storage: reintentar no duplica el reporte. */
 export type UnsentReport = NewReport & { id: string; createdAt: string; failed?: boolean };
 
@@ -19,8 +22,19 @@ const listeners = new Set<() => void>();
 
 export const isOnline = (s: NetInfoState) => s.isConnected !== false && s.isInternetReachable !== false;
 
+/**
+ * Los guardados de verdad. Enviar, descartar y marcar fallido usan solo estos, nunca un fixture.
+ * La ruta de la foto se arma de nuevo con el id: iOS cambia la carpeta de la app al actualizarla y la
+ * ruta absoluta guardada (también la de los ya guardados) deja de existir.
+ */
+const stored = (): UnsentReport[] =>
+  JSON.parse(localStorage.getItem(KEY) ?? '[]').map((p: UnsentReport) => ({
+    ...p,
+    photoUri: new File(Paths.document, 'pending', `${p.id}.jpg`).uri,
+  }));
+
 export function unsentReports(): UnsentReport[] {
-  return JSON.parse(localStorage.getItem(KEY) ?? '[]');
+  return dev?.unsentReportsFixture() ?? stored();
 }
 
 function save(items: UnsentReport[]) {
@@ -40,26 +54,30 @@ export async function saveUnsent(input: NewReport, id = String(Date.now())) {
   if (!dir.exists) dir.create();
   const photo = new File(dir, `${id}.jpg`);
   new File(await compressWithoutExif(input.photoUri)).move(photo);
-  save([...unsentReports(), { ...input, photoUri: photo.uri, id, createdAt: new Date().toISOString() }]);
+  save([...stored(), { ...input, photoUri: photo.uri, id, createdAt: new Date().toISOString() }]);
 }
 
 /** Lo saca del teléfono (se envió, o el vecino lo descartó), con su foto. */
 export function discardUnsent(id: string) {
-  const item = unsentReports().find((p) => p.id === id);
-  save(unsentReports().filter((p) => p.id !== id));
+  const item = stored().find((p) => p.id === id);
+  save(stored().filter((p) => p.id !== id));
   const photo = item && new File(item.photoUri);
   if (photo?.exists) photo.delete();
 }
 
 function setFailed(id: string, failed: boolean) {
-  save(unsentReports().map((p) => (p.id === id ? { ...p, failed } : p)));
+  save(stored().map((p) => (p.id === id ? { ...p, failed } : p)));
 }
 
 let sending: Promise<void> | null = null;
 
 /** Intenta enviar los que no fallaron; si ya hay un intento en curso, devuelve ese. */
 export function sendUnsent() {
-  const items = unsentReports().filter((p) => !p.failed);
+  // Sin la foto en el teléfono no se puede enviar: queda fallido (para descartarlo) y no traba la cola.
+  stored()
+    .filter((p) => !p.failed && !new File(p.photoUri).exists)
+    .forEach((p) => setFailed(p.id, true));
+  const items = stored().filter((p) => !p.failed);
   if (!items.length) return Promise.resolve();
   sending ??= sendInOrder(items, (p) => sendReport(p, p.id), {
     sent: (p) => discardUnsent(p.id),

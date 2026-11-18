@@ -80,7 +80,7 @@ export function AccountCard({ onChange }: { onChange: () => void }) {
   if (!user.is_anonymous && linked.length) {
     return (
       <View className="mt-4 gap-3 rounded-xl border border-border bg-card p-4">
-        <View role="status" className="flex-row items-center gap-3">
+        <View role="status" className="flex-row items-start gap-3">
           <ShieldCheck color={theme.successInk} size={24} />
           <View className="shrink">
             <Text className="font-sans-bold">Cuenta vinculada con {linked.map((p) => NAME[p]).join(' y ')}</Text>

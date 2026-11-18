@@ -1,13 +1,13 @@
 // Piezas de reporte que se repiten entre pantallas: insignia de estado y la fila de lista
 // (hoja del mapa, Mis reportes). El estado siempre va con ícono y texto, nunca solo con color.
-import { categoryShortLabel, STATUS_LABEL, type PublicReport } from '@arreglemos/shared';
+import { categoryShortLabel, reportTitle, STATUS_LABEL, type PublicReport } from '@arreglemos/shared';
 import { Image } from 'expo-image';
-import { ChevronRight, CircleCheck, Clock, Ellipsis } from 'lucide-react-native';
+import { ChevronRight, CircleCheck, Clock } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
-import { CATEGORY_ICONS } from '@/lib/categories';
+import { categoryIcon } from '@/lib/categories';
 import { photoUrl } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -29,9 +29,9 @@ export function StatusBadge({ status }: { status: PublicReport['status'] }) {
 
 const DAY = 24 * 60 * 60 * 1000;
 
-/** "12 vecinos · 23 días" / "· 1 día" / "· hoy" / "· arreglado" */
+/** "1.284 vecinos · 23 días" / "· 1 día" / "· hoy" / "· arreglado" */
 export function reportMeta(r: Pick<PublicReport, 'vecinos_count' | 'status' | 'created_at'>, now = Date.now()) {
-  const vecinos = `${r.vecinos_count} ${r.vecinos_count === 1 ? 'vecino' : 'vecinos'}`;
+  const vecinos = `${r.vecinos_count.toLocaleString('es-AR')} ${r.vecinos_count === 1 ? 'vecino' : 'vecinos'}`;
   if (r.status === 'resolved') return `${vecinos} · arreglado`;
   const days = Math.floor((now - new Date(r.created_at).getTime()) / DAY);
   return `${vecinos} · ${days < 1 ? 'hoy' : days === 1 ? '1 día' : `${days} días`}`;
@@ -39,8 +39,8 @@ export function reportMeta(r: Pick<PublicReport, 'vecinos_count' | 'status' | 'c
 
 export function ReportRow({ report, onPress, className }: { report: PublicReport; onPress: () => void; className?: string }) {
   const theme = useTheme();
-  const Icon = CATEGORY_ICONS[report.category] ?? Ellipsis;
-  const title = categoryShortLabel(report.category);
+  const Icon = categoryIcon(report.category);
+  const title = reportTitle(report, categoryShortLabel);
   return (
     <Pressable
       onPress={onPress}
@@ -53,7 +53,9 @@ export function ReportRow({ report, onPress, className }: { report: PublicReport
         <Image source={photoUrl(report.photo_path)} style={{ position: 'absolute', width: 92, height: 92 }} contentFit="cover" />
       </View>
       <View className="flex-1 gap-1">
-        <Text className="font-sans-bold">{title}</Text>
+        <Text numberOfLines={2} className="font-sans-bold">
+          {title}
+        </Text>
         <Text variant="muted">{report.address ?? 'Sin dirección'}</Text>
         <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
           <StatusBadge status={report.status} />

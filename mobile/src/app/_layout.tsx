@@ -18,6 +18,9 @@ import { startSendingUnsent } from '@/lib/unsent';
 import { ensureSession } from '@/lib/supabase';
 import { NAV_THEME } from '@/lib/theme';
 
+// Solo desarrollo: el selector de datos de break-ui (src/dev).
+const DataToggle: (() => React.JSX.Element) | null = __DEV__ ? require('@/dev/data-toggle').DataToggle : null;
+
 export default function RootLayout() {
   // NativeWind sigue el modo claro/oscuro del sistema (app.json: userInterfaceStyle "automatic").
   const { colorScheme } = useColorScheme();
@@ -51,6 +54,7 @@ export default function RootLayout() {
           <Stack.Screen name="mapa" options={{ title: 'Mapa', headerShown: false }} />
           <Stack.Screen name="reporte/[id]" options={{ headerShown: false }} />
         </Stack>
+        {DataToggle && <DataToggle />}
       </ThemeProvider>
     </GestureHandlerRootView>
   );

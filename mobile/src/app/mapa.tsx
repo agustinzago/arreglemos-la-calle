@@ -1,6 +1,6 @@
 // Mapa público: un ícono por reporte, grupos de cercanos (solo visual), filtros por categoría y estado,
 // y una hoja fija (25% / 85%) con la lista de lo que se ve. Nada depende de gestos: la hoja tiene botón.
-import { CATEGORIES, categoryShortLabel, STATUS_LABEL, type CategoryCode, type PublicReport } from '@arreglemos/shared';
+import { CATEGORIES, categoryShortLabel, reportTitle, STATUS_LABEL, type CategoryCode, type PublicReport } from '@arreglemos/shared';
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -25,11 +25,17 @@ import Supercluster from 'supercluster';
 import { ReportRow, useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { CATEGORY_ICONS } from '@/lib/categories';
+import { CATEGORY_ICONS, categoryIcon } from '@/lib/categories';
 import { whereAmI } from '@/lib/location';
 import { mapReports, type Area, type MapFilters } from '@/lib/reports';
 
 const LA_CALERA = { latitude: -31.344, longitude: -64.3355 };
+// Tope de filas del RPC map_reports (supabase/migrations/20261116120900_map_reports.sql:27, `limit 500`):
+// devuelve los de más vecinos. ponytail: con el tope solo sabemos "500 o más"; para decir el total, que
+// el RPC devuelva también count(*) over ().
+const MAP_LIMIT = 500;
+// Más allá de este zoom los grupos ya no se separan (reportes en el mismo punto).
+const MAX_CLUSTER_ZOOM = 17;
 const STATUS_OPTIONS = [
   { value: null, label: 'Todos' },
   { value: 'open', label: 'Abiertos' },
@@ -90,7 +96,7 @@ export default function MapScreen() {
   const index = useMemo(() => {
     const sc = new Supercluster<{ id: number; vecinos: number }, { vecinos: number }>({
       radius: 60,
-      maxZoom: 17,
+      maxZoom: MAX_CLUSTER_ZOOM,
       map: (p) => ({ vecinos: p.vecinos }),
       reduce: (acc, p) => {
         acc.vecinos += p.vecinos;
@@ -108,22 +114,35 @@ export default function MapScreen() {
   const byId = useMemo(() => new Map((reports ?? []).map((r) => [r.id, r])), [reports]);
 
   const a = areaOf(region);
-  const features = index.getClusters([a.west, a.south, a.east, a.north], Math.floor(zoomOf(region.longitudeDelta, width)));
+  // +0.01: el mapa puede quedar en 17,999 después de acercar a 18, y el grupo no se abriría nunca.
+  const features = index.getClusters([a.west, a.south, a.east, a.north], Math.floor(zoomOf(region.longitudeDelta, width) + 0.01));
 
+  // Un grupo que no se separa ni al zoom máximo (reportes en el mismo punto) se acerca igual y abre la
+  // lista, que entonces muestra justo esos reportes: en el mapa quedarían apilados y solo se tocaría uno.
   const zoomInto = (clusterId: number, [lng, lat]: number[]) => {
-    const lngDelta = lngDeltaOf(Math.min(index.getClusterExpansionZoom(clusterId), 18), width);
+    const zoom = index.getClusterExpansionZoom(clusterId);
+    const lngDelta = lngDeltaOf(Math.min(zoom, MAX_CLUSTER_ZOOM + 1), width);
     mapRef.current?.animateToRegion({
       latitude: lat,
       longitude: lng,
       longitudeDelta: lngDelta,
       latitudeDelta: lngDelta * (region.latitudeDelta / region.longitudeDelta),
     });
+    if (zoom > MAX_CLUSTER_ZOOM) sheetRef.current?.snapToIndex(1);
   };
 
   const toggleSheet = () => sheetRef.current?.snapToIndex(sheetOpen ? 0 : 1);
   const filtered = filters.category !== null || filters.status !== null;
   const count = reports?.length ?? 0;
-  const title = error ? 'Sin reportes' : reports === null ? 'Cargando reportes…' : count === 1 ? '1 reporte' : `${count} reportes`;
+  const title = error
+    ? 'Sin reportes'
+    : reports === null
+      ? 'Cargando reportes…'
+      : count >= MAP_LIMIT
+        ? `Los ${MAP_LIMIT} con más vecinos · acercá el mapa`
+        : count === 1
+          ? '1 reporte'
+          : `${count} reportes`;
 
   return (
     <View className="flex-1 bg-background">
@@ -175,7 +194,7 @@ export default function MapScreen() {
               coordinate={{ latitude: lat, longitude: lng }}
               tracksViewChanges={tracks}
               onPress={() => openReport(r.id)}
-              accessibilityLabel={`${categoryShortLabel(r.category)}, ${STATUS_LABEL[r.status]}`}
+              accessibilityLabel={`${reportTitle(r, categoryShortLabel)}, ${STATUS_LABEL[r.status]}`}
             >
               <ReportPin report={r} highlighted={String(r.id) === params.id} />
             </Marker>
@@ -304,7 +323,7 @@ export default function MapScreen() {
 function ReportPin({ report, highlighted }: { report: PublicReport; highlighted: boolean }) {
   const theme = useTheme();
   const resolved = report.status === 'resolved';
-  const Icon = CATEGORY_ICONS[report.category];
+  const Icon = categoryIcon(report.category);
   return (
     <View className="p-1">
       <View

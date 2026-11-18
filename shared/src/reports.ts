@@ -1,4 +1,18 @@
-import type { CategoryCode } from './categories';
+import { categoryLabel, type CategoryCode } from './categories';
+
+/** Largo máximo de la dirección y la descripción (checks en public.reports). */
+export const ADDRESS_MAX = 200;
+export const DESCRIPTION_MAX = 1000;
+/** "Otro" pide qué es (primera línea de la descripción); el resto del texto es el detalle. */
+export const OTHER_MAX = 200;
+export const DETAILS_MAX = DESCRIPTION_MAX - OTHER_MAX - 1;
+
+/**
+ * Título del reporte: el nombre de la categoría, o para "Otro" lo que escribió el vecino (la primera línea
+ * de la descripción). Si no, varios "Otro" no se distinguen. `label`: categoryShortLabel en listas.
+ */
+export const reportTitle = (r: { category: string; description: string | null }, label: (code: string) => string = categoryLabel) =>
+  (r.category === 'otro' && r.description?.split('\n')[0].trim()) || label(r.category);
 
 export type ReportStatus = 'open' | 'resolved' | 'hidden';
 

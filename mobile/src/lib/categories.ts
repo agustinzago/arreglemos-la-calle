@@ -25,3 +25,6 @@ export const CATEGORY_ICONS: Record<CategoryCode, typeof Construction> = {
   cloaca: Droplets,
   otro: Ellipsis,
 };
+
+/** El ícono de un reporte. Un código que esta versión no conoce usa el de "Otro" (si no, la pantalla rompe). */
+export const categoryIcon = (code: string) => CATEGORY_ICONS[code as CategoryCode] ?? Ellipsis;

@@ -1,10 +1,10 @@
 // Paso "¿Ya lo reportaron?", entre la categoría y la revisión: hasta 3 reportes abiertos de la
 // misma categoría cerca del pin. El vecino decide (ADR-0003): sumarse a uno o crear uno nuevo.
 // La búsqueda la hace la categoría: acá solo se llega si hay alguno (llegan en el parámetro nearby).
-import { categoryShortLabel, type CategoryCode, type NearbyReport } from '@arreglemos/shared';
+import { categoryShortLabel, reportTitle, type CategoryCode, type NearbyReport } from '@arreglemos/shared';
 import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Circle, CircleDot, Ellipsis, Navigation, UserPlus, Users } from 'lucide-react-native';
+import { Circle, CircleDot, Navigation, UserPlus, Users } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, useWindowDimensions, View } from 'react-native';
 
@@ -12,7 +12,7 @@ import { FormScreen } from '@/components/form-screen';
 import { useTheme } from '@/components/report';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { CATEGORY_ICONS } from '@/lib/categories';
+import { categoryIcon } from '@/lib/categories';
 import { joinReport, photoUrl } from '@/lib/reports';
 import { cn } from '@/lib/utils';
 
@@ -71,19 +71,20 @@ export default function NearbyScreen() {
       <View role="radiogroup" className="gap-2.5">
         {reports.map((r, i) => {
           const on = i === selected;
-          const Icon = CATEGORY_ICONS[r.category] ?? Ellipsis;
+          const Icon = categoryIcon(r.category);
+          const name = reportTitle(r, categoryShortLabel);
           const Radio = on ? CircleDot : Circle;
           const distance = `a ${Math.max(1, Math.round(r.distance_m))} m`;
-          const vecinos = `${r.vecinos_count} ${r.vecinos_count === 1 ? 'vecino' : 'vecinos'}`;
+          const vecinos = `${r.vecinos_count.toLocaleString('es-AR')} ${r.vecinos_count === 1 ? 'vecino' : 'vecinos'}`;
           return (
             <Pressable
               key={r.id}
               role="radio"
               aria-checked={on}
-              accessibilityLabel={`${categoryShortLabel(r.category)}, ${r.address ?? 'sin dirección'}, ${distance}, ${vecinos}`}
+              accessibilityLabel={`${name}, ${r.address ?? 'sin dirección'}, ${distance}, ${vecinos}`}
               onPress={() => setSelected(i)}
               className={cn(
-                'flex-row items-center gap-3 rounded-xl border-2 p-2.5',
+                'flex-row items-start gap-3 rounded-xl border-2 p-2.5',
                 on ? 'border-primary bg-primary-soft' : 'border-border bg-card',
               )}
             >
@@ -92,7 +93,7 @@ export default function NearbyScreen() {
                 <Image source={photoUrl(r.photo_path)} style={{ position: 'absolute', width: 100, height: 100 }} contentFit="cover" />
               </View>
               <View className="flex-1 gap-1">
-                <Text className="font-sans-bold">{categoryShortLabel(r.category)}</Text>
+                <Text className="font-sans-bold">{name}</Text>
                 <Text variant="muted">{r.address ?? 'Sin dirección'}</Text>
                 <View className="flex-row flex-wrap gap-x-3 gap-y-0.5">
                   <View className="flex-row items-center gap-1">

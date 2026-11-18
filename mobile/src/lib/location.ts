@@ -1,6 +1,15 @@
 import * as Location from 'expo-location';
 import type { LatLng } from 'react-native-maps';
 
+// Solo desarrollo: fixtures de break-ui (src/dev). En release __DEV__ es false y Metro saca el require.
+const dev: typeof import('@/dev/fixtures') | null = __DEV__ ? require('@/dev/fixtures') : null;
+
+/** reverseGeocodeAsync, con el fixture de break-ui delante en desarrollo. */
+export function reverseGeocode(at: LatLng) {
+  const fx = dev?.reverseGeocodeFixture();
+  return fx !== undefined ? Promise.resolve(fx) : Location.reverseGeocodeAsync(at);
+}
+
 /**
  * Dónde está el teléfono, para centrar un mapa. Nunca pide permiso (lo pide la cámara al empezar): sin
  * permiso o sin señal, null. Primero la última posición conocida, que es instantánea.

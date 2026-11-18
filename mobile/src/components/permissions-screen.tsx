@@ -112,7 +112,8 @@ function StatusRow({ icon, label, granted }: { icon: React.ReactNode; label: str
   return (
     <View className="flex-row flex-wrap items-center gap-3 p-4">
       {icon}
-      <Text className="flex-1 font-sans-bold">{label}</Text>
+      {/* grow y no flex-1: con la letra grande "No permitida" baja a otra línea en vez de aplastar el nombre. */}
+      <Text className="grow font-sans-bold">{label}</Text>
       <View
         className={`flex-row items-center gap-1 rounded-full py-[3px] pl-1.5 pr-2.5 ${granted ? 'bg-success-soft' : 'bg-destructive-soft'}`}
       >

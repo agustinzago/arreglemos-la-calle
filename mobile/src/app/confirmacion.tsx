@@ -16,7 +16,15 @@ import { Text } from '@/components/ui/text';
 import { getMunicipality, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
-type Params = { id: string; lat: string; lng: string; category: string; address: string; municipalityId: string };
+type Params = {
+  id: string;
+  lat: string;
+  lng: string;
+  category: string;
+  address: string;
+  description: string;
+  municipalityId: string;
+};
 
 export default function ConfirmationScreen() {
   const params = useLocalSearchParams<Params>();
@@ -33,10 +41,16 @@ export default function ConfirmationScreen() {
   }, [params.municipalityId]);
 
   const canSend = municipality && municipality !== 'error' && !!municipality.whatsapp;
+  const showMap = () => router.push({ pathname: '/mapa', params });
 
   function sendToMuni() {
     if (!canSend) return;
-    const report = { id: Number(params.id), category: params.category, address: params.address || null };
+    const report = {
+      id: Number(params.id),
+      category: params.category,
+      address: params.address || null,
+      description: params.description || null,
+    };
     const text = municipalityMessage(report, municipality.name, reportUrl(WEB_URL, report.id));
     Linking.openURL(whatsappLink(municipality.whatsapp!, text)).then(
       () => setOpened(true),
@@ -86,21 +100,33 @@ export default function ConfirmationScreen() {
         )}
         <NoticesCard />
         <EmergencyNotice />
+        {/* Las acciones secundarias van al final del contenido: con letra grande, tres botones fijos
+            ocupaban casi toda la pantalla. */}
+        <View className="gap-2">
+          {canSend && (
+            <Button variant="outline" onPress={showMap}>
+              <Map color={theme.primaryInk} size={24} />
+              <Text>Ver en el mapa</Text>
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" onPress={() => router.dismissAll()}>
+            <Text className="underline">{canSend && !opened ? 'Ahora no, volver a la cámara' : 'Volver a la cámara'}</Text>
+          </Button>
+        </View>
       </ScrollView>
-      <View className="gap-2 border-t border-border px-screen pb-2 pt-3">
-        {canSend && (
+      {/* Fija abajo, solo la acción principal: mandárselo a la Muni o, si no hay WhatsApp, ver el mapa. */}
+      <View className="border-t border-border px-screen pb-2 pt-3">
+        {canSend ? (
           <Button variant="success" onPress={sendToMuni}>
             <MessageCircle color={theme.successForeground} size={24} />
             <Text>Enviar a la Muni por WhatsApp</Text>
           </Button>
+        ) : (
+          <Button onPress={showMap}>
+            <Map color={theme.primaryForeground} size={24} />
+            <Text>Ver en el mapa</Text>
+          </Button>
         )}
-        <Button variant={canSend ? 'outline' : 'default'} onPress={() => router.push({ pathname: '/mapa', params })}>
-          <Map color={canSend ? theme.primaryInk : theme.primaryForeground} size={24} />
-          <Text>Ver en el mapa</Text>
-        </Button>
-        <Button variant="ghost" size="sm" onPress={() => router.dismissAll()}>
-          <Text className="underline">{canSend && !opened ? 'Ahora no, volver a la cámara' : 'Volver a la cámara'}</Text>
-        </Button>
       </View>
     </SafeAreaView>
   );

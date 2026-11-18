@@ -15,7 +15,8 @@ export const CATEGORIES = [
 
 export type CategoryCode = (typeof CATEGORIES)[number]['code'];
 
-export const categoryLabel = (code: string) => CATEGORIES.find((c) => c.code === code)?.label ?? code;
+// Un código que esta versión no conoce (categoría nueva, app vieja) se muestra como "Otro".
+export const categoryLabel = (code: string) => CATEGORIES.find((c) => c.code === code)?.label ?? 'Otro';
 
 // Nombres cortos para listas, mapa y filtros (diseño). Los que no están acá usan el nombre completo.
 const SHORT_LABELS: Partial<Record<CategoryCode, string>> = {
