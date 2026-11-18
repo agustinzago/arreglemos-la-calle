@@ -19,6 +19,7 @@ import { useColorScheme } from 'nativewind';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, ScrollView, useWindowDimensions, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Supercluster from 'supercluster';
 
@@ -28,6 +29,7 @@ import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { CATEGORY_ICONS, categoryIcon } from '@/lib/categories';
 import { whereAmI } from '@/lib/location';
+import { SHEET_ENTERING } from '@/lib/motion';
 import { mapReports, type Area, type MapFilters } from '@/lib/reports';
 
 const LA_CALERA = { latitude: -31.344, longitude: -64.3355 };
@@ -255,7 +257,7 @@ export default function MapScreen() {
         snapPoints={['25%', '85%']}
         enableDynamicSizing={false}
         enablePanDownToClose={false}
-        onChange={(i) => setSheetOpen(i === 1)}
+        onAnimate={(_from, to) => setSheetOpen(to === 1)}
         backgroundStyle={{ backgroundColor: theme.card, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
         handleIndicatorStyle={{ backgroundColor: theme.border, width: 40, height: 5 }}
       >
@@ -356,38 +358,41 @@ function CategoryFilter({
   const theme = useTheme();
   const options = [{ code: null, label: 'Todos', Icon: LayoutGrid }, ...CATEGORIES.map((c) => ({ code: c.code, label: categoryShortLabel(c.code), Icon: CATEGORY_ICONS[c.code] }))];
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 justify-end">
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View className="flex-1">
         <Pressable accessibilityLabel="Cerrar" onPress={onClose} scaleOnPress={false} className="absolute inset-0 bg-black/40" />
-        <View className="max-h-[88%] gap-4 rounded-t-2xl bg-card px-screen pb-10 pt-5">
-          <View className="flex-row flex-wrap items-center justify-between gap-2">
-            <Text variant="h2" className="shrink">
-              ¿Qué problema querés ver?
-            </Text>
-            <Pressable role="button" onPress={onClose} className="min-h-touch flex-row items-center gap-1.5 rounded-[12px] bg-muted px-3">
-              <X size={20} color={theme.foreground} />
-              <Text className="text-sm font-sans-bold">Cerrar</Text>
-            </Pressable>
+        {/* El fondo aparece con el fade del Modal; solo la hoja sube desde abajo. */}
+        <Animated.View entering={SHEET_ENTERING} pointerEvents="box-none" style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <View className="max-h-[88%] gap-4 rounded-t-2xl bg-card px-screen pb-10 pt-5">
+            <View className="flex-row flex-wrap items-center justify-between gap-2">
+              <Text variant="h2" className="shrink">
+                ¿Qué problema querés ver?
+              </Text>
+              <Pressable role="button" onPress={onClose} className="min-h-touch flex-row items-center gap-1.5 rounded-[12px] bg-muted px-3">
+                <X size={20} color={theme.foreground} />
+                <Text className="text-sm font-sans-bold">Cerrar</Text>
+              </Pressable>
+            </View>
+            <ScrollView contentContainerClassName="flex-row flex-wrap gap-2" role="radiogroup">
+              {options.map(({ code, label, Icon }) => {
+                const selected = value === code;
+                return (
+                  <Pressable
+                    key={label}
+                    role="radio"
+                    aria-checked={selected}
+                    onPress={() => onChange(code)}
+                    className={`min-h-touch grow basis-[45%] flex-row items-center gap-2 rounded-lg border-2 p-3 ${selected ? 'border-primary bg-primary-soft' : 'border-border bg-card'}`}
+                  >
+                    <Icon size={24} color={selected ? theme.primaryInk : theme.foreground} />
+                    <Text className={`shrink grow font-sans-semibold ${selected ? 'text-primary-ink' : ''}`}>{label}</Text>
+                    {selected ? <CircleDot size={20} color={theme.primaryInk} /> : <Circle size={20} color={theme.mutedForeground} />}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
           </View>
-          <ScrollView contentContainerClassName="flex-row flex-wrap gap-2" role="radiogroup">
-            {options.map(({ code, label, Icon }) => {
-              const selected = value === code;
-              return (
-                <Pressable
-                  key={label}
-                  role="radio"
-                  aria-checked={selected}
-                  onPress={() => onChange(code)}
-                  className={`min-h-touch grow basis-[45%] flex-row items-center gap-2 rounded-lg border-2 p-3 ${selected ? 'border-primary bg-primary-soft' : 'border-border bg-card'}`}
-                >
-                  <Icon size={24} color={selected ? theme.primaryInk : theme.foreground} />
-                  <Text className={`shrink grow font-sans-semibold ${selected ? 'text-primary-ink' : ''}`}>{label}</Text>
-                  {selected ? <CircleDot size={20} color={theme.primaryInk} /> : <Circle size={20} color={theme.mutedForeground} />}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

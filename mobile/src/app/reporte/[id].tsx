@@ -42,6 +42,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { StatusBadge } from '@/components/report';
@@ -49,6 +50,7 @@ import { Button } from '@/components/ui/button';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { categoryIcon } from '@/lib/categories';
+import { SHEET_ENTERING } from '@/lib/motion';
 import { blockReportAuthor, getMunicipality, getReport, joinReport, listEvents, photoUrl, registerEvent, WEB_URL } from '@/lib/reports';
 import { THEME } from '@/lib/theme';
 
@@ -391,45 +393,48 @@ function FixSheet({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 justify-end">
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View className="flex-1">
         <Pressable accessibilityLabel="Cancelar" onPress={onClose} scaleOnPress={false} className="absolute inset-0 bg-black/40" />
-        <View className="max-h-[90%] rounded-t-2xl bg-card">
-          <ScrollView contentContainerClassName="gap-4 px-screen pb-10 pt-5">
-            <Text variant="h2">¿Ya lo arreglaron?</Text>
-            <Text>Si querés, sumá una foto de cómo quedó. Es opcional.</Text>
-            {photo ? (
-              <View className="flex-row flex-wrap items-center gap-3 rounded-lg bg-success-soft p-2.5">
-                <Image source={photo} style={{ width: 64, height: 64, borderRadius: 8 }} accessibilityLabel="Tu foto" />
-                <Text className="flex-1 font-sans-bold text-success-ink">Foto agregada</Text>
-                <Button variant="ghost" size="sm" onPress={() => setPhoto(undefined)}>
-                  <X color={theme.foreground} size={20} />
-                  <Text>Quitar</Text>
-                </Button>
-              </View>
-            ) : (
-              <Pressable
-                role="button"
-                onPress={addPhoto}
-                className="min-h-button flex-row items-center justify-center gap-2.5 rounded-lg border-2 border-dashed border-border px-5 py-3.5 active:bg-muted"
-              >
-                <ImagePlus color={theme.foreground} size={24} />
-                <Text className="font-sans-bold text-lg">Agregar foto</Text>
-              </Pressable>
-            )}
-            <Button variant="success" onPress={() => onConfirm(photo)} disabled={busy}>
-              {busy ? (
-                <ActivityIndicator color={theme.successForeground} />
+        {/* El fondo aparece con el fade del Modal; solo la hoja sube desde abajo. */}
+        <Animated.View entering={SHEET_ENTERING} pointerEvents="box-none" style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <View className="max-h-[90%] rounded-t-2xl bg-card">
+            <ScrollView contentContainerClassName="gap-4 px-screen pb-10 pt-5">
+              <Text variant="h2">¿Ya lo arreglaron?</Text>
+              <Text>Si querés, sumá una foto de cómo quedó. Es opcional.</Text>
+              {photo ? (
+                <View className="flex-row flex-wrap items-center gap-3 rounded-lg bg-success-soft p-2.5">
+                  <Image source={photo} style={{ width: 64, height: 64, borderRadius: 8 }} accessibilityLabel="Tu foto" />
+                  <Text className="flex-1 font-sans-bold text-success-ink">Foto agregada</Text>
+                  <Button variant="ghost" size="sm" onPress={() => setPhoto(undefined)}>
+                    <X color={theme.foreground} size={20} />
+                    <Text>Quitar</Text>
+                  </Button>
+                </View>
               ) : (
-                <CircleCheck color={theme.successForeground} size={24} />
+                <Pressable
+                  role="button"
+                  onPress={addPhoto}
+                  className="min-h-button flex-row items-center justify-center gap-2.5 rounded-lg border-2 border-dashed border-border px-5 py-3.5 active:bg-muted"
+                >
+                  <ImagePlus color={theme.foreground} size={24} />
+                  <Text className="font-sans-bold text-lg">Agregar foto</Text>
+                </Pressable>
               )}
-              <Text>Sí, está arreglado</Text>
-            </Button>
-            <Pressable role="button" onPress={onClose} className="min-h-touch items-center justify-center">
-              <Text className="font-sans-semibold underline">Cancelar</Text>
-            </Pressable>
-          </ScrollView>
-        </View>
+              <Button variant="success" onPress={() => onConfirm(photo)} disabled={busy}>
+                {busy ? (
+                  <ActivityIndicator color={theme.successForeground} />
+                ) : (
+                  <CircleCheck color={theme.successForeground} size={24} />
+                )}
+                <Text>Sí, está arreglado</Text>
+              </Button>
+              <Pressable role="button" onPress={onClose} className="min-h-touch items-center justify-center">
+                <Text className="font-sans-semibold underline">Cancelar</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </Animated.View>
       </View>
     </Modal>
   );

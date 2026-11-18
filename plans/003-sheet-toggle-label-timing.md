@@ -1,6 +1,6 @@
 # 003 — Flip the map sheet's "Ver lista / Ver mapa" label when the sheet starts moving
 
-- **Status**: TODO
+- **Status**: DONE (not yet checked on a device)
 - **Commit**: 2579875
 - **Severity**: LOW
 - **Category**: Interruptibility (feedback timing)

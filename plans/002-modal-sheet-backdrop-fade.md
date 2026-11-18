@@ -1,6 +1,6 @@
 # 002 — Fade the modal backdrops, slide only the sheet
 
-- **Status**: TODO
+- **Status**: DONE (not yet checked on a device)
 - **Commit**: 2579875
 - **Severity**: MEDIUM
 - **Category**: Physicality & origin
